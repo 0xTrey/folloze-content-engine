@@ -1,0 +1,23 @@
+# Exclude everything that doesn't need to be on Vercel
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+.content-engine.lock
+*.egg-info/
+.venv/
+brand/
+content/
+docs/
+schema/
+scripts/
+site/assets/
+site/published/
+site/templates/
+tests/
+*.py
+*.yaml
+*.md
+*.plist
+*.toml
