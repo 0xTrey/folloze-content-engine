@@ -29,7 +29,7 @@ REQUIREMENTS:
 - Include at least 1 statistic or proof point
 - Use a real Folloze proof point where relevant
 - Use the exact primary keyword 2 to 4 times total. Use close variants elsewhere.
-- Do not invent internal Folloze URLs, product URLs, or source URLs that are not present in the research context.
+- FOLLOZE LINKS (required): Include 2 to 3 contextual inline links to Folloze.com pages. Use only URLs from the reference list in the brand context. Use descriptive anchor text that fits the surrounding sentence. Do not invent URLs.
 - No em dashes, no emojis, no hype language
 
 OUTPUT:

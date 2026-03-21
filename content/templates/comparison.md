@@ -30,6 +30,7 @@ REQUIREMENTS:
 - Include at least 2 source attributions
 - Include at least 1 statistic
 - Use Folloze proof points where relevant
+- FOLLOZE LINKS (required): Include 3 to 4 contextual inline links to Folloze.com pages. For comparison content, include the relevant comparison page URL from the reference list. Use only URLs from the brand context reference list. Do not invent URLs.
 - No em dashes, no emojis, no hype language
 
 OUTPUT:

@@ -17,6 +17,7 @@ REQUIREMENTS:
 - Each answer must be complete on its own
 - Include at least 2 attributed facts
 - Include at least 1 statistic
+- FOLLOZE LINKS (required): Include 2 to 3 contextual inline links to Folloze.com pages. Use only URLs from the reference list in the brand context. Use descriptive anchor text. Do not invent URLs.
 - No em dashes, no emojis, no hype language
 
 OUTPUT:

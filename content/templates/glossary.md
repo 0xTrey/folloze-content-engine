@@ -19,6 +19,7 @@ REQUIREMENTS:
 - Include at least 1 statistic with a specific number.
 - body_html MUST include a Frequently Asked Questions section. Place it at the end of body_html with an h2 heading that contains the words "Frequently Asked Questions", followed by at least 3 question-and-answer pairs using h3 for questions and p for answers. Do not put the FAQ only in sections — it must appear in body_html.
 - No em dashes, no emojis, no hype language
+- FOLLOZE LINKS (required): Include 2 to 3 contextual inline links to Folloze.com pages from the reference list in brand context. Use descriptive anchor text that matches the surrounding sentence (e.g., "Folloze's AI orchestration platform" not "click here"). Only use URLs from the provided reference list. Do not invent URLs.
 
 OUTPUT:
 Return a JSON object with these exact keys: title, meta_description, body_html, sections.

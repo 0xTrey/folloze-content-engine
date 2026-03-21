@@ -12,6 +12,7 @@ from optimizer import OptimizedContent
 
 NUMBER_RE = re.compile(r"\b\d+(?:[%$]|(?:\.\d+)?\s?(?:K|M|B|x))\b")
 ATTRIBUTION_RE = re.compile(r"\b(according to|per |found that|reported by)\b", re.IGNORECASE)
+FOLLOZE_LINK_RE = re.compile(r'href=["\']https?://(?:www\.)?folloze\.com[^"\']*["\']', re.IGNORECASE)
 BANNED_TERMS = [
     "buyer experience platform",
     "revolutionary",
@@ -43,6 +44,7 @@ def gate(content: OptimizedContent, config: Config, brand_context: str) -> Quali
         _check_json_ld(content.json_ld),
         _check_keyword_density(content.body_html, content.generated.primary_keyword),
         _check_paragraph_length(content.body_html),
+        _check_folloze_links(content.body_html),
     ]
 
     score = 0
@@ -114,6 +116,16 @@ def _check_keyword_density(html: str, primary_keyword: str) -> tuple[int, str, s
         10 if valid else 0,
         "keyword_density",
         None if valid else f"Primary keyword density {density:.1%} exceeds 3% ({appearances} occurrences)",
+    )
+
+
+def _check_folloze_links(html: str) -> tuple[int, str, str | None]:
+    matches = len(FOLLOZE_LINK_RE.findall(html))
+    valid = matches >= 2
+    return (
+        10 if valid else 0,
+        "folloze_links",
+        None if valid else f"Fewer than 2 links to folloze.com (found {matches})",
     )
 
 
