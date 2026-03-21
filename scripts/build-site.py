@@ -62,35 +62,57 @@ def build_site() -> int:
     return 0
 
 
+def _reading_time(body_html: str) -> str:
+    words = len(BeautifulSoup(body_html, "html.parser").get_text(" ").split())
+    minutes = max(1, round(words / 225))
+    return f"{minutes} min read"
+
+
 def _render_homepage(entries: list[dict[str, str]], config: Config) -> str:
+    sorted_entries = sorted(entries, key=lambda item: item["published_date"], reverse=True)
+
     cards = "\n".join(
         f"""
         <article class="post-card">
-          <p class="post-card__meta">{entry["content_type"]} · {entry["published_date"]}</p>
+          <p class="post-card__meta">{entry["content_type"]} &middot; {entry["published_date"]}</p>
           <h3><a href="{entry["route"]}">{entry["title"]}</a></h3>
           <p>{entry["excerpt"]}</p>
-          <a class="post-card__cta" href="{entry["route"]}">Read post</a>
+          <a class="post-card__cta" href="{entry["route"]}">Read &rarr;</a>
         </article>
         """
-        for entry in sorted(entries, key=lambda item: item["published_date"], reverse=True)
+        for entry in sorted_entries
     )
-    if not cards:
-        cards = """
-        <article class="empty-state">
-          <p class="section-label">No posts yet</p>
-          <h3>The Vercel test shell is live.</h3>
-          <p>Promote the first release artifact and rebuild the site to populate this blog.</p>
-        </article>
-        """
+
+    latest = sorted_entries[0] if sorted_entries else None
+    if latest:
+        hero_aside = f"""
+        <aside class="hero__panel">
+          <p class="section-label">Latest</p>
+          <p class="hero__panel-type">{latest["content_type"].upper()}</p>
+          <h3 class="hero__panel-title"><a href="{latest["route"]}">{latest["title"]}</a></h3>
+          <p class="hero__panel-excerpt">{latest["excerpt"][:120].rstrip()}...</p>
+          <a class="post-card__cta" href="{latest["route"]}">Read &rarr;</a>
+        </aside>"""
+    else:
+        hero_aside = """
+        <aside class="hero__panel">
+          <p class="section-label">By the numbers</p>
+          <dl class="proof-list">
+            <div><dt>98%</dt><dd>Target account engagement (RingCentral, 60 days)</dd></div>
+            <div><dt>$6.3M</dt><dd>Attributed pipeline (Conga, 6 campaigns)</dd></div>
+            <div><dt>5x</dt><dd>Faster campaign creation with Campaign Agent</dd></div>
+          </dl>
+        </aside>"""
+
     return f"""<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Folloze Insights | Simple V1 Blog</title>
+    <title>Folloze Insights | AI Orchestration for B2B Marketing</title>
     <meta
       name="description"
-      content="A simple V1 Folloze blog running on Vercel for release testing."
+      content="Research, glossary pages, and guides on AI orchestration, account-based marketing, and B2B campaign execution from the team at Folloze."
     >
     <link rel="canonical" href="{config.site.origin}/">
     <link rel="stylesheet" href="/styles.css">
@@ -103,44 +125,51 @@ def _render_homepage(entries: list[dict[str, str]], config: Config) -> str:
           <span class="brand__sub">Insights</span>
         </a>
         <nav class="site-nav">
-          <a href="#latest">Latest</a>
-          <a href="https://www.folloze.com" rel="noreferrer">Folloze</a>
+          <a href="#latest">Articles</a>
+          <a href="https://www.folloze.com" rel="noreferrer">Folloze.com</a>
+          <a class="nav__cta" href="https://www.folloze.com/request-demo" rel="noreferrer">Book a demo</a>
         </nav>
       </div>
     </header>
     <main class="shell">
       <section class="hero">
         <div class="hero__card">
-          <p class="hero__kicker">V1 test blog</p>
-          <h1>Simple Folloze publishing on Vercel.</h1>
+          <p class="hero__kicker">AI Orchestration &middot; ABM &middot; Pipeline</p>
+          <h1>B2B marketing intelligence, built for the AI era.</h1>
           <p class="hero__lede">
-            This lightweight blog is the first live delivery target for the content engine.
-            It is intentionally small, fast, and easy for the web team to take over later.
+            Practical research, glossary pages, and guides for demand gen and ABM leaders
+            running AI-powered go-to-market programs. Every post is structured for AI search visibility.
           </p>
+          <a class="hero__cta" href="#latest">Read the latest &darr;</a>
         </div>
-        <aside class="hero__panel">
-          <p class="section-label">Release shape</p>
-          <ul>
-            <li>Gemini-only content pipeline</li>
-            <li>Static bundle for Vercel</li>
-            <li>Manual promotion before publish</li>
-            <li>Webflow migration in v2</li>
-          </ul>
-        </aside>
+        {hero_aside}
       </section>
       <section class="section" id="latest">
         <div class="section-head">
           <div>
-            <p class="section-label">Latest</p>
-            <h2>Folloze blog posts</h2>
+            <p class="section-label">From the engine</p>
+            <h2>Latest intelligence</h2>
           </div>
         </div>
         <div class="post-grid">{cards}</div>
       </section>
+      <section class="cta-band">
+        <div class="shell cta-band__inner">
+          <p class="cta-band__label">See it in action</p>
+          <p class="cta-band__heading">One marketer. Enterprise-scale campaigns.</p>
+          <a class="cta-band__btn" href="https://www.folloze.com/request-demo" rel="noreferrer">Book a demo</a>
+        </div>
+      </section>
     </main>
     <footer class="site-footer">
       <div class="shell site-footer__inner">
-        <p>Preview URL: {config.delivery.preview_url}</p>
+        <p>&copy; 2026 <a href="https://www.folloze.com" rel="noreferrer">Folloze</a> &mdash; AI Orchestration Platform for B2B Teams</p>
+        <nav class="footer-nav">
+          <a href="https://www.folloze.com/platform/overview" rel="noreferrer">Platform</a>
+          <a href="https://www.folloze.com/customers" rel="noreferrer">Customers</a>
+          <a href="https://www.folloze.com/request-demo" rel="noreferrer">Book a demo</a>
+          <a href="https://www.folloze.com/privacy-policy" rel="noreferrer">Privacy</a>
+        </nav>
       </div>
     </footer>
   </body>
