@@ -9,34 +9,24 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+DIST_DIR = ROOT / "site" / "dist"
+VERCEL_PROJECT = ROOT / ".vercel" / "project.json"
 
 
 def main() -> int:
     subprocess.run([sys.executable, str(ROOT / "scripts" / "build-site.py")], cwd=ROOT, check=True)
 
-    dist_dir = ROOT / "site" / "dist"
-    output_dir = ROOT / ".vercel" / "output"
-    static_dir = output_dir / "static"
+    # Ensure site/dist has a Vercel project link so `vercel --prod` can be
+    # run directly from that directory without interactive setup prompts.
+    dist_vercel = DIST_DIR / ".vercel"
+    dist_vercel.mkdir(parents=True, exist_ok=True)
+    if VERCEL_PROJECT.exists():
+        shutil.copyfile(VERCEL_PROJECT, dist_vercel / "project.json")
 
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
-    static_dir.mkdir(parents=True, exist_ok=True)
-
-    for source in dist_dir.rglob("*"):
-        if source.is_dir():
-            continue
-        target = static_dir / source.relative_to(dist_dir)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source, target)
-
-    config = {
-        "version": 3,
-        "routes": [
-            {"handle": "filesystem"},
-            {"src": "/(.*)", "dest": "/$1"},
-        ],
-    }
-    (output_dir / "config.json").write_text(json.dumps(config, indent=2))
+    # Write a minimal vercel.json into dist so cleanUrls works without
+    # an outputDirectory indirection.
+    vercel_cfg = {"cleanUrls": True, "trailingSlash": False}
+    (DIST_DIR / "vercel.json").write_text(json.dumps(vercel_cfg, indent=2))
 
     log_path = ROOT / "logs" / "deployments.jsonl"
     log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -45,9 +35,8 @@ def main() -> int:
             json.dumps(
                 {
                     "timestamp": dt.datetime.now(dt.UTC).isoformat(),
-                    "event": "export_vercel_prebuilt",
-                    "static_dir": str(static_dir),
-                    "config_path": str(output_dir / "config.json"),
+                    "event": "export_vercel_dist",
+                    "dist_dir": str(DIST_DIR),
                 }
             )
             + "\n"

@@ -70,7 +70,11 @@ def main() -> int:
         LOGGER.info("Skipping Vercel deploy by request")
         return 0
 
-    _run_command(["vercel", "deploy", "--prebuilt", "--prod", "--yes"], env=_command_env())
+    _run_command(
+        ["vercel", "--prod", "--yes"],
+        cwd=ROOT / "site" / "dist",
+        env=_command_env(),
+    )
     _run_command(
         [
             sys.executable,
@@ -139,12 +143,16 @@ def _command_env() -> dict[str, str]:
     return env
 
 
-def _run_command(command: list[str], env: dict[str, str] | None = None) -> None:
+def _run_command(
+    command: list[str],
+    env: dict[str, str] | None = None,
+    cwd: Path | None = None,
+) -> None:
     LOGGER.info("Running command: %s", " ".join(command))
     completed = shutil.which(command[0], path=(env or os.environ).get("PATH"))
     if completed is None and not Path(command[0]).exists():
         raise FileNotFoundError(f"Command not found: {command[0]}")
-    subprocess.run(command, cwd=ROOT, env=env, check=True)
+    subprocess.run(command, cwd=cwd or ROOT, env=env, check=True)
 
 
 if __name__ == "__main__":
