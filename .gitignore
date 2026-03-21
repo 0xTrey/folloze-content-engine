@@ -1,0 +1,12 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+logs/
+site/dist/
+.content-engine.lock
+.DS_Store
+dist/
+*.egg-info/
+.vercel/
+.vercel

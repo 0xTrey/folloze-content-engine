@@ -1,0 +1,18 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ title }}",
+  "description": "{{ meta_description }}",
+  "author": {
+    "@type": "Organization",
+    "name": "Folloze",
+    "url": "https://www.folloze.com"
+  },
+  "datePublished": "{{ date_published }}",
+  "dateModified": "{{ date_published }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ canonical_url }}"
+  },
+  "keywords": "{{ keywords_csv }}"
+}

@@ -1,0 +1,31 @@
+{
+  "artifacts": [
+    {
+      "slug": "the-power-of-individual-level-engagement-in-folloze",
+      "title": "Unlock Revenue: The Power of Individual-Level Engagement in Folloze",
+      "route": "/insights/the-power-of-individual-level-engagement-in-folloze",
+      "path": "the-power-of-individual-level-engagement-in-folloze.json",
+      "canonical_url": "https://folloze-blog.vercel.app/insights/the-power-of-individual-level-engagement-in-folloze",
+      "source_run_id": "2026-03-20T17-50-25",
+      "promoted_at": "2026-03-20T22:51:20.908927+00:00"
+    },
+    {
+      "slug": "welcome-to-folloze-insights",
+      "title": "Welcome to Folloze Insights",
+      "route": "/insights/welcome-to-folloze-insights",
+      "path": "welcome-to-folloze-insights.json",
+      "canonical_url": "https://folloze-blog.vercel.app/insights/welcome-to-folloze-insights",
+      "source_run_id": "seed-welcome-post",
+      "promoted_at": "2026-03-20T00:00:00+00:00"
+    },
+    {
+      "slug": "what-is-ai-orchestration-for-b2b-go-to-market-teams",
+      "title": "What Is AI Orchestration for B2B Go-To-Market Teams? | Folloze",
+      "route": "/insights/what-is-ai-orchestration-for-b2b-go-to-market-teams",
+      "path": "what-is-ai-orchestration-for-b2b-go-to-market-teams.json",
+      "canonical_url": "https://folloze-blog.vercel.app/insights/what-is-ai-orchestration-for-b2b-go-to-market-teams",
+      "source_run_id": "2026-03-21T10-07-35",
+      "promoted_at": "2026-03-21T15:39:35.936235+00:00"
+    }
+  ]
+}

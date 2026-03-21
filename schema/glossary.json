@@ -1,0 +1,23 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "DefinedTerm",
+      "name": "{{ title }}",
+      "description": "{{ meta_description }}"
+    },
+    {
+      "@type": "Article",
+      "headline": "{{ title }}",
+      "description": "{{ meta_description }}",
+      "datePublished": "{{ date_published }}",
+      "dateModified": "{{ date_published }}",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ canonical_url }}"
+      },
+      "keywords": "{{ keywords_csv }}"
+    }
+  ]
+}
+

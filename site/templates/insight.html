@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article class="insight">
+  <a class="back-link" href="/">Back to all posts</a>
+  <div class="insight__hero">
+    <p class="eyebrow">{{ artifact.content_type | upper }}</p>
+    <h1>{{ artifact.title }}</h1>
+    <p class="meta">{{ artifact.published_date }} · AEO score {{ artifact.citation_score }}/100</p>
+  </div>
+  <div class="insight__content">
+    <div class="body">{{ artifact.body_html | safe }}</div>
+    <aside class="insight__rail">
+      <div class="rail-card">
+        <p class="rail-label">Primary topic</p>
+        <p class="rail-value">{{ artifact.target_keywords[0] }}</p>
+      </div>
+      <div class="rail-card">
+        <p class="rail-label">Release status</p>
+        <p class="rail-value">{{ artifact.status.replace("_", " ") }}</p>
+      </div>
+    </aside>
+  </div>
+</article>
+{% endblock %}

@@ -1,0 +1,30 @@
+# Environment
+
+## Required secrets
+
+- `BRAVE_API_KEY`: Brave web search key for research grounding.
+- `PERPLEXITY_API_KEY`: Perplexity key for secondary research synthesis.
+- `GEMINI_API_KEY`: the only LLM key used in v1.
+- `SMTP_PASSWORD`: optional SMTP password for release and error emails.
+- `agentmail-api` in macOS Keychain: preferred notification path for `juno@elevationengine.co` and inbox relay polling.
+
+## macOS Keychain fallback
+
+- `BRAVE_API_KEY` falls back to `brave-search-api`
+- `PERPLEXITY_API_KEY` falls back to `perplexity-api`
+- `GEMINI_API_KEY` falls back to `gemini-api` and then `gemini-api-key`
+- `SMTP_PASSWORD` falls back to `smtp-password`, `gmail-app-password`, and `gmail-smtp`
+- Notification delivery falls back to AgentMail automatically when SMTP is not configured and the local AgentMail CLI is available.
+- Discord notifications use `openclaw` directly and read the target channel from `config.yaml`
+
+## Commit-safe configuration
+
+- `config.yaml` holds site origin, preview URL, production URL, review mode, quality threshold, and scheduling defaults.
+- `.env.example` is the operator template for local shells, launchd, or CI/CD runners.
+
+## Ownership notes
+
+- Trey owns the live Vercel project, domain alias, and DNS records in v1.
+- Marketing reviewers only need artifact URLs, preview HTML, and notification emails.
+- Web dev handoff should include the final `config.yaml`, `.env.example`, and the latest deploy log files.
+- The local AgentMail webhook service is ready for future public ingress, but today the durable Juno relay is the five-minute poller because no public webhook endpoint is attached to this Mac.

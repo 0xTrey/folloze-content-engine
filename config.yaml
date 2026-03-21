@@ -1,0 +1,45 @@
+# Runtime configuration — commit safe (no secrets)
+site:
+  origin: "https://folloze-blog.vercel.app"
+  insights_path: "/insights"
+
+delivery:
+  target: "vercel_static"
+  release_mode: "manual"
+  preview_url: "https://folloze-blog.vercel.app"
+  production_url: "https://folloze-blog.vercel.app"
+
+pipeline:
+  quality_threshold: 70
+  max_retries_llm: 2
+  verify_timeout_seconds: 300
+  timezone: "America/Chicago"
+  run_hour: 9
+  log_level: "INFO"
+  max_log_age_days: 30
+
+notifications:
+  email:
+    enabled: true
+    smtp_host: "smtp.gmail.com"
+    smtp_port: 587
+    from_address: "juno@elevationengine.co"
+    to_addresses:
+      - "trey@folloze.com"
+  discord:
+    enabled: true
+    channel_target: "channel:1480677039169081434"
+
+content:
+  default_audience: "B2B revenue teams"
+  min_words_by_type:
+    comparison: 900
+    guide: 1000
+    faq: 700
+    glossary: 500
+    blog: 500
+
+llm:
+  provider: "gemini"
+  generation_model: "gemini-2.5-flash"
+  research_model: "gemini-2.5-flash"

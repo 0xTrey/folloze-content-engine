@@ -1,0 +1,177 @@
+topics:
+- title: The Power of Individual-Level Engagement in Folloze
+  content_type: blog
+  slug: the-power-of-individual-level-engagement-in-folloze
+  keywords:
+  - individual-level engagement
+  - folloze engagement
+  - personalized buyer engagement
+  priority: 5
+  planned_date: '2026-03-20'
+  status: published
+  notes: 500-word launch post. Explain why person-level engagement matters alongside
+    account orchestration. Use RingCentral engagement proof and tie to pipeline visibility.
+  release_artifact_path: logs/runs/2026-03-20/release-artifact.json
+  release_ready_date: '2026-03-20'
+  published_url: https://folloze-blog.vercel.app/insights/the-power-of-individual-level-engagement-in-folloze
+  published_date: '2026-03-20'
+- title: What Is AI Orchestration for B2B Go-To-Market Teams
+  content_type: glossary
+  slug: what-is-ai-orchestration-for-b2b-go-to-market-teams
+  keywords:
+  - ai orchestration
+  - ai orchestration for b2b
+  - marketing orchestration platform
+  priority: 5
+  planned_date: '2026-03-21'
+  status: published
+  notes: Category-defining glossary. Anchor the 2026 AI orchestration narrative and
+    distinguish Folloze from personalization tools and page builders.
+  release_artifact_path: logs/runs/2026-03-21/release-artifact.json
+  release_ready_date: '2026-03-21'
+  published_url: https://folloze-blog.vercel.app/insights/what-is-ai-orchestration-for-b2b-go-to-market-teams
+  published_date: '2026-03-21'
+- title: How One Marketer Can Run Enterprise Campaigns with Folloze
+  content_type: guide
+  slug: how-one-marketer-can-run-enterprise-campaigns-with-folloze
+  keywords:
+  - run enterprise campaigns
+  - lean marketing team
+  - folloze campaign agent
+  priority: 4
+  planned_date: '2026-03-22'
+  status: pending
+  notes: Guide for lean teams. Use Campaign Agent, 50% faster builds, and Panther-style
+    team efficiency proof.
+- title: Account Engagement Signals Every B2B Marketer Should Track
+  content_type: faq
+  slug: account-engagement-signals-every-b2b-marketer-should-track
+  keywords:
+  - account engagement signals
+  - buyer engagement metrics
+  - b2b engagement faq
+  priority: 4
+  planned_date: '2026-03-23'
+  status: pending
+  notes: FAQ that bridges account-level and individual-level behavior. Reinforce why
+    signals should tie to revenue visibility.
+- title: Folloze vs Mutiny
+  content_type: comparison
+  slug: folloze-vs-mutiny
+  keywords:
+  - folloze vs mutiny
+  - mutiny alternative
+  - folloze mutiny comparison
+  priority: 5
+  planned_date: '2026-03-24'
+  status: pending
+  notes: Lead with governance, analytics under cookie consent, no web-team dependency,
+    and campaign lifecycle scope.
+- title: Why Account-Based Marketing Breaks at the Individual Level
+  content_type: blog
+  slug: why-account-based-marketing-breaks-at-the-individual-level
+  keywords:
+  - account based marketing engagement
+  - individual-level engagement
+  - buyer committee signals
+  priority: 4
+  planned_date: '2026-03-25'
+  status: pending
+  notes: Short blog that sharpens the Folloze point of view. Contrast account selection
+    with person-level behavior and next-best action.
+- title: How to Activate 6sense and Folloze Together
+  content_type: guide
+  slug: how-to-activate-6sense-and-folloze-together
+  keywords:
+  - 6sense and folloze
+  - activate intent data
+  - pipeline orchestration
+  priority: 4
+  planned_date: '2026-03-26'
+  status: pending
+  notes: Operational guide. Use Conga $6.3M attributed pipeline proof and show signal-to-experience
+    workflow.
+- title: What Is Content Intelligence in B2B Marketing
+  content_type: glossary
+  slug: what-is-content-intelligence-in-b2b-marketing
+  keywords:
+  - content intelligence
+  - b2b content intelligence
+  - content intelligence engine
+  priority: 3
+  planned_date: '2026-03-27'
+  status: pending
+  notes: Define Folloze's Content Intelligence Engine in practical terms with LLM
+    readiness, content mapping, and optimization.
+- title: Folloze vs Userled
+  content_type: comparison
+  slug: folloze-vs-userled
+  keywords:
+  - folloze vs userled
+  - userled alternative
+  - microsite alternative
+  priority: 4
+  planned_date: '2026-03-28'
+  status: pending
+  notes: Emphasize evergreen experiences, governance, privacy posture, and operating-system
+    versus page-factory framing.
+- title: Prompt-to-Pipeline Reporting FAQ
+  content_type: faq
+  slug: prompt-to-pipeline-reporting-faq
+  keywords:
+  - prompt to pipeline
+  - marketing attribution faq
+  - campaign revenue reporting
+  priority: 4
+  planned_date: '2026-03-29'
+  status: pending
+  notes: Answer how Folloze connects campaign execution, engagement, and pipeline
+    proof for revenue leaders.
+- title: How to Build Executive-Ready Buyer Journeys Without Web-Team Bottlenecks
+  content_type: guide
+  slug: how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks
+  keywords:
+  - buyer journeys without web team
+  - executive microsites
+  - campaign governance
+  priority: 3
+  planned_date: '2026-03-30'
+  status: pending
+  notes: Guide for enterprise teams frustrated by handoffs. Tie to governance, approvals,
+    and marketer-owned execution.
+- title: Folloze vs PathFactory
+  content_type: comparison
+  slug: folloze-vs-pathfactory
+  keywords:
+  - folloze vs pathfactory
+  - pathfactory alternative
+  - content experience alternative
+  priority: 3
+  planned_date: '2026-03-31'
+  status: pending
+  notes: Focus on content destination versus full-funnel orchestration, plus broader
+    campaign and sales-room use cases.
+- title: How to Turn Buyer Intent into Campaign Action with Folloze
+  content_type: guide
+  slug: how-to-turn-buyer-intent-into-campaign-action-with-folloze
+  keywords:
+  - buyer intent activation
+  - intent to campaign action
+  - folloze activation agent
+  priority: 3
+  planned_date: '2026-04-01'
+  status: pending
+  notes: Guide that connects intent signals to Activation Agent workflows, audience
+    targeting, and next-step orchestration.
+- title: Why AI Marketing Orchestration Needs Governance
+  content_type: blog
+  slug: why-ai-marketing-orchestration-needs-governance
+  keywords:
+  - ai marketing orchestration
+  - marketing governance
+  - enterprise ai campaigns
+  priority: 3
+  planned_date: '2026-04-02'
+  status: pending
+  notes: Point-of-view post for handoff audiences. Emphasize approvals, template control,
+    privacy posture, and reliable reporting.

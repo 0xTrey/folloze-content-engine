@@ -1,0 +1,354 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap");
+
+:root {
+  color-scheme: light;
+  --paper: #f6f1e8;
+  --paper-strong: #fffaf2;
+  --ink: #18313b;
+  --ink-soft: #5a6f77;
+  --accent: #e35d3f;
+  --accent-deep: #9d3523;
+  --line: rgba(24, 49, 59, 0.14);
+  --card: rgba(255, 255, 255, 0.76);
+  --shadow: 0 24px 60px rgba(24, 49, 59, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", "Helvetica Neue", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(227, 93, 63, 0.18), transparent 32%),
+    radial-gradient(circle at top right, rgba(24, 49, 59, 0.09), transparent 28%),
+    linear-gradient(180deg, var(--paper-strong), var(--paper));
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.shell {
+  width: min(1120px, calc(100vw - 32px));
+  margin: 0 auto;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(14px);
+  background: rgba(246, 241, 232, 0.86);
+  border-bottom: 1px solid var(--line);
+}
+
+.site-header__inner,
+.site-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.brand__mark {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.brand__sub,
+.site-nav a,
+.hero__kicker,
+.eyebrow,
+.section-label,
+.rail-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.brand__sub,
+.site-nav a {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+.site-nav {
+  display: flex;
+  gap: 18px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 24px;
+  align-items: end;
+  padding: 52px 0 28px;
+}
+
+.hero__card,
+.hero__panel,
+.post-card,
+.empty-state,
+.rail-card {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.hero__card {
+  padding: 36px;
+}
+
+.hero__panel {
+  padding: 26px;
+  align-self: stretch;
+}
+
+.hero__kicker,
+.section-label {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  color: var(--accent-deep);
+}
+
+.hero h1,
+.insight h1 {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+}
+
+.hero h1 {
+  font-size: clamp(2.9rem, 7vw, 5.4rem);
+  max-width: 12ch;
+}
+
+.hero p,
+.hero li,
+.meta,
+.body p,
+.body li,
+.empty-state p,
+.rail-value,
+.site-footer p {
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.hero__lede {
+  max-width: 56ch;
+  margin: 18px 0 0;
+  font-size: 1.02rem;
+}
+
+.hero__panel ul {
+  margin: 16px 0 0;
+  padding-left: 18px;
+}
+
+.section {
+  padding: 18px 0 68px;
+}
+
+.section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+}
+
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.post-card,
+.empty-state {
+  padding: 24px;
+}
+
+.post-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 240px;
+}
+
+.post-card h3 {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.post-card__meta {
+  font-size: 0.78rem;
+  color: var(--accent-deep);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.post-card__cta {
+  margin-top: auto;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+.empty-state {
+  display: grid;
+  gap: 10px;
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.6rem;
+}
+
+.shell--article {
+  padding: 42px 0 84px;
+}
+
+.back-link {
+  display: inline-flex;
+  margin-bottom: 20px;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+.insight__hero {
+  padding: 0 0 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-size: 0.72rem;
+  color: var(--accent-deep);
+}
+
+.insight h1 {
+  font-size: clamp(2.5rem, 6vw, 4.6rem);
+  max-width: 13ch;
+}
+
+.meta {
+  margin-top: 14px;
+}
+
+.insight__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 28px;
+  padding-top: 28px;
+}
+
+.body {
+  font-size: 1.04rem;
+}
+
+.body h2,
+.body h3 {
+  margin-top: 34px;
+  font-family: "Fraunces", Georgia, serif;
+}
+
+.body a {
+  color: var(--accent-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.16em;
+}
+
+.body blockquote {
+  margin: 28px 0;
+  padding: 18px 22px;
+  border-left: 4px solid var(--accent);
+  background: rgba(227, 93, 63, 0.08);
+}
+
+.body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 26px 0;
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.body th,
+.body td {
+  border: 1px solid var(--line);
+  padding: 12px;
+  text-align: left;
+}
+
+.insight__rail {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.rail-card {
+  padding: 18px;
+}
+
+.rail-label {
+  margin: 0 0 8px;
+  font-size: 0.68rem;
+  color: var(--accent-deep);
+}
+
+.rail-value {
+  margin: 0;
+  font-size: 0.94rem;
+}
+
+.site-footer {
+  border-top: 1px solid var(--line);
+}
+
+.site-footer p {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .insight__content {
+    grid-template-columns: 1fr;
+  }
+
+  .site-header__inner,
+  .site-footer__inner,
+  .section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
