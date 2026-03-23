@@ -33,6 +33,8 @@ def optimize(content: GeneratedContent, config: Config) -> OptimizedContent:
 
 
 def _enhance_html(html: str) -> str:
+    # Normalize em dashes to avoid brand gate failures
+    html = html.replace("\u2014", " - ").replace("&mdash;", " - ")
     soup = BeautifulSoup(html, "html.parser")
     for table in soup.find_all("table"):
         if table.find("thead"):
