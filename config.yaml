@@ -25,7 +25,7 @@ notifications:
     smtp_port: 587
     from_address: "juno@elevationengine.co"
     to_addresses:
-      - "trey@folloze.com"
+      - "trey.harnden@folloze.com"
   discord:
     enabled: true
     channel_target: "channel:1480677039169081434"

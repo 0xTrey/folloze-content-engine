@@ -218,7 +218,7 @@ notifications:
     smtp_port: 587
     from_address: "juno@elevationengine.co"
     to_addresses:
-      - "trey@folloze.com"
+      - "trey.harnden@folloze.com"
 
 content:
   default_audience: "B2B revenue teams"
