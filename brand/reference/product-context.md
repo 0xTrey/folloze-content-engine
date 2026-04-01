@@ -2,7 +2,7 @@
 
 Source synthesis:
 - `Projects/folloze-outbound-engine/docs/FOLLOZE_PRODUCT_CONTEXT.md`
-- `Downloads/Trey's LLM Project Context for Folloze - July 2025 (1).md`
+- `Documents/Folloze/Brand Kit/docs/Trey's LLM Project Context for Folloze - July 2025.md`
 
 ## Category and positioning
 

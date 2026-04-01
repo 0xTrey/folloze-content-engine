@@ -36,7 +36,7 @@ def test_daily_publish_runs_full_release_flow(repo_copy: Path, monkeypatch) -> N
                 "published_date": "2026-03-21",
                 "citation_score": 88,
                 "word_count": 600,
-                "canonical_url": "https://folloze-blog.vercel.app/insights/title",
+                "canonical_url": "https://www.folloze-blog.com/insights/title",
                 "source_run_id": "run-1",
                 "status": "release_ready",
                 "review_notes": [],
@@ -72,7 +72,7 @@ def test_daily_publish_runs_full_release_flow(repo_copy: Path, monkeypatch) -> N
     monkeypatch.setattr(
         module,
         "_run_command",
-        lambda command, env=None: commands.append(command),
+        lambda command, env=None, cwd=None: commands.append(command),
     )
     monkeypatch.setattr(
         module,
@@ -91,6 +91,27 @@ def test_daily_publish_runs_full_release_flow(repo_copy: Path, monkeypatch) -> N
     assert commands[4][-1] == "production"
     assert published == {
         "title": "Title",
-        "url": "https://folloze-blog.vercel.app/insights/title",
+        "url": "https://www.folloze-blog.com/insights/title",
         "score": 88,
     }
+
+
+def test_daily_publish_can_resume_without_rerunning_pipeline(repo_copy: Path, monkeypatch) -> None:
+    module = _load_module(repo_copy)
+
+    calls = {}
+    monkeypatch.setattr(
+        module,
+        "_publish_from_run",
+        lambda run_date, config, skip_deploy=False: calls.update(
+            {
+                "run_date": run_date,
+                "skip_deploy": skip_deploy,
+            }
+        )
+        or "published",
+    )
+    monkeypatch.setattr(sys, "argv", ["run_daily_publish.py", "--skip-pipeline", "--date", "2026-03-28"])
+
+    assert module.main() == 0
+    assert calls == {"run_date": "2026-03-28", "skip_deploy": False}

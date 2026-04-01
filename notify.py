@@ -74,6 +74,10 @@ def send_error(stage: str, error: Exception, topic: Topic | None, config: Config
     )
 
 
+def send_canary_report(subject: str, body: str, config: Config) -> None:
+    _send_email(subject, body, config)
+
+
 def _send_email(subject: str, body: str, config: Config) -> None:
     if not config.notifications.email.enabled:
         _send_discord(subject, body, config)

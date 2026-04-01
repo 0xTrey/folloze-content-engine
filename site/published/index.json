@@ -1,11 +1,83 @@
 {
   "artifacts": [
     {
+      "slug": "account-engagement-signals-every-b2b-marketer-should-track",
+      "title": "Account Engagement Signals: Your FAQ Guide to B2B Pipeline Growth",
+      "route": "/insights/account-engagement-signals-every-b2b-marketer-should-track",
+      "path": "account-engagement-signals-every-b2b-marketer-should-track.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/account-engagement-signals-every-b2b-marketer-should-track",
+      "source_run_id": "2026-03-25T09-05-05",
+      "promoted_at": "2026-03-25T14:06:13.296782+00:00"
+    },
+    {
+      "slug": "folloze-vs-mutiny",
+      "title": "Folloze vs Mutiny: Which B2B Personalization Platform Drives Better Results?",
+      "route": "/insights/folloze-vs-mutiny",
+      "path": "folloze-vs-mutiny.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/folloze-vs-mutiny",
+      "source_run_id": "2026-03-26T21-44-33",
+      "promoted_at": "2026-03-27T02:55:30.627775+00:00"
+    },
+    {
+      "slug": "folloze-vs-pathfactory",
+      "title": "Folloze vs PathFactory: The AI Orchestration Advantage",
+      "route": "/insights/folloze-vs-pathfactory",
+      "path": "folloze-vs-pathfactory.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/folloze-vs-pathfactory",
+      "source_run_id": "2026-04-01T09-06-13",
+      "promoted_at": "2026-04-01T14:41:44.951975+00:00"
+    },
+    {
+      "slug": "folloze-vs-userled",
+      "title": "Folloze vs Userled: Choosing an AI Orchestration Platform Over a Page Factory",
+      "route": "/insights/folloze-vs-userled",
+      "path": "folloze-vs-userled.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/folloze-vs-userled",
+      "source_run_id": "2026-03-30T10-03-05",
+      "promoted_at": "2026-03-30T15:06:03.889567+00:00"
+    },
+    {
+      "slug": "how-one-marketer-can-run-enterprise-campaigns-with-folloze",
+      "title": "How One Marketer Can Run Enterprise Campaigns with Folloze",
+      "route": "/insights/how-one-marketer-can-run-enterprise-campaigns-with-folloze",
+      "path": "how-one-marketer-can-run-enterprise-campaigns-with-folloze.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-one-marketer-can-run-enterprise-campaigns-with-folloze",
+      "source_run_id": "2026-03-24T09-05-06",
+      "promoted_at": "2026-03-24T14:06:27.071042+00:00"
+    },
+    {
+      "slug": "how-to-activate-6sense-and-folloze-together",
+      "title": "How to Activate 6sense and Folloze for Pipeline Orchestration",
+      "route": "/insights/how-to-activate-6sense-and-folloze-together",
+      "path": "how-to-activate-6sense-and-folloze-together.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-activate-6sense-and-folloze-together",
+      "source_run_id": "2026-03-28T09-26-18",
+      "promoted_at": "2026-03-28T14:29:18.015023+00:00"
+    },
+    {
+      "slug": "how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks",
+      "title": "How to Build Executive-Ready Buyer Journeys Without Web-Team Bottlenecks",
+      "route": "/insights/how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks",
+      "path": "how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks",
+      "source_run_id": "2026-03-31T09-10-32",
+      "promoted_at": "2026-03-31T14:30:16.579783+00:00"
+    },
+    {
+      "slug": "prompt-to-pipeline-reporting-faq",
+      "title": "Prompt-to-Pipeline Reporting FAQ: Attribution, Revenue Proof & Campaign Impact",
+      "route": "/insights/prompt-to-pipeline-reporting-faq",
+      "path": "prompt-to-pipeline-reporting-faq.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/prompt-to-pipeline-reporting-faq",
+      "source_run_id": "2026-03-30T09-59-55",
+      "promoted_at": "2026-03-30T15:02:09.189390+00:00"
+    },
+    {
       "slug": "the-power-of-individual-level-engagement-in-folloze",
       "title": "Unlock Revenue: The Power of Individual-Level Engagement in Folloze",
       "route": "/insights/the-power-of-individual-level-engagement-in-folloze",
       "path": "the-power-of-individual-level-engagement-in-folloze.json",
-      "canonical_url": "https://folloze-blog.vercel.app/insights/the-power-of-individual-level-engagement-in-folloze",
+      "canonical_url": "https://www.folloze-blog.com/insights/the-power-of-individual-level-engagement-in-folloze",
       "source_run_id": "2026-03-20T17-50-25",
       "promoted_at": "2026-03-20T22:51:20.908927+00:00"
     },
@@ -14,7 +86,7 @@
       "title": "Welcome to Folloze Insights",
       "route": "/insights/welcome-to-folloze-insights",
       "path": "welcome-to-folloze-insights.json",
-      "canonical_url": "https://folloze-blog.vercel.app/insights/welcome-to-folloze-insights",
+      "canonical_url": "https://www.folloze-blog.com/insights/welcome-to-folloze-insights",
       "source_run_id": "seed-welcome-post",
       "promoted_at": "2026-03-20T00:00:00+00:00"
     },
@@ -23,9 +95,27 @@
       "title": "What Is AI Orchestration for B2B Go-To-Market Teams? | Folloze",
       "route": "/insights/what-is-ai-orchestration-for-b2b-go-to-market-teams",
       "path": "what-is-ai-orchestration-for-b2b-go-to-market-teams.json",
-      "canonical_url": "https://folloze-blog.vercel.app/insights/what-is-ai-orchestration-for-b2b-go-to-market-teams",
+      "canonical_url": "https://www.folloze-blog.com/insights/what-is-ai-orchestration-for-b2b-go-to-market-teams",
       "source_run_id": "2026-03-21T10-07-35",
       "promoted_at": "2026-03-21T15:39:35.936235+00:00"
+    },
+    {
+      "slug": "what-is-content-intelligence-in-b2b-marketing",
+      "title": "What Is Content Intelligence in B2B Marketing? | Folloze",
+      "route": "/insights/what-is-content-intelligence-in-b2b-marketing",
+      "path": "what-is-content-intelligence-in-b2b-marketing.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/what-is-content-intelligence-in-b2b-marketing",
+      "source_run_id": "2026-03-29T09-06-19",
+      "promoted_at": "2026-03-29T14:33:28.164779+00:00"
+    },
+    {
+      "slug": "why-account-based-marketing-breaks-at-the-individual-level",
+      "title": "Why Account-Based Marketing Breaks at the Individual Level",
+      "route": "/insights/why-account-based-marketing-breaks-at-the-individual-level",
+      "path": "why-account-based-marketing-breaks-at-the-individual-level.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/why-account-based-marketing-breaks-at-the-individual-level",
+      "source_run_id": "2026-03-27T09-05-05",
+      "promoted_at": "2026-03-27T14:05:54.982017+00:00"
     }
   ]
 }

@@ -5,6 +5,7 @@ import sys
 from dataclasses import asdict
 
 import pipeline
+import yaml
 from artifacts import ReleaseArtifact
 from content_calendar import Topic
 from generator import GeneratedContent
@@ -74,7 +75,7 @@ def test_full_happy_path_release_ready(project_root, monkeypatch) -> None:
         (run_dir / "rendered-preview.html").write_text(
             "<html><head><title>Title</title><meta name='description' content='Desc'>"
             "<link rel='canonical' href='https://example.com'>"
-            "<script type='application/ld+json'>{\"@context\":\"https://schema.org\",\"@type\":\"Article\"}</script>"
+            '<script type=\'application/ld+json\'>{"@context":"https://schema.org","@type":"Article"}</script>'
             "</head><body></body></html>"
         )
         return artifact
@@ -89,11 +90,77 @@ def test_full_happy_path_release_ready(project_root, monkeypatch) -> None:
     monkeypatch.setattr(sys, "argv", ["pipeline.py"])
 
     assert pipeline.main() == 0
-    assert sent["called"] is True
+    assert sent["called"] is False
     run_dir = next((project_root / "logs" / "runs").iterdir())
     assert (run_dir / "run-events.jsonl").exists()
     manifest = json.loads((run_dir / "run-manifest.json").read_text())
     assert manifest["events_file"].endswith("run-events.jsonl")
+
+
+def test_manual_release_mode_sends_release_ready_notification(project_root, monkeypatch) -> None:
+    config_path = project_root / "config.yaml"
+    raw_config = yaml.safe_load(config_path.read_text())
+    raw_config["delivery"]["release_mode"] = "manual"
+    config_path.write_text(yaml.safe_dump(raw_config, sort_keys=False))
+
+    topic = _topic()
+    research = ResearchContext(topic, [], "summary", "brief", "brand")
+    generated = GeneratedContent(
+        topic,
+        "Title",
+        "Desc",
+        "<p>Folloze is a platform.</p>",
+        [],
+        1000,
+        "comparison",
+        "folloze vs mutiny",
+    )
+    optimized = OptimizedContent(
+        generated,
+        "<p>Folloze is a platform. According to Gartner, 98%.</p><h2>FAQ</h2><p>Q</p>",
+        '{"@context":"https://schema.org","@type":"Article"}',
+        "Article",
+    )
+    artifact = ReleaseArtifact(
+        title="Title",
+        slug="folloze-vs-mutiny",
+        route="/insights/folloze-vs-mutiny",
+        content_type="comparison",
+        body_html=optimized.body_html,
+        meta_title="Title",
+        meta_description="Desc",
+        json_ld=optimized.json_ld,
+        target_keywords=["folloze vs mutiny"],
+        published_date="2026-03-20",
+        citation_score=82,
+        word_count=1000,
+        canonical_url="https://insights.folloze.com/insights/folloze-vs-mutiny",
+        source_run_id="run-1",
+        status="release_ready",
+        review_notes=[],
+    )
+
+    monkeypatch.setattr(pipeline, "enrich", lambda *args, **kwargs: research)
+    monkeypatch.setattr(pipeline, "generate", lambda *args, **kwargs: generated)
+    monkeypatch.setattr(pipeline, "optimize", lambda *args, **kwargs: optimized)
+    monkeypatch.setattr(pipeline, "gate", lambda *args, **kwargs: QualityResult(True, 82, [], []))
+    monkeypatch.setattr(
+        pipeline,
+        "write_release_artifact",
+        lambda *args, **kwargs: artifact,
+    )
+
+    sent = {"called": False}
+    monkeypatch.setattr(
+        pipeline,
+        "send_release_ready",
+        lambda *args, **kwargs: sent.__setitem__("called", True),
+    )
+    monkeypatch.setattr(pipeline, "check_preview_file", lambda *args, **kwargs: None)
+    monkeypatch.setattr(sys, "argv", ["pipeline.py"])
+
+    assert pipeline.main() == 0
+    assert sent["called"] is True
 
 
 def test_lock_file_prevents_concurrent_run(project_root, monkeypatch) -> None:
@@ -113,13 +180,12 @@ def test_calendar_exhausted_exits_clean(project_root, monkeypatch) -> None:
 
 
 def test_provider_unavailable_sends_notification(project_root, monkeypatch) -> None:
+    expected_topic = pipeline._select_topic(pipeline._build_parser().parse_args([]), dry_run=False)
     called = {"error": False}
     monkeypatch.setattr(
         pipeline,
         "enrich",
-        lambda *args, **kwargs: (_ for _ in ()).throw(
-            pipeline.ProviderUnavailableError("down")
-        ),
+        lambda *args, **kwargs: (_ for _ in ()).throw(pipeline.ProviderUnavailableError("down")),
     )
     monkeypatch.setattr(
         pipeline,
@@ -129,6 +195,206 @@ def test_provider_unavailable_sends_notification(project_root, monkeypatch) -> N
     monkeypatch.setattr(sys, "argv", ["pipeline.py"])
     assert pipeline.main() == 1
     assert called["error"] is True
+    payload = yaml.safe_load((project_root / "content" / "calendar.yaml").read_text())
+    topic = next(item for item in payload["topics"] if item["slug"] == expected_topic.slug)
+    assert topic["status"] == "pending"
+    assert topic["retry_count"] == 1
+    assert topic["last_error"] == "down"
+
+
+def test_quality_gate_triggers_single_repair_pass(project_root, monkeypatch) -> None:
+    topic = _topic()
+    research = ResearchContext(topic, [], "summary", "brief", "brand")
+    initial = GeneratedContent(
+        topic,
+        "Title",
+        "Desc",
+        "<p>Short intro.</p>",
+        [{"heading": "Deep Dive", "html": "<p>Body</p>"}],
+        200,
+        "comparison",
+        "folloze vs mutiny",
+    )
+    repaired = GeneratedContent(
+        topic,
+        "Title",
+        "Desc",
+        "<p>Folloze vs mutiny is a comparison for B2B teams.</p>"
+        "<h2>Frequently Asked Questions</h2><p>Answer.</p>",
+        [],
+        1100,
+        "comparison",
+        "folloze vs mutiny",
+    )
+    optimized = OptimizedContent(
+        repaired,
+        repaired.body_html,
+        '{"@context":"https://schema.org","@type":"Article"}',
+        "Article",
+    )
+    artifact = ReleaseArtifact(
+        title="Title",
+        slug="folloze-vs-mutiny",
+        route="/insights/folloze-vs-mutiny",
+        content_type="comparison",
+        body_html=optimized.body_html,
+        meta_title="Title",
+        meta_description="Desc",
+        json_ld=optimized.json_ld,
+        target_keywords=["folloze vs mutiny"],
+        published_date="2026-03-20",
+        citation_score=82,
+        word_count=1100,
+        canonical_url="https://insights.folloze.com/insights/folloze-vs-mutiny",
+        source_run_id="run-1",
+        status="release_ready",
+        review_notes=[],
+    )
+
+    monkeypatch.setattr(pipeline, "enrich", lambda *args, **kwargs: research)
+    monkeypatch.setattr(pipeline, "generate", lambda *args, **kwargs: initial)
+    repair_calls = {"count": 0, "failures": None}
+
+    def fake_regenerate(*args, **kwargs):
+        repair_calls["count"] += 1
+        repair_calls["failures"] = args[4]
+        return repaired
+
+    monkeypatch.setattr(pipeline, "regenerate_for_quality", fake_regenerate)
+    monkeypatch.setattr(
+        pipeline,
+        "optimize",
+        lambda content, *_: OptimizedContent(
+            content,
+            content.body_html,
+            '{"@context":"https://schema.org","@type":"Article"}',
+            "Article",
+        ),
+    )
+    gate_results = iter(
+        [
+            QualityResult(False, 50, [], ["Missing definition block", "Missing FAQ section"]),
+            QualityResult(True, 82, [], []),
+        ]
+    )
+    monkeypatch.setattr(pipeline, "gate", lambda *args, **kwargs: next(gate_results))
+
+    def fake_write_release_artifact(*args, **kwargs):
+        run_dir = args[4]
+        run_dir.mkdir(parents=True, exist_ok=True)
+        (run_dir / "release-artifact.json").write_text(json.dumps(asdict(artifact), indent=2))
+        (run_dir / "rendered-preview.html").write_text(
+            "<html><head><title>Title</title><meta name='description' content='Desc'>"
+            "<link rel='canonical' href='https://example.com'>"
+            '<script type=\'application/ld+json\'>{"@context":"https://schema.org","@type":"Article"}</script>'
+            "</head><body></body></html>"
+        )
+        return artifact
+
+    monkeypatch.setattr(pipeline, "write_release_artifact", fake_write_release_artifact)
+    monkeypatch.setattr(pipeline, "send_release_ready", lambda *args, **kwargs: None)
+    monkeypatch.setattr(sys, "argv", ["pipeline.py"])
+
+    assert pipeline.main() == 0
+    assert repair_calls["count"] == 1
+    assert repair_calls["failures"] == ["Missing definition block", "Missing FAQ section"]
+
+
+def test_quality_gate_uses_multiple_repair_passes_when_needed(project_root, monkeypatch) -> None:
+    topic = _topic()
+    research = ResearchContext(topic, [], "summary", "brief", "brand")
+    initial = GeneratedContent(
+        topic,
+        "Title",
+        "Desc",
+        "<p>Short intro.</p>",
+        [],
+        200,
+        "comparison",
+        "folloze vs mutiny",
+    )
+    repaired = GeneratedContent(
+        topic,
+        "Title",
+        "Desc",
+        "<p>Folloze vs mutiny is a comparison for B2B teams.</p>"
+        "<h2>Frequently Asked Questions</h2><p>Answer.</p>",
+        [],
+        1100,
+        "comparison",
+        "folloze vs mutiny",
+    )
+    optimized = OptimizedContent(
+        repaired,
+        repaired.body_html,
+        '{"@context":"https://schema.org","@type":"Article"}',
+        "Article",
+    )
+    artifact = ReleaseArtifact(
+        title="Title",
+        slug="folloze-vs-mutiny",
+        route="/insights/folloze-vs-mutiny",
+        content_type="comparison",
+        body_html=optimized.body_html,
+        meta_title="Title",
+        meta_description="Desc",
+        json_ld=optimized.json_ld,
+        target_keywords=["folloze vs mutiny"],
+        published_date="2026-03-20",
+        citation_score=82,
+        word_count=1100,
+        canonical_url="https://insights.folloze.com/insights/folloze-vs-mutiny",
+        source_run_id="run-1",
+        status="release_ready",
+        review_notes=[],
+    )
+
+    monkeypatch.setattr(pipeline, "enrich", lambda *args, **kwargs: research)
+    monkeypatch.setattr(pipeline, "generate", lambda *args, **kwargs: initial)
+    repair_calls: list[list[str]] = []
+
+    def fake_regenerate(*args, **kwargs):
+        repair_calls.append(args[4])
+        return repaired
+
+    monkeypatch.setattr(pipeline, "regenerate_for_quality", fake_regenerate)
+    monkeypatch.setattr(
+        pipeline,
+        "optimize",
+        lambda content, *_: OptimizedContent(
+            content,
+            content.body_html,
+            '{"@context":"https://schema.org","@type":"Article"}',
+            "Article",
+        ),
+    )
+    gate_results = iter(
+        [
+            QualityResult(False, 50, [], ["Missing definition block"]),
+            QualityResult(False, 68, [], ["Missing approved proof point"]),
+            QualityResult(True, 82, [], []),
+        ]
+    )
+    monkeypatch.setattr(pipeline, "gate", lambda *args, **kwargs: next(gate_results))
+
+    def fake_write_release_artifact(*args, **kwargs):
+        run_dir = args[4]
+        run_dir.mkdir(parents=True, exist_ok=True)
+        (run_dir / "release-artifact.json").write_text(json.dumps(asdict(artifact), indent=2))
+        (run_dir / "rendered-preview.html").write_text(
+            "<html><head><title>Title</title><meta name='description' content='Desc'>"
+            "<link rel='canonical' href='https://example.com'>"
+            '<script type=\'application/ld+json\'>{"@context":"https://schema.org","@type":"Article"}</script>'
+            "</head><body></body></html>"
+        )
+        return artifact
+
+    monkeypatch.setattr(pipeline, "write_release_artifact", fake_write_release_artifact)
+    monkeypatch.setattr(pipeline, "send_release_ready", lambda *args, **kwargs: None)
+    monkeypatch.setattr(sys, "argv", ["pipeline.py"])
+
+    assert pipeline.main() == 0
+    assert repair_calls == [["Missing definition block"], ["Missing approved proof point"]]
 
 
 def test_manual_topic_uses_existing_calendar_entry(project_root, monkeypatch) -> None:
@@ -147,3 +413,13 @@ def test_manual_topic_uses_existing_calendar_entry(project_root, monkeypatch) ->
     topic = pipeline._select_topic(args, dry_run=False)
     assert topic.slug == "the-power-of-individual-level-engagement-in-folloze"
     assert topic.keywords[0] == "individual-level engagement"
+
+
+def test_stage_for_error_maps_research_provider_failures() -> None:
+    error = pipeline.ProviderUnavailableError("Gemini research call failed: Gemini rate limit")
+    assert pipeline._stage_for_error(error) == "enrich_research"
+
+
+def test_stage_for_error_maps_generation_validation_failures() -> None:
+    error = pipeline.ValidationError("Gemini payload missing 'sections'")
+    assert pipeline._stage_for_error(error) == "generate_content"

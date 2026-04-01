@@ -38,7 +38,9 @@ Return a JSON object:
 {
   "title": "...",
   "meta_description": "...",
-  "body_html": "...",
+  "body_html": "... full article HTML including the table, all comparison sections, FAQ, citations, statistics, and required Folloze links ...",
   "sections": [{"heading": "...", "html": "..."}]
 }
 
+CRITICAL OUTPUT RULE:
+- `body_html` must contain the complete article. Do not place required content only inside `sections`.

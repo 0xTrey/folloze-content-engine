@@ -13,7 +13,7 @@ topics:
     account orchestration. Use RingCentral engagement proof and tie to pipeline visibility.
   release_artifact_path: logs/runs/2026-03-20/release-artifact.json
   release_ready_date: '2026-03-20'
-  published_url: https://folloze-blog.vercel.app/insights/the-power-of-individual-level-engagement-in-folloze
+  published_url: https://www.folloze-blog.com/insights/the-power-of-individual-level-engagement-in-folloze
   published_date: '2026-03-20'
 - title: What Is AI Orchestration for B2B Go-To-Market Teams
   content_type: glossary
@@ -29,7 +29,7 @@ topics:
     distinguish Folloze from personalization tools and page builders.
   release_artifact_path: logs/runs/2026-03-21/release-artifact.json
   release_ready_date: '2026-03-21'
-  published_url: https://folloze-blog.vercel.app/insights/what-is-ai-orchestration-for-b2b-go-to-market-teams
+  published_url: https://www.folloze-blog.com/insights/what-is-ai-orchestration-for-b2b-go-to-market-teams
   published_date: '2026-03-21'
 - title: How One Marketer Can Run Enterprise Campaigns with Folloze
   content_type: guide
@@ -40,9 +40,13 @@ topics:
   - folloze campaign agent
   priority: 4
   planned_date: '2026-03-22'
-  status: pending
+  status: published
   notes: Guide for lean teams. Use Campaign Agent, 50% faster builds, and Panther-style
     team efficiency proof.
+  release_artifact_path: logs/runs/2026-03-24/release-artifact.json
+  release_ready_date: '2026-03-24'
+  published_url: https://www.folloze-blog.com/insights/how-one-marketer-can-run-enterprise-campaigns-with-folloze
+  published_date: '2026-03-24'
 - title: Account Engagement Signals Every B2B Marketer Should Track
   content_type: faq
   slug: account-engagement-signals-every-b2b-marketer-should-track
@@ -52,9 +56,13 @@ topics:
   - b2b engagement faq
   priority: 4
   planned_date: '2026-03-23'
-  status: pending
+  status: published
   notes: FAQ that bridges account-level and individual-level behavior. Reinforce why
     signals should tie to revenue visibility.
+  release_artifact_path: logs/runs/2026-03-25/release-artifact.json
+  release_ready_date: '2026-03-25'
+  published_url: https://www.folloze-blog.com/insights/account-engagement-signals-every-b2b-marketer-should-track
+  published_date: '2026-03-25'
 - title: Folloze vs Mutiny
   content_type: comparison
   slug: folloze-vs-mutiny
@@ -64,9 +72,13 @@ topics:
   - folloze mutiny comparison
   priority: 5
   planned_date: '2026-03-24'
-  status: pending
+  status: published
   notes: Lead with governance, analytics under cookie consent, no web-team dependency,
     and campaign lifecycle scope.
+  skip_reason: Missing definition block; Fewer than two cited sources; Missing FAQ
+    section; Word count below 900; Fewer than 2 links to folloze.com (found 0)
+  published_url: https://www.folloze-blog.com/insights/folloze-vs-mutiny
+  published_date: '2026-03-26'
 - title: Why Account-Based Marketing Breaks at the Individual Level
   content_type: blog
   slug: why-account-based-marketing-breaks-at-the-individual-level
@@ -76,9 +88,13 @@ topics:
   - buyer committee signals
   priority: 4
   planned_date: '2026-03-25'
-  status: pending
+  status: published
   notes: Short blog that sharpens the Folloze point of view. Contrast account selection
     with person-level behavior and next-best action.
+  release_artifact_path: logs/runs/2026-03-27/release-artifact.json
+  release_ready_date: '2026-03-27'
+  published_url: https://www.folloze-blog.com/insights/why-account-based-marketing-breaks-at-the-individual-level
+  published_date: '2026-03-27'
 - title: How to Activate 6sense and Folloze Together
   content_type: guide
   slug: how-to-activate-6sense-and-folloze-together
@@ -88,9 +104,11 @@ topics:
   - pipeline orchestration
   priority: 4
   planned_date: '2026-03-26'
-  status: pending
+  status: published
   notes: Operational guide. Use Conga $6.3M attributed pipeline proof and show signal-to-experience
     workflow.
+  published_url: https://www.folloze-blog.com/insights/how-to-activate-6sense-and-folloze-together
+  published_date: '2026-03-28'
 - title: What Is Content Intelligence in B2B Marketing
   content_type: glossary
   slug: what-is-content-intelligence-in-b2b-marketing
@@ -100,9 +118,11 @@ topics:
   - content intelligence engine
   priority: 3
   planned_date: '2026-03-27'
-  status: pending
+  status: published
   notes: Define Folloze's Content Intelligence Engine in practical terms with LLM
     readiness, content mapping, and optimization.
+  published_url: https://www.folloze-blog.com/insights/what-is-content-intelligence-in-b2b-marketing
+  published_date: '2026-03-29'
 - title: Folloze vs Userled
   content_type: comparison
   slug: folloze-vs-userled
@@ -112,9 +132,12 @@ topics:
   - microsite alternative
   priority: 4
   planned_date: '2026-03-28'
-  status: pending
+  status: published
   notes: Emphasize evergreen experiences, governance, privacy posture, and operating-system
     versus page-factory framing.
+  retry_count: 2
+  published_url: https://www.folloze-blog.com/insights/folloze-vs-userled
+  published_date: '2026-03-30'
 - title: Prompt-to-Pipeline Reporting FAQ
   content_type: faq
   slug: prompt-to-pipeline-reporting-faq
@@ -124,9 +147,11 @@ topics:
   - campaign revenue reporting
   priority: 4
   planned_date: '2026-03-29'
-  status: pending
+  status: published
   notes: Answer how Folloze connects campaign execution, engagement, and pipeline
     proof for revenue leaders.
+  published_url: https://www.folloze-blog.com/insights/prompt-to-pipeline-reporting-faq
+  published_date: '2026-03-30'
 - title: How to Build Executive-Ready Buyer Journeys Without Web-Team Bottlenecks
   content_type: guide
   slug: how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks
@@ -136,9 +161,11 @@ topics:
   - campaign governance
   priority: 3
   planned_date: '2026-03-30'
-  status: pending
+  status: published
   notes: Guide for enterprise teams frustrated by handoffs. Tie to governance, approvals,
     and marketer-owned execution.
+  published_url: https://www.folloze-blog.com/insights/how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks
+  published_date: '2026-03-31'
 - title: Folloze vs PathFactory
   content_type: comparison
   slug: folloze-vs-pathfactory
@@ -148,9 +175,11 @@ topics:
   - content experience alternative
   priority: 3
   planned_date: '2026-03-31'
-  status: pending
+  status: published
   notes: Focus on content destination versus full-funnel orchestration, plus broader
     campaign and sales-room use cases.
+  published_url: https://www.folloze-blog.com/insights/folloze-vs-pathfactory
+  published_date: '2026-04-01'
 - title: How to Turn Buyer Intent into Campaign Action with Folloze
   content_type: guide
   slug: how-to-turn-buyer-intent-into-campaign-action-with-folloze

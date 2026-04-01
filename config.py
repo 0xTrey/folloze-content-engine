@@ -28,11 +28,13 @@ class DeliveryConfig:
 class PipelineConfig:
     quality_threshold: int
     max_retries_llm: int
+    max_quality_repairs: int
     verify_timeout_seconds: int
     timezone: str
     run_hour: int
     log_level: str
     max_log_age_days: int
+    geo_quality_threshold: int = 0
 
 
 @dataclass(slots=True)
@@ -108,8 +110,14 @@ class Config:
         if not 0 <= self.pipeline.quality_threshold <= 100:
             raise ConfigError("pipeline.quality_threshold must be between 0 and 100")
 
+        if not 0 <= self.pipeline.geo_quality_threshold <= 100:
+            raise ConfigError("pipeline.geo_quality_threshold must be between 0 and 100")
+
         if not 0 <= self.pipeline.run_hour <= 23:
             raise ConfigError("pipeline.run_hour must be between 0 and 23")
+
+        if not 0 <= self.pipeline.max_quality_repairs <= 5:
+            raise ConfigError("pipeline.max_quality_repairs must be between 0 and 5")
 
         try:
             ZoneInfo(self.pipeline.timezone)
@@ -121,8 +129,8 @@ class Config:
         if self.delivery.target != "vercel_static":
             raise ConfigError("delivery.target must be 'vercel_static'")
 
-        if self.delivery.release_mode != "manual":
-            raise ConfigError("delivery.release_mode must be 'manual'")
+        if self.delivery.release_mode not in {"manual", "auto"}:
+            raise ConfigError("delivery.release_mode must be 'manual' or 'auto'")
 
         if self.llm.provider != "gemini":
             raise ConfigError("llm.provider must be 'gemini'")

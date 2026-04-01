@@ -13,6 +13,13 @@ from content_calendar import Topic
 from exceptions import ArtifactSchemaError, ArtifactWriteError
 from optimizer import OptimizedContent
 from quality import QualityResult
+from site_rendering import (
+    author_profile,
+    build_article_json_ld,
+    extract_takeaways,
+    normalize_article_body,
+    retarget_release_artifact,
+)
 
 ARTIFACT_SCHEMA = {
     "type": "object",
@@ -112,13 +119,21 @@ def write_release_artifact(
     preview_path = run_dir / "rendered-preview.html"
     try:
         artifact_path.write_text(json.dumps(payload, indent=2))
-        preview_path.write_text(render_preview_html(artifact, Path("site/templates")))
+        preview_path.write_text(render_preview_html(artifact, Path("site/templates"), config=config))
     except OSError as exc:
         raise ArtifactWriteError(f"Failed to write release artifacts: {exc}") from exc
     return artifact
 
 
-def render_preview_html(artifact: ReleaseArtifact, template_dir: Path) -> str:
+def render_preview_html(
+    artifact: ReleaseArtifact,
+    template_dir: Path,
+    *,
+    config: Config | None = None,
+    related_posts: list[dict[str, str]] | None = None,
+) -> str:
+    config = config or Config.load(template_dir.resolve().parents[1] / "config.yaml")
+    artifact = retarget_release_artifact(artifact, config)
     environment = Environment(
         loader=FileSystemLoader(str(template_dir)),
         undefined=StrictUndefined,
@@ -126,7 +141,20 @@ def render_preview_html(artifact: ReleaseArtifact, template_dir: Path) -> str:
         lstrip_blocks=True,
     )
     template = environment.get_template("insight.html")
-    return template.render(artifact=artifact)
+    normalized_body = normalize_article_body(artifact.body_html)
+    return template.render(
+        artifact=artifact,
+        author=author_profile(config),
+        body_html=normalized_body,
+        takeaways=extract_takeaways(normalized_body),
+        related_posts=related_posts or [],
+        page_title=artifact.meta_title,
+        meta_description=artifact.meta_description,
+        canonical_url=artifact.canonical_url,
+        json_ld_blocks=[build_article_json_ld(artifact, config)],
+        body_class="article-page",
+        main_class="shell shell--article",
+    )
 
 
 def load_release_artifact(path: Path) -> ReleaseArtifact:

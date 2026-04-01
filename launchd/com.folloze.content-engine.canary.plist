@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.folloze.content-engine.canary</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Users/treyharnden/Projects/folloze-content-engine/.venv/bin/python</string>
+      <string>/Users/treyharnden/Projects/folloze-content-engine/scripts/run_publish_canary.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/treyharnden/Projects/folloze-content-engine</string>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+      <key>Hour</key>
+      <integer>9</integer>
+      <key>Minute</key>
+      <integer>15</integer>
+    </dict>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>PATH</key>
+      <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+      <key>HOME</key>
+      <string>/Users/treyharnden</string>
+      <key>LANG</key>
+      <string>en_US.UTF-8</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/treyharnden/Projects/folloze-content-engine/logs/launchagent-canary.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/treyharnden/Projects/folloze-content-engine/logs/launchagent-canary-error.log</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+  </dict>
+</plist>

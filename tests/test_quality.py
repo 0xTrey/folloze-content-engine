@@ -20,10 +20,17 @@ def test_gate_passes_with_score_above_threshold(project_root) -> None:
         title="Folloze vs Mutiny",
         meta_description="desc",
         body_html=(
-            "<p>Folloze is a platform. According to Gartner, 98% matters. "
+            '<div class="tldr">'
+            "<p>TL;DR: Folloze drives 98% better pipeline.</p></div>"
+            "<p>Teams struggle with slow campaigns before finding Folloze. "
+            "Folloze is a platform. According to Gartner (2024), 98% matters. "
             "According to Forrester, $6.3M matters.</p>"
             "<table><thead><tr><th>A</th></tr></thead><tr><td>B</td></tr></table>"
-            "<h2>FAQ</h2><p>Question.</p><p>Folloze proof $6.3M.</p>"
+            "<h2>FAQ</h2><p>Questions about folloze vs mutiny.</p><p>Folloze proof $6.3M.</p>"
+            '<a href="https://www.folloze.com/product">Product</a>'
+            '<a href="https://www.folloze.com/demo">Demo</a>'
+            "<p>Updated March 2026</p>"
+            '<meta name="author" content="Trey Harnden">'
         ),
         sections=[],
         word_count=1000,

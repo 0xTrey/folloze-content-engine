@@ -2,7 +2,7 @@
 
 Source synthesis:
 - `Projects/folloze-outbound-engine/docs/FOLLOZE_BRAND_VOICE.md`
-- `Downloads/2026 Folloze Brand Messaging.txt`
+- `Documents/Folloze/Brand Kit/docs/2026 Folloze Brand Messaging.txt`
 - `Projects/Folloze-Sales-Stack/cowork/memory/context/folloze-brand.md`
 
 ## Voice

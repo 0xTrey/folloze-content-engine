@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero hero--home">
+  <div class="hero__card">
+    <p class="hero__kicker">AI Orchestration &middot; ABM &middot; Pipeline</p>
+    <h1>B2B marketing intelligence, built for AI search and revenue teams.</h1>
+    <p class="hero__lede">
+      Folloze Insights publishes research, comparisons, and practical guides for marketers
+      turning buyer signals into campaigns, pipeline, and revenue visibility.
+    </p>
+    <div class="hero__actions">
+      <a class="hero__cta" href="/blog">Browse the archive</a>
+      <a class="hero__ghost" href="{{ featured_post.route if featured_post else '/blog' }}">Read the featured post</a>
+    </div>
+    <div class="hero__swatches" aria-hidden="true">
+      <span class="hero__swatch hero__swatch--blue"></span>
+      <span class="hero__swatch hero__swatch--pink"></span>
+      <span class="hero__swatch hero__swatch--green"></span>
+      <span class="hero__swatch hero__swatch--gold"></span>
+    </div>
+  </div>
+  <aside class="hero__panel">
+    <p class="section-label">Featured</p>
+    {% if featured_post %}
+    <p class="hero__panel-type">{{ featured_post.content_type | upper }}</p>
+    <h2 class="hero__panel-title"><a href="{{ featured_post.route }}">{{ featured_post.title }}</a></h2>
+    <p class="hero__panel-excerpt">{{ featured_post.excerpt }}</p>
+    <a class="post-card__cta" href="{{ featured_post.route }}">Read &rarr;</a>
+    {% else %}
+    <dl class="proof-list">
+      <div><dt>98%</dt><dd>Target account engagement (RingCentral, 60 days)</dd></div>
+      <div><dt>$6.3M</dt><dd>Attributed pipeline (Conga, 6 campaigns)</dd></div>
+      <div><dt>5x</dt><dd>Faster campaign creation with Campaign Agent</dd></div>
+    </dl>
+    {% endif %}
+  </aside>
+</section>
+
+<section class="section section--compact">
+  <div class="section-head">
+    <div>
+      <p class="section-label">Why this site exists</p>
+      <h2>Built to answer buyer and AI questions clearly.</h2>
+    </div>
+  </div>
+  <div class="signal-grid">
+    {% for card in topic_cards %}
+    <article class="signal-card">
+      <p class="signal-card__label">{{ card.label }}</p>
+      <h3>{{ card.title }}</h3>
+      <p>{{ card.copy }}</p>
+      <a class="post-card__cta" href="{{ card.href }}">{{ card.cta }} &rarr;</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" id="latest">
+  <div class="section-head">
+    <div>
+      <p class="section-label">Latest posts</p>
+      <h2>The newest research and comparisons</h2>
+    </div>
+    <a class="post-card__cta" href="/blog">See every post &rarr;</a>
+  </div>
+  <div class="post-grid">
+    {% for post in recent_posts %}
+    <article class="post-card">
+      <p class="post-card__meta">{{ post.content_type }} &middot; {{ post.published_date }}</p>
+      <h3><a href="{{ post.route }}">{{ post.title }}</a></h3>
+      <p>{{ post.excerpt }}</p>
+      <a class="post-card__cta" href="{{ post.route }}">Read &rarr;</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="shell cta-band__inner">
+    <p class="cta-band__label">Need the platform behind the playbook?</p>
+    <p class="cta-band__heading">See how Folloze turns signal activation into pipeline.</p>
+    <a class="cta-band__btn" href="https://www.folloze.com/request-demo" rel="noreferrer">Book a demo</a>
+  </div>
+</section>
+{% endblock %}

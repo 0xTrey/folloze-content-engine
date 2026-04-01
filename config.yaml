@@ -1,22 +1,24 @@
 # Runtime configuration — commit safe (no secrets)
 site:
-  origin: "https://folloze-blog.vercel.app"
+  origin: "https://www.folloze-blog.com"
   insights_path: "/insights"
 
 delivery:
   target: "vercel_static"
-  release_mode: "manual"
+  release_mode: "auto"
   preview_url: "https://folloze-blog.vercel.app"
-  production_url: "https://folloze-blog.vercel.app"
+  production_url: "https://www.folloze-blog.com"
 
 pipeline:
   quality_threshold: 70
   max_retries_llm: 2
+  max_quality_repairs: 3
   verify_timeout_seconds: 300
   timezone: "America/Chicago"
   run_hour: 9
   log_level: "INFO"
   max_log_age_days: 30
+  geo_quality_threshold: 0
 
 notifications:
   email:

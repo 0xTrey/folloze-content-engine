@@ -34,3 +34,6 @@ REQUIREMENTS:
 
 OUTPUT:
 Return JSON with title, meta_description, body_html, sections.
+
+CRITICAL OUTPUT RULE:
+- `body_html` must contain the complete article, including the FAQ and all required Folloze links and citations. Do not place required content only inside `sections`.

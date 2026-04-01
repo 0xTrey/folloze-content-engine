@@ -2,5 +2,29 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "site/dist",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "folloze-blog.com"
+        }
+      ],
+      "destination": "https://www.folloze-blog.com/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "folloze-blog.vercel.app"
+        }
+      ],
+      "destination": "https://www.folloze-blog.com/$1",
+      "permanent": true
+    }
+  ]
 }

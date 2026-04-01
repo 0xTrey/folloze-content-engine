@@ -1,9 +1,9 @@
 # LLM and Buyer Context Reference
 
 Source synthesis:
-- `Downloads/LLM System Instructions for Folloze Projects - July 2025.md`
-- `Downloads/Trey's LLM Project Context for Folloze - July 2025 (1).md`
-- `Downloads/Living Brand Context Template (draft) for Folloze.txt`
+- `Documents/Folloze/Brand Kit/docs/LLM System Instructions for Folloze Projects - July 2025.md`
+- `Documents/Folloze/Brand Kit/docs/Trey's LLM Project Context for Folloze - July 2025.md`
+- `Documents/Folloze/Brand Kit/docs/Living Brand Context Template (draft) for Folloze.txt`
 
 ## Buyer behavior shift
 

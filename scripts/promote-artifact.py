@@ -13,7 +13,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from artifacts import load_release_artifact  # noqa: E402
+from config import Config  # noqa: E402
 from content_calendar import Topic, load_calendar, mark_published  # noqa: E402
+from site_rendering import retarget_release_artifact  # noqa: E402
 
 
 def main() -> int:
@@ -22,7 +24,8 @@ def main() -> int:
     args = parser.parse_args()
 
     artifact_path = Path(args.artifact)
-    artifact = load_release_artifact(artifact_path)
+    config = Config.load(ROOT / "config.yaml")
+    artifact = retarget_release_artifact(load_release_artifact(artifact_path), config)
 
     published_dir = ROOT / "site" / "published"
     published_dir.mkdir(parents=True, exist_ok=True)

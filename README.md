@@ -1,6 +1,6 @@
 # Folloze Content Engine
 
-Folloze Content Engine is a Python-based AEO content pipeline that generates release-ready artifacts and renders a static Insights site bundle for Vercel validation.
+Folloze Content Engine is a Python-based AEO content pipeline that generates, repairs, publishes, and verifies Folloze Insights content on a daily schedule.
 
 ## What it does
 
@@ -10,7 +10,8 @@ Folloze Content Engine is a Python-based AEO content pipeline that generates rel
 - optimizes HTML and JSON-LD
 - scores quality and brand fit
 - writes release artifacts and preview HTML
-- supports manual promotion into the static site bundle
+- auto-promotes, deploys, and verifies the daily publish flow through `scripts/run_daily_publish.py`
+- runs a 9:15 AM canary through `scripts/run_publish_canary.py` to verify the post is live, recover missed publishes, and write an incident report when the morning job fails
 
 ## Setup
 
@@ -23,6 +24,7 @@ Folloze Content Engine is a Python-based AEO content pipeline that generates rel
 
 - `python pipeline.py`
 - `python pipeline.py --dry-run`
+- `python scripts/run_daily_publish.py`
 - `python scripts/promote-artifact.py --artifact logs/runs/YYYY-MM-DD/release-artifact.json`
 - `python scripts/build-site.py`
 - `python scripts/export-vercel.py`

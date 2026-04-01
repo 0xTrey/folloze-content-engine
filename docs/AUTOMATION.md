@@ -11,7 +11,21 @@ The daily publishing entrypoint is `scripts/run_daily_publish.py`. It runs the f
 5. verify the live route against the artifact
 6. send the published notification to Discord and email
 
-The LaunchAgent plist for macOS lives at `launchd/com.folloze.content-engine.daily.plist` and is scheduled for 9:05 AM local time.
+`config.yaml` now defaults to `delivery.release_mode: "auto"`, which means the normal production path is unattended. The standalone `pipeline.py` command still writes a release artifact, but it no longer sends a "release ready" review notification unless you explicitly switch back to `manual`.
+
+The primary LaunchAgent plist for macOS lives at `launchd/com.folloze.content-engine.daily.plist` and is scheduled for 9:05 AM local time.
+
+## 9:15 canary job
+
+The recovery entrypoint is `scripts/run_publish_canary.py`. At 9:15 AM local time it:
+
+1. checks whether a post published for today is actually live on production
+2. inspects the latest run manifest, run events, and provider log lines if nothing is live
+3. resumes an interrupted `release_ready` artifact or reruns the oldest overdue topic
+4. writes an incident report to `logs/incidents/YYYY-MM-DD/`
+5. sends a canary notification with the diagnosis, actions taken, and long-term fix recommendation
+
+The canary LaunchAgent plist lives at `launchd/com.folloze.content-engine.canary.plist`.
 
 ## Required prerequisites
 
@@ -32,17 +46,20 @@ The LaunchAgent plist for macOS lives at `launchd/com.folloze.content-engine.dai
 
 ## Install on macOS
 
-1. Copy `launchd/com.folloze.content-engine.daily.plist` to `~/Library/LaunchAgents/`
-2. Run `launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.folloze.content-engine.daily.plist` if it is already loaded
-3. Run `launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.folloze.content-engine.daily.plist`
-4. Confirm with `launchctl print gui/$(id -u)/com.folloze.content-engine.daily`
+1. Run `scripts/setup-launchd.sh`
+2. Confirm with `launchctl print gui/$(id -u)/com.folloze.content-engine.daily`
+3. Confirm with `launchctl print gui/$(id -u)/com.folloze.content-engine.canary`
 
 ## Logs
 
 - Workflow log: `logs/daily-publish.log`
+- Canary log: `logs/daily-publish-canary.log`
 - launchd stdout: `logs/launchagent.log`
 - launchd stderr: `logs/launchagent-error.log`
+- canary stdout: `logs/launchagent-canary.log`
+- canary stderr: `logs/launchagent-canary-error.log`
 - Run artifacts: `logs/runs/YYYY-MM-DD/`
+- Canary incidents: `logs/incidents/YYYY-MM-DD/`
 - Deploy events: `logs/deployments.jsonl`
 - AgentMail poller stdout: `~/.openclaw/workspace/skills/agentmail/logs/juno-discord-poller.log`
 - AgentMail poller stderr: `~/.openclaw/workspace/skills/agentmail/logs/juno-discord-poller-error.log`

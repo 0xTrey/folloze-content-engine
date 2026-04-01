@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-hero">
+  <p class="section-label">{{ page_label }}</p>
+  <h1>{{ heading }}</h1>
+  <p class="page-hero__lede">{{ lede }}</p>
+</section>
+
+<section class="section section--compact">
+  <div class="page-card">
+    <div class="page-body">{{ body_html | safe }}</div>
+  </div>
+</section>
+{% endblock %}

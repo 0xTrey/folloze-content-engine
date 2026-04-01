@@ -4,7 +4,8 @@
 
 - `BRAVE_API_KEY`: Brave web search key for research grounding.
 - `PERPLEXITY_API_KEY`: Perplexity key for secondary research synthesis.
-- `GEMINI_API_KEY`: the only LLM key used in v1.
+- `GEMINI_API_KEY`: primary Gemini key used for research and first-pass generation.
+- `AI_OPENAI_KEY`, `AI_DEEPSEEK_KEY`, `AI_GEMINI_KEY`, `AI_KIMI_KEY`, `AI_MINIMAX_KEY`: optional cloud fallback keys for `LLMGateway` when Gemini output is unusable.
 - `SMTP_PASSWORD`: optional SMTP password for release and error emails.
 - `agentmail-api` in macOS Keychain: preferred notification path for `juno@elevationengine.co` and inbox relay polling.
 
@@ -13,6 +14,11 @@
 - `BRAVE_API_KEY` falls back to `brave-search-api`
 - `PERPLEXITY_API_KEY` falls back to `perplexity-api`
 - `GEMINI_API_KEY` falls back to `gemini-api` and then `gemini-api-key`
+- `AI_GEMINI_KEY` falls back to `gemini-api` and then `gemini-api-key`
+- `AI_OPENAI_KEY` falls back to `openai-api` and then `openai-api-key`
+- `AI_DEEPSEEK_KEY` falls back to `deepseek-api`
+- `AI_KIMI_KEY` falls back to `kimi-api`
+- `AI_MINIMAX_KEY` falls back to `minimax-api`
 - `SMTP_PASSWORD` falls back to `smtp-password`, `gmail-app-password`, and `gmail-smtp`
 - Notification delivery falls back to AgentMail automatically when SMTP is not configured and the local AgentMail CLI is available.
 - Discord notifications use `openclaw` directly and read the target channel from `config.yaml`

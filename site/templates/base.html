@@ -3,37 +3,45 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ artifact.meta_title }}</title>
-    <meta name="description" content="{{ artifact.meta_description }}">
-    <link rel="canonical" href="{{ artifact.canonical_url }}">
+    <title>{{ page_title }}</title>
+    <meta name="description" content="{{ meta_description }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="alternate" type="application/rss+xml" title="Folloze Insights RSS" href="/rss.xml">
     <link rel="stylesheet" href="/styles.css">
-    <script type="application/ld+json">{{ artifact.json_ld | safe }}</script>
+    {% for block in json_ld_blocks %}
+    <script type="application/ld+json">{{ block | safe }}</script>
+    {% endfor %}
   </head>
-  <body class="article-page">
+  <body class="{{ body_class }}">
     <header class="site-header">
       <div class="shell site-header__inner">
         <a class="brand" href="/">
-          <span class="brand__mark">Folloze</span>
-          <span class="brand__sub">Insights</span>
+          <img class="brand__logo" src="/folloze-logo.png" alt="Folloze">
+          <span class="brand__sub brand__sub--pill">Insights</span>
         </a>
         <nav class="site-nav">
-          <a href="/#latest">Articles</a>
+          <a href="/">Home</a>
+          <a href="/blog">Blog</a>
+          <a href="/about">About</a>
+          <a href="/editorial-policy">Editorial Policy</a>
           <a href="https://www.folloze.com" rel="noreferrer">Folloze.com</a>
           <a class="nav__cta" href="https://www.folloze.com/request-demo" rel="noreferrer">Book a demo</a>
         </nav>
       </div>
     </header>
-    <main class="shell shell--article">
+    <main class="{{ main_class }}">
       {% block content %}{% endblock %}
     </main>
     <footer class="site-footer">
       <div class="shell site-footer__inner">
         <p>&copy; 2026 <a href="https://www.folloze.com" rel="noreferrer">Folloze</a> &mdash; AI Orchestration Platform for B2B Teams</p>
         <nav class="footer-nav">
+          <a href="/blog">Blog</a>
+          <a href="/authors/trey-harnden">Author</a>
+          <a href="/about">About</a>
+          <a href="/editorial-policy">Editorial Policy</a>
           <a href="https://www.folloze.com/platform/overview" rel="noreferrer">Platform</a>
-          <a href="https://www.folloze.com/customers" rel="noreferrer">Customers</a>
           <a href="https://www.folloze.com/request-demo" rel="noreferrer">Book a demo</a>
-          <a href="https://www.folloze.com/privacy-policy" rel="noreferrer">Privacy</a>
         </nav>
       </div>
     </footer>

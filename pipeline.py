@@ -19,6 +19,7 @@ from content_calendar import (
     load_calendar,
     mark_in_progress,
     mark_release_ready,
+    mark_retry_pending,
     mark_skipped,
     slugify,
 )
@@ -29,7 +30,7 @@ from exceptions import (
     RefusalError,
     ValidationError,
 )
-from generator import generate
+from generator import generate, regenerate_for_quality
 from notify import send_error, send_release_ready
 from optimizer import optimize
 from quality import gate
@@ -83,34 +84,68 @@ def main() -> int:
         )
         _write_json(run_dir / "research-context.json", asdict(research_context))
 
-        generated_content = _time_stage(
-            stage_timings,
-            "generate_content",
-            lambda: generate(topic, research_context, config),
-            run_dir,
-            run_id,
-        )
-        _write_json(run_dir / "generated-content.json", asdict(generated_content))
+        generated_content = None
+        optimized_content = None
+        quality_repair_failures: list[str] | None = None
+        max_quality_attempts = 1 + config.pipeline.max_quality_repairs
 
-        optimized_content = _time_stage(
-            stage_timings,
-            "optimize_aeo",
-            lambda: optimize(generated_content, config),
-            run_dir,
-            run_id,
-        )
-        (run_dir / "optimized-content.html").write_text(optimized_content.body_html)
+        for quality_attempt in range(max_quality_attempts):
+            generate_stage = _stage_name("generate_content", "repair_content", quality_attempt)
+            optimize_stage = _stage_name("optimize_aeo", "repair_optimize_aeo", quality_attempt)
+            quality_stage = _stage_name("quality_gate", "repair_quality_gate", quality_attempt)
 
-        quality_result = _time_stage(
-            stage_timings,
-            "quality_gate",
-            lambda: gate(optimized_content, config, research_context.brand_context),
-            run_dir,
-            run_id,
-        )
-        _write_json(run_dir / "quality-report.json", asdict(quality_result))
+            generated_content = _time_stage(
+                stage_timings,
+                generate_stage,
+                lambda: (
+                    generate(topic, research_context, config)
+                    if quality_repair_failures is None
+                    else regenerate_for_quality(
+                        topic,
+                        research_context,
+                        config,
+                        generated_content,
+                        quality_repair_failures,
+                    )
+                ),
+                run_dir,
+                run_id,
+            )
+            _write_json(run_dir / "generated-content.json", asdict(generated_content))
 
-        if not quality_result.passed:
+            optimized_content = _time_stage(
+                stage_timings,
+                optimize_stage,
+                lambda: optimize(generated_content, config),
+                run_dir,
+                run_id,
+            )
+            (run_dir / "optimized-content.html").write_text(optimized_content.body_html)
+
+            quality_result = _time_stage(
+                stage_timings,
+                quality_stage,
+                lambda: gate(optimized_content, config, research_context.brand_context),
+                run_dir,
+                run_id,
+            )
+            _write_json(run_dir / "quality-report.json", asdict(quality_result))
+
+            if quality_result.passed:
+                break
+            if quality_attempt < config.pipeline.max_quality_repairs:
+                quality_repair_failures = list(dict.fromkeys(quality_result.failures))
+                _record_event(
+                    run_dir,
+                    {
+                        "run_id": run_id,
+                        "event": "quality_repair_requested",
+                        "attempt": quality_attempt + 1,
+                        "topic": topic.title,
+                        "failures": quality_repair_failures,
+                    },
+                )
+                continue
             raise ValidationError("; ".join(quality_result.failures) or "Quality gate failed")
 
         artifact = _time_stage(
@@ -136,7 +171,8 @@ def main() -> int:
         )
 
         if not args.dry_run:
-            send_release_ready(topic, artifact, quality_result, run_dir, config)
+            if config.delivery.release_mode == "manual":
+                send_release_ready(topic, artifact, quality_result, run_dir, config)
             if args.topic is None:
                 mark_release_ready(
                     Path("content/calendar.yaml"),
@@ -170,9 +206,16 @@ def main() -> int:
             topic
             and not args.dry_run
             and args.topic is None
-            and not isinstance(exc, ProviderUnavailableError)
         ):
-            mark_skipped(Path("content/calendar.yaml"), topic, str(exc))
+            if isinstance(exc, (ProviderUnavailableError, ValidationError)):
+                mark_retry_pending(
+                    Path("content/calendar.yaml"),
+                    topic,
+                    str(exc),
+                    date.today().isoformat(),
+                )
+            else:
+                mark_skipped(Path("content/calendar.yaml"), topic, str(exc))
         send_error(_stage_for_error(exc), exc, topic, config)
         _record_error(run_dir, run_id, _stage_for_error(exc), exc, topic)
     finally:
@@ -305,6 +348,14 @@ def _time_stage(stage_timings: dict[str, float], name: str, func, run_dir: Path,
     return result
 
 
+def _stage_name(initial_stage: str, repair_stage: str, quality_attempt: int) -> str:
+    if quality_attempt == 0:
+        return initial_stage
+    if quality_attempt == 1:
+        return repair_stage
+    return f"{repair_stage}_{quality_attempt}"
+
+
 def _write_json(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2))
@@ -365,8 +416,21 @@ def _prune_old_logs(max_age_days: int) -> None:
 
 def _stage_for_error(error: Exception) -> str:
     if isinstance(error, ProviderUnavailableError):
+        if "research" in str(error).lower():
+            return "enrich_research"
         return "generate_content"
     if isinstance(error, ValidationError):
+        message = str(error).lower()
+        if any(
+            token in message
+            for token in (
+                "generated content too short",
+                "payload missing",
+                "returned invalid json",
+                "did not contain a json object",
+            )
+        ):
+            return "generate_content"
         return "quality_gate"
     return "pipeline"
 

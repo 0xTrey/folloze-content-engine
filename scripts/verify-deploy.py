@@ -13,6 +13,7 @@ if str(ROOT) not in sys.path:
 
 from artifacts import load_release_artifact  # noqa: E402
 from config import Config  # noqa: E402
+from site_rendering import retarget_release_artifact  # noqa: E402
 from verify import check_live_against_artifact  # noqa: E402
 
 
@@ -26,7 +27,7 @@ def main() -> int:
     args = parser.parse_args()
 
     config = Config.load(ROOT / "config.yaml")
-    artifact = load_release_artifact(Path(args.artifact))
+    artifact = retarget_release_artifact(load_release_artifact(Path(args.artifact)), config)
 
     base_url = args.url or (
         config.delivery.preview_url if args.target == "preview" else config.delivery.production_url

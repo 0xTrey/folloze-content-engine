@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = ROOT / "site" / "dist"
 VERCEL_PROJECT = ROOT / ".vercel" / "project.json"
+VERCEL_CONFIG = ROOT / "vercel.json"
 
 
 def main() -> int:
@@ -23,10 +24,39 @@ def main() -> int:
     if VERCEL_PROJECT.exists():
         shutil.copyfile(VERCEL_PROJECT, dist_vercel / "project.json")
 
-    # Write a minimal vercel.json into dist so cleanUrls works without
-    # an outputDirectory indirection.
+    # Copy the root Vercel settings into dist but strip the outputDirectory
+    # indirection because dist is deployed directly.
     vercel_cfg = {"cleanUrls": True, "trailingSlash": False}
+    if VERCEL_CONFIG.exists():
+        root_cfg = json.loads(VERCEL_CONFIG.read_text())
+        vercel_cfg = {key: value for key, value in root_cfg.items() if key != "outputDirectory"}
     (DIST_DIR / "vercel.json").write_text(json.dumps(vercel_cfg, indent=2))
+
+    output_dir = ROOT / ".vercel" / "output"
+    output_static = output_dir / "static"
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
+    output_static.mkdir(parents=True, exist_ok=True)
+    for source in DIST_DIR.rglob("*"):
+        if source.is_dir():
+            continue
+        if ".vercel" in source.parts:
+            continue
+        target = output_static / source.relative_to(DIST_DIR)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+    (output_dir / "config.json").write_text(
+        json.dumps(
+            {
+                "version": 3,
+                "routes": [
+                    {"handle": "filesystem"},
+                    {"src": "/(.*)", "dest": "/$1"},
+                ],
+            },
+            indent=2,
+        )
+    )
 
     log_path = ROOT / "logs" / "deployments.jsonl"
     log_path.parent.mkdir(parents=True, exist_ok=True)

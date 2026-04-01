@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-hero">
+  <p class="section-label">Archive</p>
+  <h1>All Folloze Insights posts</h1>
+  <p class="page-hero__lede">
+    Every published guide, glossary page, comparison, and article in one place.
+    Use this archive as the main repository for the publication.
+  </p>
+</section>
+
+<section class="section section--compact">
+  <div class="archive-filter-row">
+    {% for filter in filters %}
+    <div class="filter-chip">
+      <span>{{ filter.label }}</span>
+      <strong>{{ filter.count }}</strong>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section archive-section">
+  <div class="post-grid">
+    {% for post in posts %}
+    <article class="post-card">
+      <p class="post-card__meta">{{ post.content_type }} &middot; {{ post.published_date }}</p>
+      <h2><a href="{{ post.route }}">{{ post.title }}</a></h2>
+      <p>{{ post.excerpt }}</p>
+      <div class="archive-card__footer">
+        <span class="archive-card__tag">{{ post.primary_keyword }}</span>
+        <a class="post-card__cta" href="{{ post.route }}">Read &rarr;</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

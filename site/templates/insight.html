@@ -2,24 +2,93 @@
 
 {% block content %}
 <article class="insight">
-  <a class="back-link" href="/">Back to all posts</a>
+  <a class="back-link" href="/blog">Back to the archive</a>
   <div class="insight__hero">
     <p class="eyebrow">{{ artifact.content_type | upper }}</p>
     <h1>{{ artifact.title }}</h1>
-    <p class="meta">{{ artifact.published_date }} · AEO score {{ artifact.citation_score }}/100</p>
+    <div class="insight__meta-row">
+      <p class="meta">{{ artifact.published_date }} · {{ reading_time | default("5 min read") }} · AEO score {{ artifact.citation_score }}/100</p>
+      <a class="meta-link" href="/authors/{{ author.slug }}">By {{ author.name }}</a>
+    </div>
+    <div class="author-strip">
+      <img class="author-strip__image" src="{{ author.image_path }}" alt="{{ author.name }}">
+      <div>
+        <p class="author-strip__name">{{ author.name }}</p>
+        <p class="author-strip__role">{{ author.role }}</p>
+      </div>
+    </div>
+    <div class="insight__hero-accent"></div>
   </div>
+
+  {% if takeaways %}
+  <section class="takeaways" aria-labelledby="key-takeaways-title">
+    <div class="takeaways__header">
+      <p class="section-label">Bottom line up front</p>
+      <h2 id="key-takeaways-title">Key takeaways</h2>
+    </div>
+    <ul class="takeaways__list">
+      {% for takeaway in takeaways %}
+      <li>{{ takeaway }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
   <div class="insight__content">
-    <div class="body">{{ artifact.body_html | safe }}</div>
+    <div class="body">{{ body_html | safe }}</div>
     <aside class="insight__rail">
       <div class="rail-card">
         <p class="rail-label">Primary topic</p>
         <p class="rail-value">{{ artifact.target_keywords[0] }}</p>
       </div>
       <div class="rail-card">
-        <p class="rail-label">Release status</p>
-        <p class="rail-value">{{ artifact.status.replace("_", " ") }}</p>
+        <p class="rail-label">Publisher</p>
+        <p class="rail-value">Folloze Insights</p>
+      </div>
+      <div class="rail-card rail-card--author">
+        <img class="rail-card__image" src="{{ author.image_path }}" alt="{{ author.name }}">
+        <p class="rail-label">Author</p>
+        <p class="rail-value rail-value--strong">{{ author.name }}</p>
+        <p class="rail-copy">{{ author.short_bio }}</p>
+        <a class="post-card__cta" href="/authors/{{ author.slug }}">View author page &rarr;</a>
       </div>
     </aside>
   </div>
+
+  <section class="author-bio">
+    <img class="author-bio__image" src="{{ author.image_path }}" alt="{{ author.name }}">
+    <div>
+      <p class="section-label">Written by</p>
+      <h2>{{ author.name }}</h2>
+      <p>{{ author.long_bio }}</p>
+      <div class="author-bio__links">
+        <a href="/authors/{{ author.slug }}">Author page</a>
+        <a href="{{ author.linkedin_url }}" rel="noreferrer">LinkedIn</a>
+        <a href="{{ author.x_url }}" rel="noreferrer">X</a>
+      </div>
+    </div>
+  </section>
+
+  {% if related_posts %}
+  <section class="related-posts">
+    <div class="section-head">
+      <div>
+        <p class="section-label">Keep reading</p>
+        <h2>Related posts</h2>
+      </div>
+      <a class="post-card__cta" href="/blog">Browse the full archive &rarr;</a>
+    </div>
+    <div class="post-grid">
+      {% for post in related_posts %}
+      <article class="post-card">
+        <p class="post-card__meta">{{ post.content_type }} &middot; {{ post.published_date }}</p>
+        <h3><a href="{{ post.route }}">{{ post.title }}</a></h3>
+        <p>{{ post.excerpt }}</p>
+        <a class="post-card__cta" href="{{ post.route }}">Read &rarr;</a>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
 </article>
 {% endblock %}
