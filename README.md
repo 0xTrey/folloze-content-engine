@@ -4,7 +4,8 @@ Folloze Content Engine is a Python-based AEO content pipeline that generates, re
 
 ## What it does
 
-- pulls a topic from `content/calendar.yaml`
+- pulls the next pending topic from `content/calendar.yaml`
+- carries `topic.notes` into research and prompt generation so product marketing guidance, emotional territory, link priorities, and platform-specific optimization survive the pipeline
 - enriches it with research
 - generates content with Gemini
 - optimizes HTML and JSON-LD
@@ -34,6 +35,7 @@ Folloze Content Engine is a Python-based AEO content pipeline that generates, re
 ## Structure
 
 - pipeline modules live at repo root
+- topic scheduling and operator guidance live in `content/calendar.yaml`
 - content prompts in `content/templates/`
 - JSON-LD templates in `schema/`
 - published artifacts in `site/published/`
@@ -44,3 +46,4 @@ Folloze Content Engine is a Python-based AEO content pipeline that generates, re
 ## Development log
 
 - 2026-03-20: initial Gemini-only, Vercel-first build scaffold
+- 2026-04-05: calendar strategy refocused around buyer-intent clusters, integration pages, and tighter answer-engine definitions

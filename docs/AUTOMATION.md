@@ -25,6 +25,8 @@ The recovery entrypoint is `scripts/run_publish_canary.py`. At 8:45 AM America/C
 4. writes an incident report to `logs/incidents/YYYY-MM-DD/`
 5. sends a canary notification with the diagnosis, actions taken, and long-term fix recommendation
 
+If the calendar has no due `pending` topic, the canary records `no_due_topic` and does not recover anything. That is a content-operations gap, not an infra outage.
+
 The canary LaunchAgent plist lives at `launchd/com.folloze.content-engine.canary.plist`.
 
 ## Social brief artifact
@@ -46,6 +48,8 @@ The citation monitor LaunchAgent plist lives at `launchd/com.folloze.content-eng
 ## Required prerequisites
 
 - Pending topics must exist in `content/calendar.yaml`
+- The calendar should maintain at least 30 to 45 days of future `pending` coverage
+- Topic `notes` should contain any operator guidance the engine must carry into research and generation
 - Gemini, Brave, and Perplexity credentials must be available via env vars or macOS Keychain
 - Vercel CLI must be installed and authenticated, or `VERCEL_TOKEN` must be available via env var or Keychain
 - The project virtualenv must exist at `.venv`
@@ -86,3 +90,9 @@ The old repo-root plist `com.folloze.content-engine.plist` is deprecated and sho
 - AgentMail poller stderr: `~/.openclaw/workspace/skills/agentmail/logs/juno-discord-poller-error.log`
 - AgentMail webhook stdout: `~/.openclaw/workspace/skills/agentmail/logs/webhook-server.log`
 - AgentMail webhook stderr: `~/.openclaw/workspace/skills/agentmail/logs/webhook-server-error.log`
+
+## Common failure modes
+
+- `no_due_topic`: the publish queue ran out. Extend `content/calendar.yaml`.
+- provider degradation: inspect `logs/runs/YYYY-MM-DD/run-events.jsonl` and the preview artifacts, then rerun the daily publish job.
+- deploy verification failure: compare the promoted artifact, `site/dist/`, and the live route before redeploying.

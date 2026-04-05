@@ -15,6 +15,19 @@
 - Use `pending` for new topics.
 - Use `release_ready` only when the pipeline sets it.
 - Use `published` only after promotion.
+- Keep at least 30 to 45 days of future `pending` coverage so the daily job does not fail with `no_due_topic`.
+- Treat each topic as both scheduling and prompt control. `title`, `content_type`, `keywords`, and `notes` all matter.
+- Use `notes` for guidance the engine should actually honor: emotional territory, platform-specific optimization, integration or competitor angle, required internal-link targets, proof constraints, and any taboo claims.
+- Prefer one primary page per keyword cluster. Do not add near-duplicate topics that compete with an existing money page unless you are intentionally building a spoke around it.
+- Bias new additions toward the commercial lanes defined in `docs/CALENDAR_STRATEGY.md` before adding broad thought-leadership pieces.
+
+## Common calendar patterns
+
+- Money page: one canonical page for a high-intent cluster such as ABM landing pages, B2B microsites, or website personalization.
+- Definition page: short, explicit glossary-style page built for AI Overviews and citation systems.
+- Comparison page: bottom-of-funnel evaluation page with a table and clear trade-offs.
+- Integration page: high-intent workflow page for a paired platform such as 6sense, Demandbase, Outreach, Salesforce, Marketo, or Eloqua.
+- Spoke guide: implementation or measurement page that strengthens an existing money page instead of creating a second category center.
 
 ## Logs
 
@@ -41,3 +54,4 @@
 
 - Content or config issues: Trey
 - Vercel deploy or domain issues: Trey or web dev team
+- Calendar coverage gap or `no_due_topic`: Trey and product marketing
