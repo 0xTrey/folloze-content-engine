@@ -35,7 +35,13 @@ def test_publish_canary_exits_when_today_is_already_live(repo_copy: Path, monkey
             [],
         ),
     )
-    monkeypatch.setattr(module, "send_canary_report", lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("should not notify when live")))
+    monkeypatch.setattr(
+        module,
+        "send_canary_report",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("should not notify when live")
+        ),
+    )
     monkeypatch.setattr(sys, "argv", ["run_publish_canary.py", "--date", "2026-04-01"])
 
     assert module.main() == 0
@@ -109,11 +115,23 @@ def test_publish_canary_reruns_daily_publish_for_missed_post(repo_copy: Path, mo
             "markdown": "logs/incidents/2026-04-01/publish-canary.md",
         },
     )
-    monkeypatch.setattr(module, "send_canary_report", lambda subject, body, config: reports.append(subject))
+    monkeypatch.setattr(
+        module,
+        "send_canary_report",
+        lambda subject, body, config: reports.append(subject),
+    )
     monkeypatch.setattr(sys, "argv", ["run_publish_canary.py", "--date", "2026-04-01"])
 
     assert module.main() == 0
-    assert commands == [[sys.executable, str(repo_copy / "scripts" / "run_daily_publish.py")]]
+    assert commands == [
+        [
+            sys.executable,
+            str(repo_copy / "scripts" / "run_daily_publish.py"),
+            "--skip-pipeline",
+            "--date",
+            "2026-04-01",
+        ]
+    ]
     assert reports == ["[Folloze Insights] Canary recovered missed publish for 2026-04-01"]
 
 
@@ -187,7 +205,15 @@ def test_publish_canary_requeues_stale_in_progress_topic(repo_copy: Path, monkey
     monkeypatch.setattr(sys, "argv", ["run_publish_canary.py", "--date", "2026-04-01"])
 
     assert module.main() == 0
-    assert commands == [[sys.executable, str(repo_copy / "scripts" / "run_daily_publish.py")]]
+    assert commands == [
+        [
+            sys.executable,
+            str(repo_copy / "scripts" / "run_daily_publish.py"),
+            "--skip-pipeline",
+            "--date",
+            "2026-04-01",
+        ]
+    ]
 
     payload = yaml.safe_load((repo_copy / "content" / "calendar.yaml").read_text())
     item = payload["topics"][0]
@@ -203,7 +229,11 @@ def test_publish_canary_reports_failed_recovery_attempt(repo_copy: Path, monkeyp
     reports: list[str] = []
 
     monkeypatch.setattr(module.Config, "load", lambda path: object())
-    monkeypatch.setattr(module, "_live_published_entries_for_date", lambda target_date, config: ([], []))
+    monkeypatch.setattr(
+        module,
+        "_live_published_entries_for_date",
+        lambda target_date, config: ([], []),
+    )
     monkeypatch.setattr(
         module,
         "_diagnose",
@@ -255,7 +285,11 @@ def test_publish_canary_reports_failed_recovery_attempt(repo_copy: Path, monkeyp
             }
         ),
     )
-    monkeypatch.setattr(module, "send_canary_report", lambda subject, body, config: reports.append(subject))
+    monkeypatch.setattr(
+        module,
+        "send_canary_report",
+        lambda subject, body, config: reports.append(subject),
+    )
     monkeypatch.setattr(sys, "argv", ["run_publish_canary.py", "--date", "2026-04-01"])
 
     assert module.main() == 1

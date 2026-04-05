@@ -108,4 +108,4 @@ def test_research_uses_gateway_fallback_when_gemini_fails(project_root, monkeypa
     monkeypatch.setattr(research, "_call_gateway", fake_gateway)
     context = enrich(topic, Config.load())
     assert context.gemini_brief == "Gateway research brief"
-    assert seen_profiles == ["openai"]
+    assert seen_profiles == ["workhorse", "openai"]

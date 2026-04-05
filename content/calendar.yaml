@@ -189,9 +189,11 @@ topics:
   - folloze activation agent
   priority: 3
   planned_date: '2026-04-01'
-  status: pending
+  status: published
   notes: Guide that connects intent signals to Activation Agent workflows, audience
     targeting, and next-step orchestration.
+  published_url: https://www.folloze-blog.com/insights/how-to-turn-buyer-intent-into-campaign-action-with-folloze
+  published_date: '2026-04-02'
 - title: Why AI Marketing Orchestration Needs Governance
   content_type: blog
   slug: why-ai-marketing-orchestration-needs-governance
@@ -201,6 +203,8 @@ topics:
   - enterprise ai campaigns
   priority: 3
   planned_date: '2026-04-02'
-  status: pending
+  status: published
   notes: Point-of-view post for handoff audiences. Emphasize approvals, template control,
     privacy posture, and reliable reporting.
+  published_url: https://www.folloze-blog.com/insights/why-ai-marketing-orchestration-needs-governance
+  published_date: '2026-04-03'

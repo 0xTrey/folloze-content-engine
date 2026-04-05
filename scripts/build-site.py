@@ -45,6 +45,7 @@ def build_site() -> int:
     if output_dir.exists():
         shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    _copy_social_briefs(published_dir, output_dir)
 
     for entry in entries:
         related_posts = _related_posts(entry, entries)
@@ -426,6 +427,16 @@ def _copy_assets(assets_dir: Path, output_dir: Path) -> None:
         shutil.copyfile(source, target)
 
 
+def _copy_social_briefs(published_dir: Path, output_dir: Path) -> None:
+    social_briefs_dir = published_dir / "social-briefs"
+    if not social_briefs_dir.exists():
+        return
+    for source in social_briefs_dir.rglob("*.json"):
+        target = output_dir / "social-briefs" / source.relative_to(social_briefs_dir)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+
+
 def _write_robots_txt(output_dir: Path, config: Config) -> None:
     robots = f"""User-agent: *
 Allow: /
@@ -550,12 +561,25 @@ def _write_deployment_manifest(
     entries: list[dict[str, object]],
     static_pages: list[dict[str, str]],
 ) -> None:
+    latest_social_brief = next(
+        (
+            {
+                "slug": entry["slug"],
+                "title": entry["title"],
+                "url": f"{config.site.origin}/social-briefs/{entry['slug']}.json",
+                "published_date": entry["published_date"],
+            }
+            for entry in entries
+        ),
+        None,
+    )
     payload = {
         "generated_at": dt.datetime.now(dt.UTC).isoformat(),
         "artifact_count": len(entries),
         "site_origin": config.site.origin,
         "preview_url": config.delivery.preview_url,
         "production_url": config.delivery.production_url,
+        "latest_social_brief": latest_social_brief,
         "routes": [
             {
                 "slug": entry["slug"],
@@ -563,6 +587,7 @@ def _write_deployment_manifest(
                 "route": entry["route"],
                 "canonical_url": entry["canonical_url"],
                 "published_date": entry["published_date"],
+                "social_brief_url": f"{config.site.origin}/social-briefs/{entry['slug']}.json",
             }
             for entry in entries
         ],

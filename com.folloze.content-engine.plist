@@ -2,6 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+  <!--
+    Deprecated legacy plist.
+    Do not install this file.
+    Use launchd/com.folloze.content-engine.daily.plist,
+    launchd/com.folloze.content-engine.canary.plist, and
+    launchd/com.folloze.content-engine.citation-monitor.plist instead.
+  -->
   <key>Label</key>
   <string>com.folloze.content-engine</string>
   <key>ProgramArguments</key>
@@ -35,4 +42,3 @@
   <false/>
 </dict>
 </plist>
-

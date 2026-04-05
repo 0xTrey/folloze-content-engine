@@ -64,6 +64,15 @@
       "promoted_at": "2026-03-31T14:30:16.579783+00:00"
     },
     {
+      "slug": "how-to-turn-buyer-intent-into-campaign-action-with-folloze",
+      "title": "Buyer Intent Activation: How Folloze Turns Signals into Campaign Action",
+      "route": "/insights/how-to-turn-buyer-intent-into-campaign-action-with-folloze",
+      "path": "how-to-turn-buyer-intent-into-campaign-action-with-folloze.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-turn-buyer-intent-into-campaign-action-with-folloze",
+      "source_run_id": "2026-04-02T09-05-18",
+      "promoted_at": "2026-04-02T14:11:59.553473+00:00"
+    },
+    {
       "slug": "prompt-to-pipeline-reporting-faq",
       "title": "Prompt-to-Pipeline Reporting FAQ: Attribution, Revenue Proof & Campaign Impact",
       "route": "/insights/prompt-to-pipeline-reporting-faq",
@@ -116,6 +125,15 @@
       "canonical_url": "https://www.folloze-blog.com/insights/why-account-based-marketing-breaks-at-the-individual-level",
       "source_run_id": "2026-03-27T09-05-05",
       "promoted_at": "2026-03-27T14:05:54.982017+00:00"
+    },
+    {
+      "slug": "why-ai-marketing-orchestration-needs-governance",
+      "title": "Why AI Marketing Orchestration Needs Enterprise Governance",
+      "route": "/insights/why-ai-marketing-orchestration-needs-governance",
+      "path": "why-ai-marketing-orchestration-needs-governance.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/why-ai-marketing-orchestration-needs-governance",
+      "source_run_id": "2026-04-03T09-12-32",
+      "promoted_at": "2026-04-03T14:15:29.261502+00:00"
     }
   ]
 }

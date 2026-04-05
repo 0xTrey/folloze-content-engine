@@ -20,6 +20,7 @@ from site_rendering import (
     normalize_article_body,
     retarget_release_artifact,
 )
+from social_brief import build_social_brief, social_brief_payload
 
 ARTIFACT_SCHEMA = {
     "type": "object",
@@ -117,9 +118,12 @@ def write_release_artifact(
     run_dir.mkdir(parents=True, exist_ok=True)
     artifact_path = run_dir / "release-artifact.json"
     preview_path = run_dir / "rendered-preview.html"
+    social_brief_path = run_dir / "social-brief.json"
     try:
         artifact_path.write_text(json.dumps(payload, indent=2))
         preview_path.write_text(render_preview_html(artifact, Path("site/templates"), config=config))
+        social_brief = build_social_brief(topic, artifact)
+        social_brief_path.write_text(json.dumps(social_brief_payload(social_brief), indent=2))
     except OSError as exc:
         raise ArtifactWriteError(f"Failed to write release artifacts: {exc}") from exc
     return artifact

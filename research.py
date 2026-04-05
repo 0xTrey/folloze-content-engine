@@ -148,12 +148,14 @@ def _gemini_brief(
     perplexity_summary: str,
     config: Config,
 ) -> str:
+    topic_notes = f"TOPIC NOTES:\n{topic.notes}\n\n" if topic.notes else ""
     prompt = (
         "Create a grounded research brief for a Folloze AEO article.\n"
         f"TOPIC: {topic.title}\n"
         f"KEYWORDS: {', '.join(topic.keywords)}\n"
+        f"{topic_notes}"
         "Use the brand context and research context below. Focus on proof points, buyer pain, "
-        "competitor positioning, and facts worth citing.\n\n"
+        "competitor positioning, platform-specific optimization notes, and facts worth citing.\n\n"
         "BRAND CONTEXT:\n"
         f"{brand_context}\n\n"
         "<research_context>\n"

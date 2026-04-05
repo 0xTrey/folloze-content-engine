@@ -15,7 +15,7 @@ pipeline:
   max_quality_repairs: 3
   verify_timeout_seconds: 300
   timezone: "America/Chicago"
-  run_hour: 9
+  run_hour: 7
   log_level: "INFO"
   max_log_age_days: 30
   geo_quality_threshold: 0

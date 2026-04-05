@@ -38,7 +38,7 @@ RUN_DATE_RE = re.compile(r"logs/runs/(\d{4}-\d{2}-\d{2})/")
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Run the 9:15 Folloze publish canary and auto-recover missed posts"
+        description="Run the 8:45 Folloze publish canary and auto-recover missed posts"
     )
     parser.add_argument("--date", help="YYYY-MM-DD publish date to verify, defaults to today")
     parser.add_argument(
@@ -203,7 +203,7 @@ def _diagnose(target_date: str) -> dict:
         "provider_signals": _provider_signals_for_date(target_date),
         "log_excerpt": _log_excerpt(target_date),
         "recommended_fix": (
-            "The 9:05 job never wrote a run directory. Check launchd state, launchagent-error.log, "
+            "The 7:30 job never wrote a run directory. Check launchd state, launchagent-error.log, "
             "and Python/venv path resolution before the next scheduled run."
         ),
     }

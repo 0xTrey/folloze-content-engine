@@ -10,8 +10,9 @@ Folloze Content Engine is a Python-based AEO content pipeline that generates, re
 - optimizes HTML and JSON-LD
 - scores quality and brand fit
 - writes release artifacts and preview HTML
+- publishes a machine-readable same-day social brief at `/social-briefs/latest.json` for downstream distribution systems
 - auto-promotes, deploys, and verifies the daily publish flow through `scripts/run_daily_publish.py`
-- runs a 9:15 AM canary through `scripts/run_publish_canary.py` to verify the post is live, recover missed publishes, and write an incident report when the morning job fails
+- runs an 8:45 AM canary through `scripts/run_publish_canary.py` to verify the post is live, recover missed publishes, and write an incident report when the morning job fails
 
 ## Setup
 

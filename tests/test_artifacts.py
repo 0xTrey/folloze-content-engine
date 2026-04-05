@@ -42,6 +42,7 @@ def test_write_release_artifact_outputs_expected_shape(project_root: Path) -> No
     quality = QualityResult(True, 80, ["ok"], [])
     artifact = write_release_artifact(topic, optimized, quality, Config.load(), run_dir, "run-1")
     assert (run_dir / "release-artifact.json").exists()
+    assert (run_dir / "social-brief.json").exists()
     loaded = load_release_artifact(run_dir / "release-artifact.json")
     assert loaded.slug == artifact.slug
 
@@ -126,6 +127,27 @@ def test_build_site_generates_output(repo_copy: Path) -> None:
         "review_notes": [],
     }
     (repo_copy / "site" / "published" / "title.json").write_text(json.dumps(artifact, indent=2))
+    social_briefs_dir = repo_copy / "site" / "published" / "social-briefs"
+    social_briefs_dir.mkdir(parents=True, exist_ok=True)
+    social_brief = {
+        "title": "Title",
+        "slug": "title",
+        "published_date": "2026-03-20",
+        "canonical_url": "https://insights.folloze.com/insights/title",
+        "source_run_id": "run-1",
+        "content_type": "guide",
+        "theme": "Title",
+        "thesis": "A concise thesis.",
+        "summary": "A concise summary.",
+        "target_keywords": ["hello"],
+        "key_takeaways": ["First takeaway"],
+        "proof_points": ["50% faster campaign builds"],
+        "brand_posture": "personal_thought_leadership_rooted_in_blog",
+        "role_angle_suggestions": {"marketing": "Use the practical marketing angle."},
+        "generated_at": "2026-03-20T12:00:00+00:00",
+    }
+    (social_briefs_dir / "title.json").write_text(json.dumps(social_brief, indent=2))
+    (social_briefs_dir / "latest.json").write_text(json.dumps(social_brief, indent=2))
     (repo_copy / "site" / "published" / "index.json").write_text(
         json.dumps({"artifacts": [{"slug": "title", "path": "title.json"}]}, indent=2)
     )
@@ -135,11 +157,15 @@ def test_build_site_generates_output(repo_copy: Path) -> None:
         check=True,
     )
     assert (repo_copy / "site" / "dist" / "insights" / "title" / "index.html").exists()
+    assert (repo_copy / "site" / "dist" / "social-briefs" / "title.json").exists()
+    assert (repo_copy / "site" / "dist" / "social-briefs" / "latest.json").exists()
     deployment_manifest = json.loads(
         (repo_copy / "site" / "dist" / "deployment-manifest.json").read_text()
     )
     assert deployment_manifest["artifact_count"] == 1
     assert deployment_manifest["routes"][0]["slug"] == "title"
+    assert deployment_manifest["routes"][0]["social_brief_url"].endswith("/social-briefs/title.json")
+    assert deployment_manifest["latest_social_brief"]["slug"] == "title"
 
 
 def test_promote_artifact_is_idempotent(repo_copy: Path) -> None:
@@ -165,6 +191,28 @@ def test_promote_artifact_is_idempotent(repo_copy: Path) -> None:
     run_dir.mkdir(parents=True, exist_ok=True)
     artifact_path = run_dir / "release-artifact.json"
     artifact_path.write_text(json.dumps(artifact, indent=2))
+    (run_dir / "social-brief.json").write_text(
+        json.dumps(
+            {
+                "title": "Title",
+                "slug": "folloze-vs-mutiny",
+                "published_date": "2026-03-20",
+                "canonical_url": "https://insights.folloze.com/insights/folloze-vs-mutiny",
+                "source_run_id": "run-1",
+                "content_type": "comparison",
+                "theme": "Title",
+                "thesis": "A concise thesis.",
+                "summary": "A concise summary.",
+                "target_keywords": ["folloze vs mutiny"],
+                "key_takeaways": ["First takeaway"],
+                "proof_points": ["$6.3M pipeline"],
+                "brand_posture": "specific_folloze_branded_ok",
+                "role_angle_suggestions": {"sales": "Use the sales angle."},
+                "generated_at": "2026-03-20T12:00:00+00:00",
+            },
+            indent=2,
+        )
+    )
     command = [
         sys.executable,
         str(repo_copy / "scripts" / "promote-artifact.py"),
@@ -178,6 +226,10 @@ def test_promote_artifact_is_idempotent(repo_copy: Path) -> None:
         entry for entry in manifest["artifacts"] if entry["slug"] == "folloze-vs-mutiny"
     ]
     assert len(folloze_entries) == 1
+    assert folloze_entries[0]["social_brief_path"] == "social-briefs/folloze-vs-mutiny.json"
+    assert folloze_entries[0]["social_brief_url"].endswith("/social-briefs/folloze-vs-mutiny.json")
+    assert (repo_copy / "site" / "published" / "social-briefs" / "folloze-vs-mutiny.json").exists()
+    assert (repo_copy / "site" / "published" / "social-briefs" / "latest.json").exists()
     promotion_log = (repo_copy / "logs" / "promotions.jsonl").read_text().strip().splitlines()
     assert len(promotion_log) == 2
 

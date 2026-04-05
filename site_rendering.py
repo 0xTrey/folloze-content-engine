@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from bs4 import BeautifulSoup, Tag
 
+from authors import primary_author_profile
 from config import Config
 
 if TYPE_CHECKING:
@@ -18,18 +19,6 @@ _SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
 
 
 @dataclass(frozen=True, slots=True)
-class AuthorProfile:
-    name: str
-    slug: str
-    role: str
-    short_bio: str
-    long_bio: str
-    linkedin_url: str
-    x_url: str
-    image_path: str
-
-
-@dataclass(frozen=True, slots=True)
 class PublisherProfile:
     name: str
     description: str
@@ -37,27 +26,6 @@ class PublisherProfile:
     logo_path: str
     linkedin_url: str
     x_url: str
-
-
-AUTHOR = AuthorProfile(
-    name="Trey Harnden",
-    slug="trey-harnden",
-    role="Account Executive at Folloze",
-    short_bio=(
-        "Trey Harnden writes about AI orchestration, buyer committee signals, "
-        "ABM personalization, and how lean teams run enterprise campaigns."
-    ),
-    long_bio=(
-        "Trey Harnden works at Folloze across pipeline generation, go-to-market "
-        "experiments, and AI-assisted content systems. His coverage focuses on "
-        "how B2B marketing and revenue teams scale signal activation, content "
-        "orchestration, and revenue visibility without adding headcount."
-    ),
-    linkedin_url="https://www.linkedin.com/in/treyharnden/",
-    x_url="https://x.com/Trey_Harnden",
-    image_path="/authors/trey-harnden.jpg",
-)
-
 
 def publisher_profile(config: Config) -> PublisherProfile:
     return PublisherProfile(
@@ -75,20 +43,24 @@ def publisher_profile(config: Config) -> PublisherProfile:
 
 
 def author_profile(config: Config) -> dict[str, Any]:
-    author_url = absolute_url(config.site.origin, f"/authors/{AUTHOR.slug}")
-    image_url = absolute_url(config.site.origin, AUTHOR.image_path)
+    author = primary_author_profile()
+    author_url = absolute_url(config.site.origin, f"/authors/{author.slug}")
+    image_url = absolute_url(config.site.origin, author.image_path)
     return {
-        "name": AUTHOR.name,
-        "slug": AUTHOR.slug,
-        "role": AUTHOR.role,
-        "short_bio": AUTHOR.short_bio,
-        "long_bio": AUTHOR.long_bio,
-        "linkedin_url": AUTHOR.linkedin_url,
-        "x_url": AUTHOR.x_url,
-        "image_path": AUTHOR.image_path,
+        "author_id": author.author_id,
+        "name": author.name,
+        "slug": author.slug,
+        "role_slug": author.role_slug,
+        "role": author.role,
+        "team": author.team,
+        "short_bio": author.short_bio,
+        "long_bio": author.long_bio,
+        "linkedin_url": author.linkedin_url,
+        "x_url": author.x_url,
+        "image_path": author.image_path,
         "image_url": image_url,
         "url": author_url,
-        "same_as": [AUTHOR.linkedin_url, AUTHOR.x_url],
+        "same_as": [author.linkedin_url, author.x_url],
     }
 
 
@@ -256,6 +228,7 @@ def build_author_page_json_ld(config: Config, posts: list[dict[str, Any]]) -> st
     author = author_profile(config)
     publisher = publisher_profile_dict(config)
     page_url = author["url"]
+    author_route = f"/authors/{author['slug']}"
     graph: list[dict[str, Any]] = [
         _organization_node(publisher),
         _person_node(author),
@@ -279,8 +252,8 @@ def build_author_page_json_ld(config: Config, posts: list[dict[str, Any]]) -> st
         _breadcrumb_node(
             [
                 ("Home", "/"),
-                ("Author", "/authors/trey-harnden"),
-                (author["name"], "/authors/trey-harnden"),
+                ("Author", author_route),
+                (author["name"], author_route),
             ],
             config,
         ),
