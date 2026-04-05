@@ -2,15 +2,40 @@
 
 ## Current launch mode
 
-The first 14 publishing days are manually curated in `content/calendar.yaml`. This sequence is designed to establish category ownership, prove product depth, and create reusable comparison assets early.
+The first 40 pending publishing days are manually curated in `content/calendar.yaml`. The queue is designed to establish category ownership around Folloze's strongest commercial lanes, prove product depth, and create reusable comparison and integration assets early.
+
+## Must-win lanes
+
+- ABM landing pages
+- B2B microsites
+- B2B website personalization
+- Personalized landing pages and digital sales rooms for sales teams
+- Integration-led pages for 6sense, Demandbase, Outreach, Salesforce, Marketo, and Eloqua
+
+## What the queue should not over-index on
+
+- Broad "ABM platform" listicles
+- Generic "personalization software" language
+- Generic "AI marketing platform" framing
+- "Buyer experience platform" as the only category bet
+
+Those terms can support the narrative, but they should not displace tighter commercial pages with clearer buyer intent.
 
 ## Sequence logic
 
-- Days 1, 6, and 14 are short point-of-view blog posts to sharpen Folloze's narrative.
-- Days 2 and 8 define category language Folloze wants to own in AI search and answer engines.
-- Days 3, 7, 11, and 13 are operational guides that connect product capabilities to execution.
-- Days 5, 9, and 12 address common objections, reporting questions, and governance friction.
-- Days 5, 9, and 12 are also the highest-value comparison or buyer-evaluation moments for pipeline influence.
+- Open each cluster with one primary money page on the main domain, then publish definition, comparison, and implementation spokes around it.
+- Prioritize integration pages early because they carry narrower, higher-intent searches than broad category terms.
+- Keep answer-first pages short, explicit, and table-heavy so they can perform in AI Overviews and LLM citation workflows.
+- Use comparison pages to convert evaluation traffic, but keep each one anchored to a single keyword cluster and a single canonical page.
+- Let broader thought-leadership and ecosystem pieces trail the money pages instead of leading the sequence.
+
+## Technical cleanup requirements
+
+- Canonicalize or noindex parameterized `?flz-category=` and similar duplicate URLs.
+- Decide whether `engage.folloze.com` is campaign-only or an indexable evergreen content property.
+- Move or canonicalize evergreen comparison and use-case content to the main domain.
+- Enforce one primary page per keyword cluster.
+- Tighten internal links from FAQ, features, use cases, and blog posts into the main money pages.
 
 ## Future Juno operating model
 

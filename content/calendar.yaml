@@ -208,3 +208,558 @@ topics:
     privacy posture, and reliable reporting.
   published_url: https://www.folloze-blog.com/insights/why-ai-marketing-orchestration-needs-governance
   published_date: '2026-04-03'
+- title: How to Personalize B2B Landing Pages at Scale Without More Headcount
+  content_type: guide
+  slug: how-to-personalize-b2b-landing-pages-at-scale-without-more-headcount
+  keywords:
+  - personalized landing pages
+  - b2b landing page personalization
+  - landing page personalization
+  priority: 5
+  planned_date: '2026-04-04'
+  status: pending
+  notes: 'Pillar: ABM landing pages and microsites. Cluster 2 Personalization. Emotional
+    territory: credibility risk, then speed equals outcomes. P0 from Kristi brief.
+    Optimize for Google AI Overview with direct-answer H2s and a conversion table.
+    Link to Folloze personalization pages and request-demo CTA.'
+- title: ABM Landing Pages for B2B Teams
+  content_type: guide
+  slug: abm-landing-pages-for-b2b-teams
+  keywords:
+  - abm landing pages
+  - abm landing page software
+  - scalable abm landing pages
+  priority: 5
+  planned_date: '2026-04-05'
+  status: pending
+  notes: 'Pillar: ABM landing pages and microsites. Emotional territory: credibility
+    risk. Primary money page for this cluster. Make this the canonical main-domain
+    page for ABM landing page intent, with a direct definition, who-it-is-for section,
+    evaluation criteria, proof, FAQ, and strong internal links to personalization,
+    microsite, and comparison content.'
+- title: 'No-Code B2B Campaign Landing Pages: How to Launch Faster Without Web Tickets'
+  content_type: guide
+  slug: no-code-b2b-campaign-landing-pages-how-to-launch-faster-without-web-tickets
+  keywords:
+  - no-code b2b campaign landing pages
+  - no-code campaign landing pages
+  - campaign landing pages b2b
+  priority: 5
+  planned_date: '2026-04-06'
+  status: pending
+  notes: 'Pillar: ABM landing pages and microsites. Emotional territory: campaign
+    chaos. Strong fit for Folloze launch-speed proof. Focus on marketer autonomy,
+    governance, and time-to-launch with a table or step framework.'
+- title: B2B Website Personalization That Drives Pipeline
+  content_type: guide
+  slug: b2b-website-personalization-that-drives-pipeline
+  keywords:
+  - b2b website personalization
+  - website personalization for abm
+  - account-based website personalization
+  priority: 5
+  planned_date: '2026-04-07'
+  status: pending
+  notes: 'Pillar: B2B website personalization. Emotional territory: credibility risk.
+    Primary money page for the website-personalization cluster. Lead with pipeline
+    outcomes, not cosmetic personalization. Include what-it-is, what-it-is-not,
+    examples, measurement guidance, FAQ, and links to ABX, intent-data, and integration
+    spokes.'
+- title: 'Website Personalization vs. ABX: What Is the Difference'
+  content_type: comparison
+  slug: website-personalization-vs-abx-what-is-the-difference
+  keywords:
+  - website personalization vs abx
+  - abx marketing
+  - b2b website personalization
+  priority: 5
+  planned_date: '2026-04-08'
+  status: pending
+  notes: 'Pillar: B2B website personalization. Emotional territory: AI overwhelm.
+    This is a taxonomy-clarifying page and should be brutally clear about category
+    differences. Use a direct comparison table and keep Folloze framed as an AI orchestration
+    platform and ABX platform.'
+- title: What Is ABX?
+  content_type: glossary
+  slug: what-is-abx
+  keywords:
+  - what is abx
+  - account based experience
+  - abx marketing
+  priority: 4
+  planned_date: '2026-04-09'
+  status: pending
+  notes: 'Pillar: B2B website personalization plus revenue alignment. Emotional territory:
+    AI overwhelm. Answer-engine page. Define ABX directly, explain who it is for
+    and not for, contrast it with website personalization and ABM, and route readers
+    into the core money pages.'
+- title: Digital Sales Rooms for B2B Revenue Teams
+  content_type: guide
+  slug: digital-sales-rooms-for-b2b-revenue-teams
+  keywords:
+  - digital sales room
+  - digital sales room software
+  - deal room software
+  priority: 4
+  planned_date: '2026-04-10'
+  status: pending
+  notes: 'Pillar: digital sales rooms and sales orchestration. Emotional territory:
+    credibility risk. Primary money page for digital sales room intent. Cover definition,
+    buyer expectations, where Folloze fits, common evaluation criteria, FAQ, and
+    explicit links to Dock, trumpet, and deal-room comparison pages.'
+- title: 'Digital Sales Room vs. Deal Room: What Buyers Actually Mean'
+  content_type: comparison
+  slug: digital-sales-room-vs-deal-room-what-buyers-actually-mean
+  keywords:
+  - digital sales room vs deal room
+  - deal room software
+  - digital sales room software
+  priority: 4
+  planned_date: '2026-04-11'
+  status: pending
+  notes: 'Pillar: digital sales rooms and sales orchestration. Emotional territory:
+    AI overwhelm. Educational comparison keyword from the taxonomy plan. Define terms
+    clearly, show where they overlap, and explain what enterprise buyers actually
+    evaluate.'
+- title: B2B Microsite Platform for ABM and Sales
+  content_type: guide
+  slug: b2b-microsite-platform-for-abm-and-sales
+  keywords:
+  - b2b microsite platform
+  - abm microsites
+  - personalized microsites for b2b
+  priority: 4
+  planned_date: '2026-04-12'
+  status: pending
+  notes: 'Pillar: ABM landing pages and microsites. Emotional territory: credibility
+    risk. Primary money page for the microsite lane. Explain how B2B microsites differ
+    from static campaign pages and deal rooms, with examples, selection criteria,
+    and internal links to the microsite-versus-landing-page and buyer-experience
+    definitions.'
+- title: Microsite vs Landing Page for B2B Campaigns
+  content_type: comparison
+  slug: microsite-vs-landing-page-for-b2b-campaigns
+  keywords:
+  - microsite vs landing page
+  - abm landing pages
+  - personalized microsites
+  priority: 4
+  planned_date: '2026-04-13'
+  status: pending
+  notes: 'Pillar: ABM landing pages and microsites. Emotional territory: credibility
+    risk. P2 from Kristi brief and tier-1 optimization target. Use a conversion-focused
+    table and avoid forbidden category language in the copy body.'
+- title: What Is a B2B Microsite Platform
+  content_type: glossary
+  slug: what-is-a-b2b-microsite-platform
+  keywords:
+  - b2b microsite platform
+  - microsite platform for b2b
+  - abm microsites
+  priority: 4
+  planned_date: '2026-04-14'
+  status: pending
+  notes: 'Pillar: ABM landing pages and microsites. Emotional territory: credibility
+    risk. Definition-first category page targeting narrower commercial intent. Explain
+    the operational difference between static microsites and orchestrated campaign
+    experiences.'
+- title: What Is First-Party Intent Data?
+  content_type: glossary
+  slug: what-is-first-party-intent-data
+  keywords:
+  - what is first-party intent data
+  - first-party intent data
+  - first-party intent data for abm
+  priority: 4
+  planned_date: '2026-04-15'
+  status: pending
+  notes: 'Pillar: integrations plus website personalization. Emotional territory:
+    AI overwhelm. Answer-first definition page for a term Folloze can credibly own.
+    Cover what counts as first-party intent data, how it differs from third-party
+    signals, how to activate it, FAQ, and links to the 6sense, Demandbase, and personalization
+    pages.'
+- title: Personalized Landing Pages for Sales Outreach
+  content_type: guide
+  slug: personalized-landing-pages-for-sales-outreach
+  keywords:
+  - personalized landing pages for sales
+  - sales outreach landing pages
+  - personalized sales microsites
+  priority: 4
+  planned_date: '2026-04-16'
+  status: pending
+  notes: 'Pillar: personalized landing pages for sales outreach. Emotional territory:
+    pipeline anxiety. Commercial bridge page between marketing and sales use cases.
+    Show why personalized landing pages outperform generic follow-up, how SDRs and
+    AEs use them, what to measure, and where Folloze fits versus PDFs, decks, and
+    basic page builders.'
+- title: What Is a B2B Buyer Experience Platform?
+  content_type: glossary
+  slug: what-is-a-b2b-buyer-experience-platform
+  keywords:
+  - b2b buyer experience platform
+  - buyer experience platform for b2b
+  - account-based experience platform
+  priority: 4
+  planned_date: '2026-04-17'
+  status: pending
+  notes: 'Pillar: buyer experience platform narrative. Emotional territory: credibility
+    risk. Use this as narrative support, not the whole SEO plan. Define the category
+    cleanly, explain adjacent terms like ABX platform and microsite platform, and
+    route readers into higher-intent landing-page, personalization, and sales-room
+    pages.'
+- title: How to Use Intent Data to Drive Personalization Without More Tools
+  content_type: guide
+  slug: how-to-use-intent-data-to-drive-personalization-without-more-tools
+  keywords:
+  - intent data personalization
+  - use intent data for personalization
+  - first-party intent data for abm
+  priority: 4
+  planned_date: '2026-04-18'
+  status: pending
+  notes: 'Pillar: B2B website personalization plus integration-led content. Emotional
+    territory: speed equals outcomes. P2 from Kristi brief. Use 6sense and Bombora
+    examples, but keep Folloze as the orchestration layer. Link to personalization
+    pages and one integration page.'
+- title: 6sense Personalization for ABM Programs
+  content_type: guide
+  slug: 6sense-personalization-for-abm-programs
+  keywords:
+  - 6sense personalization
+  - 6sense landing page personalization
+  - 6sense plus folloze
+  priority: 4
+  planned_date: '2026-04-19'
+  status: pending
+  notes: 'Pillar: integrations with 6sense, Demandbase, and Outreach. Emotional territory:
+    speed equals outcomes. High-intent integration money page. Show how 6sense signals
+    map to audience selection, landing page personalization, and account-level engagement,
+    with direct links to core ABM landing page and website-personalization pages.'
+- title: Demandbase Personalization for B2B Buyer Journeys
+  content_type: guide
+  slug: demandbase-personalization-for-b2b-buyer-journeys
+  keywords:
+  - demandbase personalization
+  - demandbase website personalization
+  - demandbase folloze integration
+  priority: 4
+  planned_date: '2026-04-20'
+  status: pending
+  notes: 'Pillar: integrations with 6sense, Demandbase, and Outreach. Emotional territory:
+    pipeline anxiety. High-intent integration page. Tie Demandbase audiences and
+    signals to buyer-journey personalization and show how Folloze becomes the execution
+    layer for the experience.'
+- title: Outreach + Folloze for Personalized Sales Experiences
+  content_type: guide
+  slug: outreach-plus-folloze-for-personalized-sales-experiences
+  keywords:
+  - outreach digital sales room
+  - outreach personalized landing pages
+  - folloze outreach integration
+  priority: 4
+  planned_date: '2026-04-21'
+  status: pending
+  notes: 'Pillar: integrations with 6sense, Demandbase, and Outreach plus digital
+    sales rooms. Emotional territory: pipeline anxiety. Integration page for sales-facing
+    personalization. Cover landing pages, sales rooms, engagement tracking, and how
+    Folloze helps Outreach users act on buyer signals.'
+- title: Scaling ABM with a Two-Person Marketing Team
+  content_type: guide
+  slug: scaling-abm-with-a-two-person-marketing-team
+  keywords:
+  - scalable abm
+  - small team abm
+  - abm with small team
+  priority: 4
+  planned_date: '2026-04-22'
+  status: pending
+  notes: 'Pillar: AI-powered campaign creation plus ABX strategy. Emotional territory:
+    campaign chaos. P2 from Kristi brief. Build a concrete operating playbook with
+    staffing and workflow choices, not vague advice. Reuse the one-marketer proof
+    narrative.'
+- title: How to Personalize Content for Different Accounts Without Hiring More People
+  content_type: guide
+  slug: how-to-personalize-content-for-different-accounts-without-hiring-more-people
+  keywords:
+  - personalize content for different accounts
+  - b2b buyer journey personalization
+  - account personalization
+  priority: 3
+  planned_date: '2026-04-23'
+  status: pending
+  notes: 'Pillar: B2B website personalization. Emotional territory: campaign chaos
+    and credibility risk. Tier-3 pain-point query. Build a small-team playbook with
+    repeatable segmentation and reuse patterns.'
+- title: How to Make ABM Work with a Small Marketing Team
+  content_type: guide
+  slug: how-to-make-abm-work-with-a-small-marketing-team
+  keywords:
+  - abm with small marketing team
+  - small team abm
+  - lean abm
+  priority: 3
+  planned_date: '2026-04-24'
+  status: pending
+  notes: 'Pillar: ABX and ABM strategy. Emotional territory: campaign chaos. Tier-3
+    pain-point query. Give practical staffing, tooling, and workflow choices with
+    proof that one marketer can run enterprise-grade programs.'
+- title: What Tools Help Marketers Create Personalized Buying Journeys
+  content_type: comparison
+  slug: what-tools-help-marketers-create-personalized-buying-journeys
+  keywords:
+  - tools for personalized buying journeys
+  - personalized buying journey tools
+  - content personalization examples for b2b
+  priority: 3
+  planned_date: '2026-04-25'
+  status: pending
+  notes: 'Pillar: B2B website personalization plus digital sales rooms. Emotional
+    territory: credibility risk. Tier-3 pain-point query. Commercial investigation
+    piece with honest pros and cons. Avoid forbidden category language while still
+    comparing the landscape clearly.'
+- title: How to Measure Account Engagement Score
+  content_type: guide
+  slug: how-to-measure-account-engagement-score
+  keywords:
+  - how to measure account engagement score
+  - account engagement score
+  - account engagement scoring
+  - account engagement measurement
+  priority: 3
+  planned_date: '2026-04-26'
+  status: pending
+  notes: 'Pillar: ABX and ABM strategy. Emotional territory: pipeline anxiety. Answer-first
+    measurement page. Explain scoring inputs, weighting, governance, what good looks
+    like, and how to connect score movement to pipeline. Link to signals, ROI, and
+    sales-prioritization content.'
+- title: How to Measure ABX ROI When Traditional Metrics Fail
+  content_type: guide
+  slug: how-to-measure-abx-roi-when-traditional-metrics-fail
+  keywords:
+  - measure abx roi
+  - how to measure abm engagement
+  - account based experience measurement
+  priority: 3
+  planned_date: '2026-04-27'
+  status: pending
+  notes: 'Pillar: ABX and ABM strategy. Emotional territory: pipeline anxiety. Show
+    how to connect engagement to pipeline when channel-level metrics are not enough.
+    Make the metrics framework specific and executive-readable.'
+- title: ABM KPIs That Actually Predict Pipeline
+  content_type: faq
+  slug: abm-kpis-that-actually-predict-pipeline
+  keywords:
+  - abm kpis
+  - abm metrics
+  - how to measure abm engagement
+  priority: 3
+  planned_date: '2026-04-28'
+  status: pending
+  notes: 'Pillar: ABX and ABM strategy. Emotional territory: pipeline anxiety. FAQ
+    format should answer exact buyer questions that appear in prompt-style research
+    queries. Distinguish predictive metrics from vanity metrics.'
+- title: Using Buyer Engagement Data to Prioritize Sales Outreach
+  content_type: guide
+  slug: using-buyer-engagement-data-to-prioritize-sales-outreach
+  keywords:
+  - buyer engagement data
+  - prioritize sales outreach
+  - sales engagement signals
+  priority: 3
+  planned_date: '2026-04-29'
+  status: pending
+  notes: 'Pillar: digital sales rooms and sales orchestration. Emotional territory:
+    pipeline anxiety. Build this as a practical playbook that bridges marketing signals
+    and sales action. Link to existing signal and revenue-visibility pages.'
+- title: Salesforce + Folloze for Account-Level Engagement Tracking
+  content_type: guide
+  slug: salesforce-plus-folloze-for-account-level-engagement-tracking
+  keywords:
+  - salesforce plus folloze
+  - salesforce account engagement tracking
+  - folloze salesforce integration
+  priority: 3
+  planned_date: '2026-04-30'
+  status: pending
+  notes: 'Pillar: integrations and revenue visibility. Emotional territory: pipeline
+    anxiety. High-intent integration page. Show how account-level engagement data,
+    sales context, and campaign experiences connect back into Salesforce for clearer
+    follow-up and reporting.'
+- title: Building Automated Digital Sales Rooms from CRM Context
+  content_type: guide
+  slug: building-automated-digital-sales-rooms-from-crm-context
+  keywords:
+  - automated digital sales rooms
+  - crm digital sales rooms
+  - sales rooms from crm data
+  priority: 3
+  planned_date: '2026-05-01'
+  status: pending
+  notes: 'Pillar: digital sales rooms and sales orchestration. Emotional territory:
+    speed equals outcomes. Show how CRM context, engagement data, and AI orchestration
+    create persistent sales-room experiences.'
+- title: Marketo + Folloze for Personalized Campaign Journeys
+  content_type: guide
+  slug: marketo-plus-folloze-for-personalized-campaign-journeys
+  keywords:
+  - marketo plus folloze
+  - marketo personalized campaign journeys
+  - folloze marketo integration
+  priority: 3
+  planned_date: '2026-05-02'
+  status: pending
+  notes: 'Pillar: integrations and campaign orchestration. Emotional territory: speed
+    equals outcomes. Integration-led page for marketing teams already using Marketo.
+    Focus on journey orchestration, segmentation handoff, personalization, and measurement.'
+- title: Eloqua + Folloze for Enterprise ABM Landing Pages
+  content_type: guide
+  slug: eloqua-plus-folloze-for-enterprise-abm-landing-pages
+  keywords:
+  - eloqua plus folloze
+  - eloqua abm landing pages
+  - folloze eloqua integration
+  priority: 4
+  planned_date: '2026-05-03'
+  status: pending
+  notes: 'Pillar: integrations and enterprise campaign execution. Emotional territory:
+    speed equals outcomes. Enterprise integration page. Emphasize governance, campaign
+    launch speed, ABM landing pages, and how Eloqua programs feed into personalized
+    experiences.'
+- title: Folloze vs Demandbase Personalization
+  content_type: comparison
+  slug: folloze-vs-demandbase-personalization
+  keywords:
+  - folloze vs demandbase personalization
+  - demandbase website personalization
+  - demandbase personalization alternative
+  priority: 3
+  planned_date: '2026-05-04'
+  status: pending
+  notes: 'Pillar: competitive positioning plus website personalization. Emotional
+    territory: credibility risk. Bottom-of-funnel comparison. Be explicit about data
+    platform strengths versus experience-layer strengths, and keep the table focused
+    on orchestration, content experiences, measurement, and sales/marketing execution.'
+- title: 'Folloze vs. Dock: Which Platform Fits B2B Sales Rooms Better'
+  content_type: comparison
+  slug: folloze-vs-dock-which-platform-fits-b2b-sales-rooms-better
+  keywords:
+  - folloze vs dock
+  - dock alternative for b2b
+  - digital sales room software
+  priority: 3
+  planned_date: '2026-05-05'
+  status: pending
+  notes: 'Pillar: digital sales rooms and sales orchestration plus competitive positioning.
+    Emotional territory: credibility risk. Bottom-of-funnel comparison page requested
+    by the taxonomy-first plan. Be specific about sales-room workflows and enterprise
+    governance.'
+- title: 'Folloze vs. trumpet: Which Platform Fits Enterprise Buying Journeys'
+  content_type: comparison
+  slug: folloze-vs-trumpet-which-platform-fits-enterprise-buying-journeys
+  keywords:
+  - folloze vs trumpet
+  - trumpet alternative b2b
+  - digital sales room alternatives
+  priority: 3
+  planned_date: '2026-05-06'
+  status: pending
+  notes: 'Pillar: digital sales rooms and sales orchestration plus competitive positioning.
+    Emotional territory: credibility risk. Bottom-of-funnel comparison page. Use a
+    clear table and honest trade-offs around deal rooms, buying journeys, and orchestration.'
+- title: Digital Sales Room Alternatives for B2B Revenue Teams
+  content_type: comparison
+  slug: digital-sales-room-alternatives-for-b2b-revenue-teams
+  keywords:
+  - digital sales room alternatives
+  - digital sales room software
+  - virtual sales room software
+  priority: 3
+  planned_date: '2026-05-07'
+  status: pending
+  notes: 'Pillar: digital sales rooms and sales orchestration. Emotional territory:
+    AI overwhelm. High-intent landscape page that supports Dock, trumpet, and broader
+    sales-room comparisons. Keep recommendation criteria explicit.'
+- title: Intent Data and First-Party Data Activation for B2B
+  content_type: guide
+  slug: intent-data-and-first-party-data-activation-for-b2b
+  keywords:
+  - intent data activation
+  - first-party data activation
+  - b2b intent data
+  priority: 4
+  planned_date: '2026-05-08'
+  status: pending
+  notes: 'Pillar: integrations plus website personalization. Emotional territory:
+    speed equals outcomes. Noble reverse-mention post. Include natural, factual references
+    to SalesIntel and Easy Insights with no reciprocal explanation. Tie both back
+    to Folloze as the experience and orchestration layer.'
+- title: 'ABM and AI Personalization: Building the Modern ABX Stack'
+  content_type: guide
+  slug: abm-and-ai-personalization-building-the-modern-abx-stack
+  keywords:
+  - abx stack
+  - ai personalization stack
+  - modern abx stack
+  priority: 4
+  planned_date: '2026-05-09'
+  status: pending
+  notes: 'Pillar: ABX and ABM strategy. Emotional territory: AI overwhelm. Noble reverse-mention
+    post. Reference Omniscient Digital as a content strategy example and GNW Consulting
+    in ABM implementation context. Position Folloze as the orchestration layer that
+    connects the stack.'
+- title: Multi-Channel Sales Engagement and GTM Efficiency
+  content_type: blog
+  slug: multi-channel-sales-engagement-and-gtm-efficiency
+  keywords:
+  - multi-channel sales engagement
+  - gtm efficiency
+  - sales engagement stack
+  priority: 3
+  planned_date: '2026-05-10'
+  status: pending
+  notes: 'Pillar: digital sales rooms and sales orchestration. Emotional territory:
+    campaign chaos. Noble reverse-mention post. Weave in Expandi and Sales Motion
+    as useful adjacent tools, and keep any Landbase mention brief and factual because
+    it is competitive.'
+- title: ABM Platform vs Landing Page Builder
+  content_type: comparison
+  slug: abm-platform-vs-landing-page-builder
+  keywords:
+  - abm platform vs landing page builder
+  - abm landing page builder
+  - abm platform comparison
+  priority: 3
+  planned_date: '2026-05-11'
+  status: pending
+  notes: 'Pillar: ABM landing pages and microsites plus category definition. Emotional
+    territory: AI overwhelm. Definition-and-comparison page built for AI extraction.
+    Explain where ABM platforms end, where landing page builders fit, and why buyers
+    often need an orchestration layer connecting data, content, and sales experiences.'
+- title: Best ABM Landing Page Tools for B2B
+  content_type: comparison
+  slug: best-abm-landing-page-tools-for-b2b
+  keywords:
+  - best abm landing page tools
+  - abm landing page builder
+  - abm landing page software
+  priority: 3
+  planned_date: '2026-05-12'
+  status: pending
+  notes: 'Pillar: competitive positioning plus ABM landing pages. Emotional territory:
+    credibility risk. Commercial investigation page targeting a tighter, higher-intent
+    search than generic ABM platform terms. Use a clean table, honest trade-offs,
+    and clear criteria tied to personalization, governance, measurement, and speed.'
+- title: 'B2B Buyer Journey Personalization: A Practical Playbook'
+  content_type: guide
+  slug: b2b-buyer-journey-personalization-a-practical-playbook
+  keywords:
+  - b2b buyer journey personalization
+  - personalized buyer journeys b2b
+  - buying journey personalization
+  priority: 3
+  planned_date: '2026-05-13'
+  status: pending
+  notes: 'Pillar: B2B website personalization. Emotional territory: credibility risk.
+    Mid-funnel educational keyword from the taxonomy plan. Make this a strong spoke
+    page tying landing pages, sales rooms, intent data, and ABX together.'
