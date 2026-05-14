@@ -7,15 +7,15 @@ Deferred work. Pick up in phase order.
 ## TODO-1: Citation Monitor
 **Phase:** 3 | **Priority:** P1 | **Effort:** M
 
-**What:** Periodically query ChatGPT, Perplexity, and Claude with target keywords. Check whether Folloze appears in the response. Track citation rate over time. Report weekly.
+**What:** Periodically query ChatGPT, Perplexity, Claude, Gemini, and Google AI surfaces with a benchmarked prompt set. Track Brand Visibility Score, Citation Rate, Share of Voice, Sentiment Score, and Source Attribution over time. Report monthly with weekly operational alerts.
 
-**Why:** Without this, you're publishing content but never knowing if LLMs are actually citing it. Citation monitor closes the feedback loop.
+**Why:** Without this, you're publishing content but never knowing whether Folloze is showing up in AI answers, getting cited, or losing share to competitors. Citation monitor closes the feedback loop and anchors the primary KPI layer in the marketing framework.
 
-**Pros:** Measures actual impact. Identifies which content types get cited most. Guides future calendar priorities.
+**Pros:** Measures actual AI visibility. Separates mentions from citations. Identifies which content types and URLs become citation-worthy. Guides future calendar priorities.
 
-**Cons:** Costs API calls per query. Requires parsing LLM responses to detect mentions (fuzzy match needed).
+**Cons:** Costs API calls per query. Requires response parsing, sentiment classification, competitor normalization, and source-attribution extraction. Cross-provider comparability must be preserved.
 
-**Context:** Build after V1 pipeline has been running for 2+ weeks and has 20+ pages published. Start with 10 target queries (e.g., "best ABM platform", "Folloze vs Mutiny", "AI marketing orchestration tool"). Log results to `logs/citations/YYYY-MM-DD.json`. Weekly digest email.
+**Context:** Build after V1 pipeline has been running for 2+ weeks and has 20+ pages published. Start with a benchmark prompt set spanning branded, non-branded, comparison, and category questions (e.g., "best ABM platform", "Folloze vs Mutiny", "AI marketing orchestration tool"). Persist normalized results to SQLite and generate a monthly scorecard aligned to the internal marketing framework.
 
 **Depends on:** V1 pipeline running, content published.
 

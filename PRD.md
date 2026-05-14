@@ -216,9 +216,14 @@ notifications:
     enabled: true
     smtp_host: "smtp.gmail.com"
     smtp_port: 587
-    from_address: "juno@elevationengine.co"
+    from_address: "hermes@elevationengine.co"
+    # Default Folloze Insights email recipients (errors/failures and non-weekly-GEO mail)
     to_addresses:
       - "trey.harnden@folloze.com"
+    # Weekly GEO summary recipients only
+    weekly_geo_to_addresses:
+      - "trey.harnden@folloze.com"
+      - "kristi.tutt@folloze.com"
 
 content:
   default_audience: "B2B revenue teams"
@@ -532,7 +537,7 @@ All secrets in macOS Keychain, exported via `~/.zshrc`.
 | `PERPLEXITY_API_KEY` | `perplexity-api` | Research enrichment |
 | `GEMINI_API_KEY` | `gemini-api-key` | Gemini generation and research synthesis |
 | `SMTP_PASSWORD` | `smtp-password` | Email notifications |
-| `NOTIFY_EMAIL_TO` | (config) | Recipient(s) for notifications |
+| `NOTIFY_EMAIL_TO` | (optional override) | Overrides config-based email routing for all notification emails; leave unset to preserve split routing between default Insights/error recipients and weekly GEO recipients |
 
 **`.env.example` must document all of the above. Never write actual values to any file.**
 

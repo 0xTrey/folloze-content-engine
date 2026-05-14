@@ -13,6 +13,7 @@ from runtime_secrets import get_secret, hydrate_provider_env
 LOGGER = logging.getLogger("content_engine.citation_monitor")
 
 FOLLOZE_RE = re.compile(r"\bfolloze\b", re.IGNORECASE)
+URL_RE = re.compile(r"https?://[^\s)\]>\"']+", re.IGNORECASE)
 COMPETITOR_PATTERNS = {
     "mutiny": re.compile(r"\bmutiny\b", re.IGNORECASE),
     "userled": re.compile(r"\buserled\b", re.IGNORECASE),
@@ -39,6 +40,8 @@ class ProviderResult:
     folloze_citation_position: int | None
     competitors_mentioned: list[str]
     confidence_flag: str
+    sentiment_label: str
+    source_urls: list[str]
 
 
 def query_perplexity(prompt_text: str) -> ProviderResult:
@@ -118,7 +121,6 @@ PROVIDERS = {
 def _analyze_response(provider: str, text: str) -> ProviderResult:
     folloze_mentioned = bool(FOLLOZE_RE.search(text))
 
-    # Find citation position (paragraph number where Folloze first appears)
     citation_position = None
     if folloze_mentioned:
         paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
@@ -127,15 +129,15 @@ def _analyze_response(provider: str, text: str) -> ProviderResult:
                 citation_position = i + 1
                 break
 
-    # Detect cited (mentioned with context, not just passing reference)
-    folloze_cited = folloze_mentioned and citation_position is not None
-
+    source_urls = list(dict.fromkeys(URL_RE.findall(text)))
+    folloze_cited = folloze_mentioned and (citation_position is not None or bool(source_urls))
     competitors = [name for name, pattern in COMPETITOR_PATTERNS.items() if pattern.search(text)]
 
     confidence = "normal"
+    lowered = text.lower()
     if len(text) < 50:
         confidence = "low"
-    elif any(phrase in text.lower() for phrase in ("i'm not sure", "i don't have", "unable to")):
+    elif any(phrase in lowered for phrase in ("i'm not sure", "i don't have", "unable to")):
         confidence = "low"
 
     return ProviderResult(
@@ -146,7 +148,45 @@ def _analyze_response(provider: str, text: str) -> ProviderResult:
         folloze_citation_position=citation_position,
         competitors_mentioned=competitors,
         confidence_flag=confidence,
+        sentiment_label=_classify_sentiment(lowered, folloze_mentioned),
+        source_urls=source_urls,
     )
+
+
+def _classify_sentiment(lowered_text: str, folloze_mentioned: bool) -> str:
+    if not folloze_mentioned:
+        return "neutral"
+
+    negative_markers = (
+        "poor fit",
+        "not recommended",
+        "weak",
+        "limited",
+        "expensive",
+        "difficult",
+        "lacks",
+        "not ideal",
+        "negative",
+        "bad",
+    )
+    positive_markers = (
+        "best",
+        "strong",
+        "recommended",
+        "leading",
+        "excellent",
+        "good fit",
+        "great fit",
+        "top choice",
+        "well suited",
+        "ideal",
+    )
+
+    if any(marker in lowered_text for marker in negative_markers):
+        return "negative"
+    if any(marker in lowered_text for marker in positive_markers):
+        return "positive"
+    return "neutral"
 
 
 class ProviderError(Exception):

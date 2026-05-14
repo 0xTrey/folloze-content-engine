@@ -3,15 +3,22 @@ from __future__ import annotations
 import html
 import json
 import logging
+import re
 import smtplib
 import subprocess
 import sys
 import traceback
+import urllib.error
+import urllib.request
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from html.parser import HTMLParser
 from pathlib import Path
 
-from bs4 import BeautifulSoup
+try:
+    from bs4 import BeautifulSoup
+except ImportError:  # pragma: no cover - fallback for lean environments
+    BeautifulSoup = None
 
 from artifacts import ReleaseArtifact
 from config import Config
@@ -20,6 +27,30 @@ from quality import QualityResult
 from runtime_secrets import get_secret
 
 LOGGER = logging.getLogger(__name__)
+
+CLOUDFLARE_EMAIL_WORKER_URL = "https://juno-cloudflare-relay.harnden-trey.workers.dev/send-email"
+CLOUDFLARE_EMAIL_FROM = "juno@elevation-engine.com"
+EMAIL_ONLY_ON_FAILURE_SUBJECT_PATTERNS = (
+    re.compile(r"ERROR:", re.IGNORECASE),
+    re.compile(r"\bfailed\b", re.IGNORECASE),
+)
+
+
+class _HTMLTextExtractor(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.parts: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        if tag in {"p", "div", "h1", "h2", "h3", "h4", "li", "pre", "br", "ul", "ol"}:
+            self.parts.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if data:
+            self.parts.append(data)
+
+    def get_text(self) -> str:
+        return "".join(self.parts)
 
 
 def send_release_ready(
@@ -85,11 +116,15 @@ def _send_email(subject: str, body: str, config: Config) -> None:
 
     _send_discord(subject, body, config)
 
+    if not _should_send_email(subject):
+        LOGGER.info("Skipping email for success notification subject=%s", subject)
+        return
+
     password = get_secret("SMTP_PASSWORD")
     username = get_secret("SMTP_USER") or config.notifications.email.from_address
     recipient = get_secret(
         "NOTIFY_EMAIL_TO",
-    ) or ",".join(config.notifications.email.to_addresses)
+    ) or ",".join(_resolve_recipients(subject, config))
     recipients = [entry.strip() for entry in recipient.split(",") if entry.strip()]
     if not recipients:
         LOGGER.warning(
@@ -97,6 +132,10 @@ def _send_email(subject: str, body: str, config: Config) -> None:
             subject,
         )
         return
+
+    if _send_via_cloudflare(subject, body, recipients, config.notifications.email.from_address):
+        return
+
     if not password:
         if _send_via_agentmail(subject, body, recipients, config.notifications.email.from_address):
             return
@@ -132,7 +171,7 @@ def _send_discord(subject: str, body_html: str, config: Config) -> None:
         return
 
     openclaw_cli = get_secret("OPENCLAW_CLI") or "openclaw"
-    message = f"{subject}\n\n{_html_to_text(body_html)}"
+    message = _format_discord_message(subject, body_html)
     try:
         subprocess.run(
             [
@@ -153,6 +192,162 @@ def _send_discord(subject: str, body_html: str, config: Config) -> None:
         LOGGER.info("Sent Discord notification for subject=%s", subject)
     except (OSError, subprocess.CalledProcessError) as exc:
         LOGGER.error("Discord notification failed for subject=%s: %s", subject, exc)
+
+
+def _format_discord_message(subject: str, body_html: str) -> str:
+    text_body = _html_to_text(body_html)
+    if "Visibility Monitor Alerts" not in subject:
+        return f"{subject}\n\n{text_body}"
+
+    metrics = _extract_metric_pairs(text_body)
+    alerts = _extract_section_items(text_body, "Alerts", {"Gap Prompts", "Competitor Sightings", "Source Attribution"})
+    gaps = _extract_section_items(text_body, "Gap Prompts", {"Competitor Sightings", "Source Attribution"})
+    competitors = _extract_section_items(text_body, "Competitor Sightings", {"Source Attribution"})
+    sources = _extract_section_items(text_body, "Source Attribution", set())
+
+    lines = [subject, "", "Scorecard"]
+    preferred_order = [
+        "Brand Visibility Score",
+        "Citation Rate",
+        "Share of Voice",
+        "Sentiment Score",
+        "Branded Prompt Visibility",
+        "Non-branded Prompt Visibility",
+        "Failure count",
+    ]
+    for key in preferred_order:
+        if key in metrics:
+            lines.append(f"- {key}: {metrics[key]}")
+
+    if alerts:
+        lines.append("")
+        lines.append("Alerts")
+        lines.extend(f"- {item}" for item in alerts[:8])
+
+    if gaps:
+        lines.append("")
+        lines.append("Largest prompt gaps")
+        lines.extend(f"- {item}" for item in gaps[:5])
+
+    if competitors:
+        lines.append("")
+        lines.append("Competitor pressure")
+        lines.extend(f"- {item}" for item in competitors[:5])
+
+    if sources:
+        lines.append("")
+        lines.append("Top attributed sources")
+        lines.extend(f"- {item}" for item in sources[:5])
+
+    return "\n".join(lines)
+
+
+def _extract_metric_pairs(text: str) -> dict[str, str]:
+    metrics: dict[str, str] = {}
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+        if key in {
+            "Run date",
+            "Prompts checked",
+            "Brand Visibility Score",
+            "Citation Rate",
+            "Share of Voice",
+            "Sentiment Score",
+            "Branded Prompt Visibility",
+            "Non-branded Prompt Visibility",
+            "Failure count",
+        }:
+            metrics[key] = value
+    return metrics
+
+
+def _extract_section_items(text: str, section_name: str, stop_headers: set[str]) -> list[str]:
+    lines = [line.strip() for line in text.splitlines()]
+    items: list[str] = []
+    in_section = False
+    for line in lines:
+        if not line:
+            continue
+        if line == section_name:
+            in_section = True
+            continue
+        if in_section and line in stop_headers:
+            break
+        if in_section:
+            items.append(re.sub(r"^[•*-]\s*", "", line))
+    return [item for item in items if item and item != "None"]
+
+
+def _should_send_email(subject: str) -> bool:
+    return any(pattern.search(subject) for pattern in EMAIL_ONLY_ON_FAILURE_SUBJECT_PATTERNS)
+
+
+def _resolve_recipients(subject: str, config: Config) -> list[str]:
+    if subject.startswith("[Folloze GEO] Weekly"):
+        return config.notifications.email.weekly_geo_to_addresses or []
+    return config.notifications.email.to_addresses
+
+
+def _send_via_cloudflare(
+    subject: str,
+    body_html: str,
+    recipients: list[str],
+    from_address: str,
+) -> bool:
+    token = get_secret("CLOUDFLARE_EMAIL_SEND_TOKEN")
+    if not token:
+        return False
+
+    worker_url = get_secret("CLOUDFLARE_EMAIL_WORKER_URL") or CLOUDFLARE_EMAIL_WORKER_URL
+    effective_from = get_secret("CLOUDFLARE_EMAIL_FROM") or CLOUDFLARE_EMAIL_FROM or from_address
+    text_body = _html_to_text(body_html)
+    payload = {
+        "to": recipients,
+        "from": effective_from,
+        "subject": subject,
+        "html": body_html,
+        "text": text_body,
+    }
+    request = urllib.request.Request(
+        worker_url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "content-type": "application/json",
+            "authorization": f"Bearer {token}",
+            "User-Agent": (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
+            ),
+            "Accept": "*/*",
+            "Accept-Language": "en-US,en;q=0.9",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            response_body = response.read().decode("utf-8", errors="replace")
+            LOGGER.info(
+                "Sent notification via Cloudflare email worker for subject=%s response=%s",
+                subject,
+                response_body,
+            )
+            return True
+    except urllib.error.HTTPError as exc:
+        details = exc.read().decode("utf-8", errors="replace")
+        LOGGER.error(
+            "Cloudflare email send failed for subject=%s status=%s details=%s",
+            subject,
+            exc.code,
+            details,
+        )
+    except (urllib.error.URLError, OSError) as exc:
+        LOGGER.error("Cloudflare email send failed for subject=%s: %s", subject, exc)
+    return False
 
 
 def _send_via_agentmail(
@@ -211,6 +406,12 @@ def _resolve_agentmail_cli() -> Path | None:
 
 
 def _html_to_text(value: str) -> str:
-    text = BeautifulSoup(value, "html.parser").get_text("\n")
+    if BeautifulSoup is not None:
+        text = BeautifulSoup(value, "html.parser").get_text("\n")
+    else:
+        parser = _HTMLTextExtractor()
+        parser.feed(value)
+        parser.close()
+        text = parser.get_text()
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     return "\n\n".join(lines)

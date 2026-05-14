@@ -4,12 +4,12 @@ import json
 import logging
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 LOGGER = logging.getLogger("content_engine.citation_monitor")
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 PARSER_VERSION = "regex-v1"
 
 DB_PATH = Path("data/citation_monitor.db")
@@ -53,6 +53,8 @@ CREATE TABLE IF NOT EXISTS citation_results (
     branded INTEGER NOT NULL DEFAULT 0,
     competitors_mentioned TEXT DEFAULT '[]',
     confidence_flag TEXT DEFAULT 'normal',
+    sentiment_label TEXT NOT NULL DEFAULT 'neutral',
+    source_urls TEXT NOT NULL DEFAULT '[]',
     citation_probability REAL DEFAULT 0.0,
     parser_version TEXT NOT NULL DEFAULT 'regex-v1',
     detection_method TEXT NOT NULL DEFAULT 'regex',
@@ -91,6 +93,8 @@ class CitationRow:
     branded: bool
     competitors_mentioned: list[str]
     confidence_flag: str
+    sentiment_label: str
+    source_urls: list[str]
     citation_probability: float
     parser_version: str
     detection_method: str
@@ -103,15 +107,29 @@ def init_db(db_path: Path = DB_PATH) -> sqlite3.Connection:
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.executescript(_SCHEMA_SQL)
-    # Set schema version if not present
+    _migrate_schema(conn)
     row = conn.execute("SELECT COUNT(*) FROM schema_version").fetchone()
     if row[0] == 0:
         conn.execute(
             "INSERT INTO schema_version (version) VALUES (?)",
             (SCHEMA_VERSION,),
         )
-        conn.commit()
+    else:
+        conn.execute("UPDATE schema_version SET version = ?", (SCHEMA_VERSION,))
+    conn.commit()
     return conn
+
+
+def _migrate_schema(conn: sqlite3.Connection) -> None:
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(citation_results)").fetchall()}
+    if "sentiment_label" not in columns:
+        conn.execute(
+            "ALTER TABLE citation_results ADD COLUMN sentiment_label TEXT NOT NULL DEFAULT 'neutral'"
+        )
+    if "source_urls" not in columns:
+        conn.execute(
+            "ALTER TABLE citation_results ADD COLUMN source_urls TEXT NOT NULL DEFAULT '[]'"
+        )
 
 
 def create_run(
@@ -148,9 +166,9 @@ def insert_citation(conn: sqlite3.Connection, row: CitationRow) -> None:
         "INSERT INTO citation_results "
         "(run_id, prompt_id, variant_text, provider, response_text, "
         "folloze_mentioned, folloze_cited, folloze_citation_position, "
-        "branded, competitors_mentioned, confidence_flag, "
+        "branded, competitors_mentioned, confidence_flag, sentiment_label, source_urls, "
         "citation_probability, parser_version, detection_method, checked_at) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             row.run_id,
             row.prompt_id,
@@ -163,6 +181,8 @@ def insert_citation(conn: sqlite3.Connection, row: CitationRow) -> None:
             int(row.branded),
             json.dumps(row.competitors_mentioned),
             row.confidence_flag,
+            row.sentiment_label,
+            json.dumps(row.source_urls),
             row.citation_probability,
             row.parser_version,
             row.detection_method,
@@ -278,15 +298,101 @@ def get_run_citation_stats(
         "SELECT "
         "COUNT(*) as total, "
         "SUM(folloze_mentioned) as mentioned, "
-        "SUM(branded) as branded_count "
+        "SUM(folloze_cited) as cited, "
+        "SUM(CASE WHEN branded = 1 THEN folloze_mentioned ELSE 0 END) as branded_mentions, "
+        "SUM(CASE WHEN branded = 1 THEN 1 ELSE 0 END) as branded_checks, "
+        "SUM(CASE WHEN branded = 0 THEN folloze_mentioned ELSE 0 END) as non_branded_mentions, "
+        "SUM(CASE WHEN branded = 0 THEN 1 ELSE 0 END) as non_branded_checks, "
+        "SUM(CASE WHEN folloze_mentioned = 1 AND sentiment_label = 'positive' THEN 1 ELSE 0 END) as positive_mentions "
         "FROM citation_results WHERE run_id = ?",
         (run_id,),
     ).fetchone()
-    total = row[0] or 1
+
+    total = row[0] or 0
+    brand_mentions = row[1] or 0
+    brand_citations = row[2] or 0
+    branded_mentions = row[3] or 0
+    branded_checks = row[4] or 0
+    non_branded_mentions = row[5] or 0
+    non_branded_checks = row[6] or 0
+    positive_mentions = row[7] or 0
+
+    competitor_total = conn.execute(
+        "SELECT COALESCE(SUM(sighting_count), 0) FROM competitor_sightings WHERE run_id = ?",
+        (run_id,),
+    ).fetchone()[0]
+
+    total_for_rate = total or 1
+    share_denominator = brand_mentions + competitor_total
+
     return {
-        "total": row[0],
-        "mentioned": row[1] or 0,
-        "branded_count": row[2] or 0,
-        "overall_citation_rate": (row[1] or 0) / total,
-        "branded_rate": (row[2] or 0) / max(row[1] or 0, 1),
+        "total": total,
+        "total_checks": total,
+        "mentioned": brand_mentions,
+        "brand_mentions": brand_mentions,
+        "brand_citations": brand_citations,
+        "competitor_mentions": competitor_total,
+        "brand_visibility_score": brand_mentions / total_for_rate,
+        "citation_rate": brand_citations / total_for_rate,
+        "share_of_voice": brand_mentions / share_denominator if share_denominator else 0.0,
+        "sentiment_score": positive_mentions / max(brand_mentions, 1),
+        "branded_prompt_visibility_score": branded_mentions / max(branded_checks, 1),
+        "non_branded_prompt_visibility_score": non_branded_mentions / max(non_branded_checks, 1),
+        # Backward-compatible aliases.
+        "overall_citation_rate": brand_mentions / total_for_rate,
+        "branded_rate": branded_mentions / max(branded_checks, 1),
+        "unbranded_rate": non_branded_mentions / max(non_branded_checks, 1),
     }
+
+
+def get_run_source_attribution_summary(
+    conn: sqlite3.Connection,
+    run_id: int,
+    limit: int = 10,
+) -> list[dict]:
+    rows = conn.execute(
+        "SELECT source_urls FROM citation_results WHERE run_id = ? AND source_urls != '[]'",
+        (run_id,),
+    ).fetchall()
+
+    counts: dict[str, int] = {}
+    for (raw_urls,) in rows:
+        try:
+            urls = json.loads(raw_urls or "[]")
+        except json.JSONDecodeError:
+            urls = []
+        for url in urls:
+            counts[url] = counts.get(url, 0) + 1
+
+    ranked = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
+    return [{"url": url, "count": count} for url, count in ranked[:limit]]
+
+
+def get_completed_run_summaries(
+    conn: sqlite3.Connection,
+    end_date: str,
+    days: int = 7,
+) -> list[dict]:
+    end = date.fromisoformat(end_date)
+    start = end - timedelta(days=days - 1)
+    rows = conn.execute(
+        "SELECT run_date, summary_json "
+        "FROM monitor_runs "
+        "WHERE completed = 1 AND run_date >= ? AND run_date <= ? "
+        "ORDER BY run_date ASC, id ASC",
+        (start.isoformat(), end.isoformat()),
+    ).fetchall()
+
+    summaries: list[dict] = []
+    for run_date, summary_json in rows:
+        if not summary_json:
+            continue
+        try:
+            parsed = json.loads(summary_json)
+        except json.JSONDecodeError:
+            LOGGER.warning("Skipping malformed summary_json for run_date=%s", run_date)
+            continue
+        if isinstance(parsed, dict):
+            parsed.setdefault("run_date", run_date)
+            summaries.append(parsed)
+    return summaries

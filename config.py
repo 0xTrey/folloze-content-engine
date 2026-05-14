@@ -44,6 +44,7 @@ class EmailNotificationsConfig:
     smtp_port: int
     from_address: str
     to_addresses: list[str]
+    weekly_geo_to_addresses: list[str] | None = None
 
 
 @dataclass(slots=True)
@@ -134,6 +135,11 @@ class Config:
 
         if self.llm.provider != "gemini":
             raise ConfigError("llm.provider must be 'gemini'")
+
+        if self.notifications.email.weekly_geo_to_addresses is None:
+            self.notifications.email.weekly_geo_to_addresses = list(
+                self.notifications.email.to_addresses
+            )
 
         for field_name, value in (
             ("delivery.preview_url", self.delivery.preview_url),

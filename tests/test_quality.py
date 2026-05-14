@@ -68,3 +68,45 @@ def test_gate_fails_banned_term_and_missing_proof(project_root) -> None:
     result = gate(optimized, Config.load(), "brand")
     assert result.passed is False
     assert any("Banned term" in failure for failure in result.failures)
+
+
+def test_gate_includes_seo_warnings_without_blocking_pass(project_root) -> None:
+    generated = GeneratedContent(
+        topic=Topic(
+            "AI Marketing Orchestration Governance",
+            "blog",
+            "ai-marketing-orchestration-governance",
+            ["marketing orchestration"],
+            5,
+            "pending",
+        ),
+        title="AI Marketing Orchestration Governance Guide",
+        meta_description=(
+            "Marketing orchestration guide for enterprise teams that need stronger approvals, "
+            "governance, and execution discipline across campaigns."
+        ),
+        body_html=(
+            '<div class="tldr"><p>TL;DR: Marketing orchestration improves campaign control by 98%.</p></div>'
+            "<p>Teams struggle with slow approvals before using marketing orchestration to simplify campaign execution. "
+            "According to Gartner (2024), 98% matters. According to Forrester, $6.3M matters.</p>"
+            "<h2>What is marketing orchestration?</h2><p>Marketing orchestration is the discipline of coordinating campaign execution, approvals, and signals.</p>"
+            "<h2>FAQ</h2><p>Questions about marketing orchestration.</p><p>Folloze proof $6.3M.</p>"
+            '<a href="https://www.folloze.com/product">Product</a>'
+            '<a href="https://www.folloze.com/demo">Demo</a>'
+            "<p>Updated March 2026</p>"
+            '<meta name="author" content="Trey Harnden">'
+        ),
+        sections=[],
+        word_count=1000,
+        content_type="blog",
+        primary_keyword="marketing orchestration",
+    )
+    optimized = OptimizedContent(
+        generated=generated,
+        body_html=generated.body_html,
+        json_ld='{"@context":"https://schema.org","@type":"Article"}',
+        schema_type="Article",
+    )
+    result = gate(optimized, Config.load(), "brand")
+    assert result.seo_warnings is not None
+    assert any("meta description" in warning.lower() for warning in result.seo_warnings)

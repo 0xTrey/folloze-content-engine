@@ -1,18 +1,32 @@
 {
   "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "{{ title }}",
-  "description": "{{ meta_description }}",
-  "author": {
-    "@type": "Organization",
-    "name": "Folloze",
-    "url": "https://www.folloze.com"
-  },
-  "datePublished": "{{ date_published }}",
-  "dateModified": "{{ date_published }}",
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "{{ canonical_url }}"
-  },
-  "keywords": "{{ keywords_csv }}"
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "headline": "{{ title }}",
+      "description": "{{ meta_description }}",
+      "author": {
+        "@type": "Organization",
+        "name": "Folloze",
+        "url": "https://www.folloze.com"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Folloze",
+        "url": "https://www.folloze.com"
+      },
+      "datePublished": "{{ date_published }}",
+      "dateModified": "{{ date_published }}",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ canonical_url }}"
+      },
+      "isPartOf": {
+        "@type": "Blog",
+        "name": "Folloze Insights",
+        "url": "{{ canonical_url.rsplit('/', 1)[0] }}"
+      },
+      "keywords": "{{ keywords_csv }}"
+    }
+  ]
 }

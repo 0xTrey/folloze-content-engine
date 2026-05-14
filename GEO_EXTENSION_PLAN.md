@@ -13,18 +13,56 @@ Three new modules extend the existing content engine to close the feedback loop 
 
 **Goals:**
 - SEO: rank for targeted keywords in Google
-- LLM/GEO: get cited by ChatGPT, Perplexity, Claude, Gemini on buyer questions
-- AIO: appear in Google AI Overview (triggers on 82% of B2B Tech queries)
+- LLM/GEO: increase Folloze Brand Visibility Score, citation rate, and share of voice across AI assistants on buyer questions
+- AIO: appear in Google AI Overview and adjacent AI answer surfaces
+- Revenue: connect AI visibility improvements to branded search lift, AI referral traffic, Folloze engagement, and pipeline progression
 
 **Three modules to build:**
 
 | Module | What it does | Schedule |
 |---|---|---|
 | Quality Gate Extensions | Extends `quality.py` with 10 new GEO checks | Inline on every publish run |
-| Citation Monitor | Queries LLMs with target keywords, tracks Folloze citation rate over time | Nightly, 10 PM |
-| Gap Analyzer | Scores keyword gaps by citation rate + competitor dominance, proposes topics to calendar | Weekly, Sunday 6 AM |
+| Citation Monitor | Queries LLMs with target prompts, tracks Brand Visibility Score, citation rate, share of voice, sentiment, and source attribution over time | Nightly, 10 PM |
+| Gap Analyzer | Scores prompt gaps by visibility gap + competitor dominance, proposes topics to calendar | Weekly, Sunday 6 AM |
 
 **Build order:** Phase 1 (Quality Gate) → Phase 2 (Citation Monitor) → Phase 3 (Gap Analyzer). Each phase depends on the previous. Phase 3 needs at least one week of Monitor data before its first real run.
+
+## Measurement framework alignment (updated 2026-04-14)
+
+This plan is aligned to Folloze marketing's benchmark-and-measurement framework from
+"AI-Native SEO & Visibility Framework for B2B Tech Clients."
+
+Do not treat the monitor as a single blended score. The operating KPI stack is:
+
+### Tier 1: AI Citation & Mention Tracking
+- Brand Visibility Score = % of relevant prompts where Folloze appears
+- Citation Rate = % of responses where Folloze is cited with a link
+- Share of Voice = Folloze mentions / total mentions of all brands
+- Sentiment Score = positive / neutral / negative tone of AI mentions
+- Source Attribution = which URLs/snippets are cited by AI systems
+
+Benchmarks to use in executive reporting:
+- Brand Visibility Score: 30%+ on core category queries; top brands may reach 50%+
+- Share of Voice: >=15% across core queries; enterprise leaders may reach 25-30% in focused niches
+- Sentiment Score: >70% positive
+
+### Tier 2: Branded Search Lift
+- Track branded query growth in Google Search Console
+- Use branded search lift as the leading downstream validation signal for LLM visibility improvements
+
+### Tier 3: AI Referral Traffic
+- Track AI assistant traffic in GA4 with a dedicated AI Traffic channel group
+- Expect partial undercount because some AI surfaces strip referrers
+
+### Tier 4: Pipeline & Revenue Attribution
+- Add self-reported attribution for AI assistants on forms
+- Connect AI visibility -> Folloze engagement -> CRM progression -> pipeline / revenue
+
+Reporting guardrails:
+- Always separate mentions from citations
+- Benchmark Folloze against 3-5 competitors on the same prompt set
+- Use monthly trend reporting and quarterly business-impact reporting
+- Never claim improvement from one provider, one run, or one metric alone
 
 ---
 
@@ -1998,263 +2036,3 @@ def build_gap_report(
 
     <h2>Summary</h2>
     <p>Keywords analyzed: <b>{result.total_keywords_analyzed}</b> |
-    Average citation rate: <b>{result.avg_citation_rate:.0%}</b> |
-    Topics proposed: <b>{len(result.proposed_topics)}</b> |
-    Added to calendar: <b>{len(added)}</b></p>
-
-    <h2>Proposed topics</h2>
-    <table border='1' cellpadding='4'>
-    <tr><th>Title</th><th>Type</th><th>Priority</th><th>Gap score</th><th>Status</th></tr>
-    {proposed_rows}
-    </table>
-
-    <h2>Top 10 keyword gaps</h2>
-    <table border='1' cellpadding='4'>
-    <tr><th>Rank</th><th>Keyword</th><th>Tier</th><th>Citation rate</th>
-    <th>Leading competitor</th><th>Gap score</th></tr>
-    {top_gap_rows}
-    </table>
-    """
-```
-
-### launchd plist — `launchd/com.folloze.content-engine.gap-analyzer.plist`
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.folloze.content-engine.gap-analyzer</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/Users/treyharnden/Projects/folloze-content-engine/.venv/bin/python</string>
-        <string>scripts/run_gap_analyzer.py</string>
-    </array>
-    <key>WorkingDirectory</key>
-    <string>/Users/treyharnden/Projects/folloze-content-engine</string>
-    <key>StartCalendarInterval</key>
-    <dict>
-        <key>Weekday</key>
-        <integer>0</integer>
-        <key>Hour</key>
-        <integer>6</integer>
-        <key>Minute</key>
-        <integer>0</integer>
-    </dict>
-    <key>StandardOutPath</key>
-    <string>/Users/treyharnden/Projects/folloze-content-engine/logs/gap-analyzer.log</string>
-    <key>StandardErrorPath</key>
-    <string>/Users/treyharnden/Projects/folloze-content-engine/logs/gap-analyzer-error.log</string>
-    <key>RunAtLoad</key>
-    <false/>
-    <key>KeepAlive</key>
-    <false/>
-</dict>
-</plist>
-```
-
-Install with: `cp launchd/com.folloze.content-engine.gap-analyzer.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.folloze.content-engine.gap-analyzer.plist`
-
----
-
-## Complete file change summary
-
-### New files
-
-```
-citation_monitor/__init__.py
-citation_monitor/monitor.py
-citation_monitor/providers.py
-citation_monitor/variants.py
-citation_monitor/storage.py
-citation_monitor/report.py
-gap_analyzer/__init__.py
-gap_analyzer/analyzer.py
-gap_analyzer/dominance.py
-gap_analyzer/calendar_writer.py
-gap_analyzer/report.py
-gap_analyzer/storage.py          # init_gap_db, create_gap_run, save_keyword_scores, save_competitor_dominance
-scripts/run_citation_monitor.py
-scripts/run_gap_analyzer.py
-launchd/com.folloze.content-engine.citation-monitor.plist
-launchd/com.folloze.content-engine.gap-analyzer.plist
-tests/test_quality_geo.py
-data/                            # directory only (gitignored)
-```
-
-### Modified files
-
-```
-brand_rules.py      — add GEO_KILL_LIST, ENTITY_REQUIRED, ENTITY_FORBIDDEN, PAIN_SIGNALS, PRODUCT_SIGNALS
-config.py           — add geo_quality_threshold to PipelineConfig; add CitationMonitorConfig, GapAnalyzerConfig; add fields to Config
-config.yaml         — add geo_quality_threshold: 0; add citation_monitor: section; add gap_analyzer: section
-quality.py          — add 9 new check functions; extend gate() body; update gate() signature
-generator.py        — add _geo_repair_instructions(); patch regenerate_for_quality() to call it
-runtime_secrets.py  — add OPENAI_API_KEY to DEFAULT_KEYCHAIN_SERVICES
-.gitignore          — add data/*.db and data/ directory
-```
-
-### Untouched files
-
-```
-pipeline.py         — no changes; gate() default argument covers it
-optimizer.py        — no changes
-research.py         — no changes
-notify.py           — no changes; send_canary_report() reused directly
-artifacts.py        — no changes
-verify.py           — no changes
-content_calendar.py — no changes; calendar_writer.py uses yaml directly to avoid circular dependency
-exceptions.py       — no changes
-```
-
----
-
-## Build order and dependencies
-
-### Phase 1: Quality Gate Extensions (~2 days)
-
-No external API dependencies. Improves every publish run immediately.
-
-```
-Step 1: brand_rules.py     — add constants
-Step 2: config.py          — add geo_quality_threshold to PipelineConfig
-Step 3: config.yaml        — add geo_quality_threshold: 0
-Step 4: quality.py         — add 9 check functions
-Step 5: quality.py         — extend gate() body and signature
-Step 6: generator.py       — add _geo_repair_instructions(); patch regenerate_for_quality()
-Step 7: tests/test_quality_geo.py  — write all test cases listed above
-Step 8: pytest tests/test_quality.py tests/test_quality_geo.py  — must pass clean
-Step 9: run manual smoke test: python -c "from quality import gate; print('gate imported OK')"
-```
-
-**Calibration period**: After deploying Phase 1, let the engine run for 2 weeks. Observe GEO scores logged in `logs/runs/*/quality-report.json`. Set `geo_quality_threshold` to the 25th-percentile score observed (so 75% of content passes without repair). This prevents blocking the publish queue while learning baseline scores.
-
-### Phase 2: Citation Monitor (~3 days, after Phase 1)
-
-Run for at least one full week before Phase 3 has meaningful data.
-
-```
-Step 1: .gitignore         — add data/ exclusion
-Step 2: citation_monitor/storage.py   — schema + CRUD
-Step 3: citation_monitor/variants.py  — KEYWORDS registry + generate_variants()
-Step 4: citation_monitor/providers.py — query_perplexity() + query_openai_web_search()
-Step 5: citation_monitor/monitor.py   — CitationMonitor class
-Step 6: citation_monitor/report.py    — build_daily_report()
-Step 7: citation_monitor/__init__.py  — empty or re-exports
-Step 8: scripts/run_citation_monitor.py
-Step 9: runtime_secrets.py           — add OPENAI_API_KEY
-Step 10: launchd plist               — create file
-Step 11: Smoke test:
-         python scripts/run_citation_monitor.py
-         (watch logs/citation-monitor.log, verify DB writes with sqlite3 data/citation_monitor.db)
-Step 12: Install plist               — launchctl load
-Step 13: Wait 7 days for meaningful data accumulation
-```
-
-**Before Step 9**: check if `LLMGateway(profile="openai")` can do web search. If yes, simplify `query_openai_web_search()` to a LLMGateway call and skip the new keychain secret.
-
-### Phase 3: Gap Analyzer (~2 days, after Phase 2 has 7 days of data)
-
-```
-Step 1: gap_analyzer/storage.py       — init_gap_db, CRUD functions
-Step 2: gap_analyzer/dominance.py     — DominanceGraph class
-Step 3: gap_analyzer/analyzer.py      — KEYWORD_REGISTRY, compute_gap_score(), GapAnalyzer class
-Step 4: gap_analyzer/calendar_writer.py — propose_to_calendar()
-Step 5: gap_analyzer/report.py        — build_gap_report()
-Step 6: gap_analyzer/__init__.py
-Step 7: scripts/run_gap_analyzer.py
-Step 8: launchd plist                 — create file
-Step 9: First run dry:
-         python scripts/run_gap_analyzer.py --dry-run
-         Verify output before calendar writes go live
-Step 10: First real run:
-          python scripts/run_gap_analyzer.py
-          Inspect content/calendar.yaml to confirm new topics look correct
-Step 11: Install plist               — launchctl load
-```
-
----
-
-## Risks and decisions needed before starting
-
-### Before Phase 1
-
-**Decision: GEO quality threshold calibration strategy**
-Set `geo_quality_threshold: 0` on deploy and raise it after 2 weeks of observed data. Do not skip this — setting it too high on day one will block the publish queue.
-
-### Before Phase 2
-
-**Decision: OpenAI web search via LLMGateway vs. direct API**
-Check: `python -c "from llm_gateway import LLMGateway; gw = LLMGateway(profile='openai'); print(gw.chat([{'role':'user','content':'does perplexity use web search?'}]))"`. If the response references real-time web results, use LLMGateway directly and skip the direct adapter + new keychain secret.
-
-**Decision: Perplexity model tier**
-`sonar-pro` is the most accurate but more expensive. `sonar` is cheaper with slightly lower precision. With 130 queries/night × 30 nights = ~3,900 queries/month. Evaluate cost before committing.
-
-**Risk: Citation detection false negatives**
-LLMs sometimes refer to Folloze as "the platform" after an initial mention. The current regex on response text will miss these. Mitigation for v1: accepted limitation. Future improvement: run the full response through a single classification prompt ("Does this response recommend or mention Folloze? Yes/No") using LLMGateway.
-
-**Risk: Rate limit 429s on nightly batch**
-260 queries at 1 req/sec = 4+ minutes. The `_backoff_request` wrapper handles 429s with exponential backoff. If a provider blocks the entire run, the monitor returns a partial result and logs the error — it does not crash. The plist does not retry on failure; the next night's run catches up.
-
-### Before Phase 3
-
-**Decision: 6sense signal weighting**
-The strategy doc mentions weighting by 6sense signal strength. Phase 3 uses `search_volume` as the proxy. If a 6sense CSV or API export is available, add a `sixsense_signal: float` field to `KEYWORD_REGISTRY` and multiply it into `compute_gap_score()` as an additional factor. This is a data availability question, not a code architecture question.
-
-**Risk: Gap Analyzer proposes low-quality titles**
-The `_llm_title()` fallback is deterministic but generic. The LLM-generated titles will be better if `workhorse` (DeepSeek) is available. Monitor the first 3 weekly runs and manually review proposed titles before they enter the publish queue. If titles are consistently poor, add a `title_review: pending` status to calendar entries so they require manual approval before `get_next_topic()` picks them up.
-
-**Risk: Duplicate keyword entries between citation_monitor/variants.py and gap_analyzer/analyzer.py**
-These two files both maintain a keyword list. They must stay in sync. Future improvement: extract `KEYWORDS` to a single source-of-truth file (e.g., `content/keywords.yaml`) and have both modules load from it. For v1, the duplication is acceptable; document it clearly in both files.
-
----
-
-## Testing checklist before each phase goes live
-
-### Phase 1
-
-- [ ] `pytest tests/test_quality.py` — all existing tests still pass
-- [ ] `pytest tests/test_quality_geo.py` — all new tests pass
-- [ ] `ruff check . --fix && ruff format .` — no lint errors
-- [ ] Manual run of `pipeline.py --dry-run` on a pending topic — confirms no import errors
-- [ ] Confirm `quality-report.json` in run output includes GEO check results
-- [ ] Confirm `geo_quality_threshold: 0` in `config.yaml` (does not block publishes)
-
-### Phase 2
-
-- [ ] `python scripts/run_citation_monitor.py` completes without error
-- [ ] `data/citation_monitor.db` exists and contains rows in all 4 tables
-- [ ] Notification email received with correct subject and HTML body
-- [ ] `sqlite3 data/citation_monitor.db "SELECT COUNT(*) FROM citation_results;"` returns > 0
-- [ ] Verify at least one keyword shows `folloze_mentioned = 1` (sanity check detection)
-- [ ] Confirm launchd plist loads: `launchctl list | grep citation-monitor`
-
-### Phase 3
-
-- [ ] `python scripts/run_gap_analyzer.py --dry-run` outputs proposed topics
-- [ ] Proposed titles look reasonable and pass the kill-list word check mentally
-- [ ] `data/gap_scores.db` exists and contains rows
-- [ ] `python scripts/run_gap_analyzer.py` runs without `--dry-run`
-- [ ] `content/calendar.yaml` contains new `status: pending` entries
-- [ ] Confirm no duplicate slugs in calendar
-- [ ] Confirm launchd plist loads: `launchctl list | grep gap-analyzer`
-
----
-
-## Monthly feedback loop (operations)
-
-After these modules are running, use Promptwatch, SE Ranking, and the citation monitor together each month:
-
-1. Pull `get_trend_data()` from `citation_monitor.db` for the month
-2. Cross-reference with SE Ranking keyword position changes
-3. Cross-reference with Promptwatch coverage changes
-4. Update `KEYWORDS` in `variants.py` and `KEYWORD_REGISTRY` in `analyzer.py` when new keywords emerge from the monthly review
-5. Update `GEO_KILL_LIST` in `brand_rules.py` if Kristi identifies new banned phrases
-6. Update `COMPETITOR_PATTERNS` in `providers.py` when new competitors appear
-7. Raise `geo_quality_threshold` incrementally as content quality improves (target: 50 by Q3 2026)
-
----
-
-*End of plan. Last updated: 2026-03-31.*

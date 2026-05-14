@@ -80,6 +80,8 @@ SMTP_PASSWORD=
 NOTIFY_EMAIL_TO=trey.harnden@folloze.com
 ```
 
+Note: `NOTIFY_EMAIL_TO` overrides the config recipient split for every email notification. Leave it unset if you want `config.yaml` to control the distinction between default Folloze Insights/error recipients and weekly GEO recipients.
+
 ---
 
 ## Step 2: Config loader

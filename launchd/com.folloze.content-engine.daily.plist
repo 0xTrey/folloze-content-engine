@@ -7,8 +7,8 @@
 
     <key>ProgramArguments</key>
     <array>
-      <string>/Users/treyharnden/Projects/folloze-content-engine/.venv/bin/python</string>
-      <string>/Users/treyharnden/Projects/folloze-content-engine/scripts/run_daily_publish.py</string>
+      <string>/bin/zsh</string>
+      <string>/Users/treyharnden/Projects/folloze-content-engine/scripts/launch_daily_publish.sh</string>
     </array>
 
     <key>WorkingDirectory</key>

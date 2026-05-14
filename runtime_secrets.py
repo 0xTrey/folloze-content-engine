@@ -14,6 +14,7 @@ DEFAULT_KEYCHAIN_SERVICES = {
     "AI_MINIMAX_KEY": ("minimax-api",),
     "SMTP_PASSWORD": ("smtp-password", "gmail-app-password", "gmail-smtp"),
     "VERCEL_TOKEN": ("vercel-token", "vercel-cli-token"),
+    "CLOUDFLARE_EMAIL_SEND_TOKEN": ("juno-cloudflare-send-token",),
 }
 
 

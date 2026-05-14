@@ -49,7 +49,7 @@
     <article class="signal-card">
       <p class="signal-card__label">{{ card.label }}</p>
       <h3>{{ card.title }}</h3>
-      <p>{{ card.copy }}</p>
+      <p>{{ card['copy'] }}</p>
       <a class="post-card__cta" href="{{ card.href }}">{{ card.cta }} &rarr;</a>
     </article>
     {% endfor %}

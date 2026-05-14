@@ -137,7 +137,9 @@ def main() -> int:
         config,
     )
     LOGGER.info("Publish canary complete for %s status=%s", target_date, incident["status"])
-    return 0 if recovered else 1
+    # A handled failed recovery should still exit cleanly after emitting the incident report.
+    # Returning non-zero here makes launchd treat expected operational incidents like job crashes.
+    return 0
 
 
 def _configure_logging() -> None:
@@ -210,6 +212,9 @@ def _diagnose(target_date: str) -> dict:
 
     manifest_path = run_dir / "run-manifest.json"
     if not manifest_path.exists():
+        partial_run = _detect_partial_run(run_dir)
+        if partial_run:
+            return diagnosis | partial_run
         return diagnosis
 
     manifest = json.loads(manifest_path.read_text())
@@ -244,6 +249,42 @@ def _diagnose(target_date: str) -> dict:
 
     diagnosis["category"], diagnosis["recommended_fix"] = _classify_diagnosis(diagnosis)
     return diagnosis
+
+
+def _detect_partial_run(run_dir: Path) -> dict[str, object] | None:
+    events = _load_run_events(run_dir / "run-events.jsonl", run_id=None)
+    if not events:
+        return None
+
+    if any(event.get("event") == "run_completed" for event in events):
+        return None
+
+    run_started = next((event for event in events if event.get("event") == "run_started"), None)
+    if run_started is None:
+        return None
+
+    if not _daily_publish_process_active():
+        return None
+
+    latest_stage_event = next(
+        (
+            event
+            for event in reversed(events)
+            if event.get("event") in {"stage_started", "stage_completed", "stage_failed"}
+        ),
+        None,
+    )
+    active_stage = latest_stage_event.get("stage") if latest_stage_event else None
+    return {
+        "category": "active_run",
+        "run_status": run_started.get("status", "started"),
+        "failed_stage": active_stage,
+        "recommended_fix": (
+            "The daily publish was still running at canary time. Do not auto-retry. "
+            "Keep the Mac awake through the 7:30 to 9:00 publish window or move the job "
+            "to always-on infrastructure if provider fallbacks routinely exceed the canary deadline."
+        ),
+    }
 
 
 def _load_run_events(path: Path, run_id: str | None) -> list[dict]:

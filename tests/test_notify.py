@@ -6,7 +6,14 @@ from pathlib import Path
 from artifacts import ReleaseArtifact
 from config import Config
 from content_calendar import Topic
-from notify import send_error, send_release_ready
+from notify import (
+    _format_discord_message,
+    _resolve_recipients,
+    send_canary_report,
+    send_error,
+    send_published,
+    send_release_ready,
+)
 from quality import QualityResult
 
 
@@ -38,7 +45,8 @@ class FakeCompletedProcess(subprocess.CompletedProcess):
         super().__init__(args=args, returncode=0, stdout="", stderr="")
 
 
-def test_send_release_ready_renders_email(project_root, monkeypatch) -> None:
+def test_send_release_ready_skips_email_for_success(project_root, monkeypatch) -> None:
+    FakeSMTP.sent_messages.clear()
     monkeypatch.setenv("SMTP_PASSWORD", "secret")
     monkeypatch.setattr("notify.smtplib.SMTP", FakeSMTP)
     monkeypatch.setattr(
@@ -70,10 +78,30 @@ def test_send_release_ready_renders_email(project_root, monkeypatch) -> None:
         Path("logs/runs/2026-03-20"),
         Config.load(),
     )
-    assert FakeSMTP.sent_messages
+    assert not FakeSMTP.sent_messages
+
+
+def test_send_published_skips_email_for_success(project_root, monkeypatch) -> None:
+    FakeSMTP.sent_messages.clear()
+    monkeypatch.setenv("SMTP_PASSWORD", "secret")
+    monkeypatch.setattr("notify.smtplib.SMTP", FakeSMTP)
+    monkeypatch.setattr(
+        "notify.subprocess.run",
+        lambda *args, **kwargs: FakeCompletedProcess(args[0]),
+    )
+
+    send_published(
+        Topic("Title", "guide", "title", ["hello"], 5, "published"),
+        "https://example.com/insights/title",
+        QualityResult(True, 80, [], []),
+        Config.load(),
+    )
+
+    assert not FakeSMTP.sent_messages
 
 
 def test_send_error_renders_email(project_root, monkeypatch) -> None:
+    FakeSMTP.sent_messages.clear()
     monkeypatch.setenv("SMTP_PASSWORD", "secret")
     monkeypatch.setattr("notify.smtplib.SMTP", FakeSMTP)
     monkeypatch.setattr(
@@ -82,6 +110,67 @@ def test_send_error_renders_email(project_root, monkeypatch) -> None:
     )
     send_error("pipeline", RuntimeError("boom"), None, Config.load())
     assert any("RuntimeError" in message for message in FakeSMTP.sent_messages)
+
+
+def test_send_canary_recovered_skips_email(project_root, monkeypatch) -> None:
+    FakeSMTP.sent_messages.clear()
+    monkeypatch.setenv("SMTP_PASSWORD", "secret")
+    monkeypatch.setattr("notify.smtplib.SMTP", FakeSMTP)
+    monkeypatch.setattr(
+        "notify.subprocess.run",
+        lambda *args, **kwargs: FakeCompletedProcess(args[0]),
+    )
+
+    send_canary_report(
+        "[Folloze Insights] Canary recovered missed publish for 2026-04-01",
+        "<p>Recovered</p>",
+        Config.load(),
+    )
+
+    assert not FakeSMTP.sent_messages
+
+
+def test_send_canary_failed_still_emails(project_root, monkeypatch) -> None:
+    FakeSMTP.sent_messages.clear()
+    monkeypatch.setenv("SMTP_PASSWORD", "secret")
+    monkeypatch.setattr("notify.smtplib.SMTP", FakeSMTP)
+    monkeypatch.setattr(
+        "notify.subprocess.run",
+        lambda *args, **kwargs: FakeCompletedProcess(args[0]),
+    )
+
+    send_canary_report(
+        "[Folloze Insights] Canary failed to recover publish for 2026-04-01",
+        "<p>Failed</p>",
+        Config.load(),
+    )
+
+    assert any("Canary failed to recover publish" in message for message in FakeSMTP.sent_messages)
+
+
+def test_resolve_recipients_uses_weekly_geo_list(project_root) -> None:
+    config = Config.load()
+
+    recipients = _resolve_recipients(
+        "[Folloze GEO] Weekly Visibility Monitor — 2026-04-14 to 2026-04-20",
+        config,
+    )
+
+    assert recipients == [
+        "trey.harnden@folloze.com",
+        "kristi.tutt@folloze.com",
+    ]
+
+
+def test_resolve_recipients_keeps_errors_off_weekly_geo_list(project_root) -> None:
+    config = Config.load()
+
+    recipients = _resolve_recipients(
+        "[Folloze Insights] ERROR: RuntimeError in pipeline",
+        config,
+    )
+
+    assert recipients == ["trey.harnden@folloze.com"]
 
 
 def test_send_release_ready_falls_back_to_agentmail(project_root, monkeypatch, tmp_path) -> None:
@@ -127,7 +216,10 @@ def test_send_release_ready_falls_back_to_agentmail(project_root, monkeypatch, t
         Config.load(),
     )
     assert calls
-    assert calls[0][2] == "send"
+    assert not any(
+        len(command) > 2 and str(command[1]).endswith("agentmail.py") and command[2] == "send"
+        for command in calls
+    )
 
 
 def test_send_release_ready_posts_to_discord(project_root, monkeypatch) -> None:
@@ -167,3 +259,35 @@ def test_send_release_ready_posts_to_discord(project_root, monkeypatch) -> None:
         Config.load(),
     )
     assert any(command[0] == "openclaw" for command in calls)
+
+
+def test_format_visibility_discord_message() -> None:
+    body = """
+    <h1>Visibility Monitor Alerts</h1>
+    <p>Run date: 2026-04-14</p>
+    <p>Prompts checked: 15</p>
+    <p>Brand Visibility Score: 31%</p>
+    <p>Citation Rate: 12%</p>
+    <p>Share of Voice: 18%</p>
+    <p>Sentiment Score: 80%</p>
+    <p>Branded Prompt Visibility: 60%</p>
+    <p>Non-branded Prompt Visibility: 22%</p>
+    <p>Failure count: 0</p>
+    <h2>Alerts</h2>
+    <ul><li>LOW SHARE OF VOICE</li><li>NON-BRANDED VISIBILITY GAP</li></ul>
+    <h2>Gap Prompts</h2>
+    <ul><li>t1-001</li></ul>
+    <h2>Competitor Sightings</h2>
+    <ul><li>mutiny on t1-001: 6</li></ul>
+    <h2>Source Attribution</h2>
+    <ul><li>https://www.folloze.com/insights/example: 2</li></ul>
+    """
+    message = _format_discord_message(
+        "[Folloze GEO] Visibility Monitor Alerts — 2026-04-14",
+        body,
+    )
+    assert "Scorecard" in message
+    assert "- Brand Visibility Score: 31%" in message
+    assert "Alerts" in message
+    assert "Largest prompt gaps" in message
+    assert "Top attributed sources" in message

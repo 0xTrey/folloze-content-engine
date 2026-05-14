@@ -4,6 +4,9 @@ import argparse
 import json
 import logging
 import os
+import shutil
+import subprocess
+import sys
 import time
 from dataclasses import asdict
 from datetime import date, datetime, timedelta
@@ -12,6 +15,7 @@ from pathlib import Path
 import yaml
 
 from artifacts import write_release_artifact
+from brand_rules import BANNED_TERMS, ENTITY_FORBIDDEN
 from config import Config
 from content_calendar import (
     Topic,
@@ -39,6 +43,8 @@ from verify import check_preview_file
 
 LOGGER = logging.getLogger("content_engine")
 LOCK_PATH = Path(".content-engine.lock")
+LOCK_METADATA_PATH = LOCK_PATH / "owner.json"
+STALE_LOCK_MAX_AGE = timedelta(hours=6)
 
 
 def main() -> int:
@@ -278,12 +284,92 @@ def _configure_logging(level: str) -> None:
 
 
 def _acquire_lock() -> None:
-    os.mkdir(LOCK_PATH)
+    try:
+        os.mkdir(LOCK_PATH)
+    except FileExistsError:
+        if not _should_break_stale_lock():
+            raise
+        LOGGER.warning("Removing stale content-engine lock at %s", LOCK_PATH)
+        _release_lock()
+        os.mkdir(LOCK_PATH)
+    _write_lock_metadata()
 
 
 def _release_lock() -> None:
     if LOCK_PATH.exists():
+        for child in LOCK_PATH.iterdir():
+            if child.is_dir():
+                shutil.rmtree(child)
+            else:
+                child.unlink(missing_ok=True)
         LOCK_PATH.rmdir()
+
+
+def _write_lock_metadata() -> None:
+    payload = {
+        "pid": os.getpid(),
+        "started_at": datetime.now().isoformat(),
+        "command": sys.argv,
+    }
+    LOCK_METADATA_PATH.write_text(json.dumps(payload, indent=2))
+
+
+def _should_break_stale_lock() -> bool:
+    if not LOCK_PATH.exists():
+        return False
+    try:
+        age = datetime.now() - datetime.fromtimestamp(LOCK_PATH.stat().st_mtime)
+    except OSError:
+        return False
+    if age < STALE_LOCK_MAX_AGE:
+        return False
+
+    owner_pid = _read_lock_owner_pid()
+    if owner_pid and _pid_is_running(owner_pid):
+        return False
+
+    return not _content_engine_process_active(exclude_pids={str(os.getpid())})
+
+
+def _read_lock_owner_pid() -> int | None:
+    try:
+        payload = json.loads(LOCK_METADATA_PATH.read_text())
+    except (OSError, json.JSONDecodeError):
+        return None
+    pid = payload.get("pid")
+    return pid if isinstance(pid, int) and pid > 0 else None
+
+
+def _pid_is_running(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    return True
+
+
+def _content_engine_process_active(exclude_pids: set[str] | None = None) -> bool:
+    exclude = exclude_pids or set()
+    try:
+        completed = subprocess.run(
+            ["ps", "-axo", "pid=,command="],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return False
+
+    for line in completed.stdout.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        pid, _, command = stripped.partition(" ")
+        if pid in exclude:
+            continue
+        if "pipeline.py" in command or "run_daily_publish.py" in command:
+            return True
+    return False
 
 
 def _select_topic(args: argparse.Namespace, dry_run: bool) -> Topic:
@@ -297,10 +383,11 @@ def _select_topic(args: argparse.Namespace, dry_run: bool) -> Topic:
                         f"--type {args.content_type!r} does not match calendar topic type "
                         f"{topic.content_type!r}"
                     )
+                _validate_topic_for_generation(topic)
                 return topic
         if not args.content_type:
             raise ValueError("--type is required when --topic is provided")
-        return Topic(
+        topic = Topic(
             title=args.topic,
             content_type=args.content_type,
             slug=requested_slug,
@@ -309,7 +396,35 @@ def _select_topic(args: argparse.Namespace, dry_run: bool) -> Topic:
             status="pending",
             notes="manual topic override",
         )
-    return get_next_topic(calendar_topics)
+        _validate_topic_for_generation(topic)
+        return topic
+    topic = get_next_topic(calendar_topics)
+    _validate_topic_for_generation(topic)
+    return topic
+
+
+def _validate_topic_for_generation(topic: Topic) -> None:
+    if not topic.keywords:
+        raise ValidationError(f"Topic '{topic.title}' is missing keywords")
+
+    primary_keyword = topic.keywords[0].strip().lower()
+    combined_text = " ".join([topic.title, topic.notes, *topic.keywords]).lower()
+    forbidden_hits = sorted({term for term in ENTITY_FORBIDDEN if term in combined_text})
+    banned_hits = sorted({term for term in BANNED_TERMS if term in combined_text})
+
+    if primary_keyword in ENTITY_FORBIDDEN or primary_keyword in BANNED_TERMS:
+        raise ValidationError(
+            f"Topic '{topic.title}' uses a forbidden primary keyword '{topic.keywords[0]}'. "
+            "Rewrite the topic to use approved language and keep legacy terminology as "
+            "search-intent only framing in notes/title if needed."
+        )
+
+    if topic.content_type == "glossary" and forbidden_hits and "search-intent only" not in topic.notes.lower():
+        hits = ", ".join(sorted(set(forbidden_hits + banned_hits)))
+        raise ValidationError(
+            f"Glossary topic '{topic.title}' contains forbidden terminology ({hits}) without "
+            "explicit search-intent only guidance in notes. Add that framing or rewrite the topic."
+        )
 
 
 def _time_stage(stage_timings: dict[str, float], name: str, func, run_dir: Path, run_id: str):

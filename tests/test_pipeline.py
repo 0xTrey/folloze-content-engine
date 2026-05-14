@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from dataclasses import asdict
 
@@ -8,6 +9,7 @@ import pipeline
 import yaml
 from artifacts import ReleaseArtifact
 from content_calendar import Topic
+from exceptions import ValidationError
 from generator import GeneratedContent
 from optimizer import OptimizedContent
 from quality import QualityResult
@@ -169,6 +171,25 @@ def test_lock_file_prevents_concurrent_run(project_root, monkeypatch) -> None:
     assert pipeline.main() == 0
 
 
+def test_stale_lock_is_removed_and_reacquired(project_root, monkeypatch) -> None:
+    lock_dir = project_root / ".content-engine.lock"
+    lock_dir.mkdir()
+    stale_time = 1_700_000_000
+    os.utime(lock_dir, (stale_time, stale_time))
+
+    monkeypatch.setattr(pipeline, "_content_engine_process_active", lambda exclude_pids=None: False)
+    monkeypatch.setattr(pipeline, "_pid_is_running", lambda pid: False)
+
+    pipeline._acquire_lock()
+
+    assert lock_dir.exists()
+    metadata = json.loads((lock_dir / "owner.json").read_text())
+    assert metadata["pid"] == os.getpid()
+
+    pipeline._release_lock()
+    assert not lock_dir.exists()
+
+
 def test_calendar_exhausted_exits_clean(project_root, monkeypatch) -> None:
     calendar_path = project_root / "content" / "calendar.yaml"
     payload = json.loads(json.dumps({"topics": []}))
@@ -200,6 +221,31 @@ def test_provider_unavailable_sends_notification(project_root, monkeypatch) -> N
     assert topic["status"] == "pending"
     assert topic["retry_count"] == 1
     assert topic["last_error"] == "down"
+
+
+def test_select_topic_rejects_calendar_topic_with_forbidden_primary_keyword(project_root) -> None:
+    calendar_path = project_root / "content" / "calendar.yaml"
+    payload = yaml.safe_load(calendar_path.read_text())
+    payload["topics"] = [
+        {
+            "title": "What Is a B2B Buyer Experience Platform?",
+            "content_type": "glossary",
+            "slug": "what-is-a-b2b-buyer-experience-platform",
+            "keywords": ["buyer experience platform", "abx platform"],
+            "priority": 5,
+            "status": "pending",
+            "notes": "Legacy category term without search-intent-only framing.",
+        }
+    ]
+    calendar_path.write_text(yaml.safe_dump(payload, sort_keys=False))
+
+    args = pipeline._build_parser().parse_args([])
+    try:
+        pipeline._select_topic(args, dry_run=False)
+        raise AssertionError("Expected ValidationError for forbidden primary keyword")
+    except ValidationError as exc:
+        assert "forbidden" in str(exc).lower()
+        assert "search-intent only" in str(exc).lower()
 
 
 def test_quality_gate_triggers_single_repair_pass(project_root, monkeypatch) -> None:

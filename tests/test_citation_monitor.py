@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -17,6 +18,7 @@ from citation_monitor.storage import (
     get_checked_variants_for_run,
     get_latest_incomplete_run,
     get_run_citation_stats,
+    get_run_source_attribution_summary,
     init_db,
     insert_citation,
     upsert_competitor_sighting,
@@ -55,22 +57,28 @@ def _citation_row(
     variant_text: str = "What is the best AI marketing platform for B2B?",
     provider: str = "perplexity",
     folloze_mentioned: bool = True,
+    folloze_cited: bool | None = None,
     branded: bool = False,
     competitors_mentioned: list[str] | None = None,
+    sentiment_label: str | None = None,
+    source_urls: list[str] | None = None,
 ) -> CitationRow:
+    mentioned = folloze_mentioned
     return CitationRow(
         run_id=run_id,
         prompt_id=prompt_id,
         variant_text=variant_text,
         provider=provider,
-        response_text="Folloze and Mutiny are both mentioned.",
-        folloze_mentioned=folloze_mentioned,
-        folloze_cited=folloze_mentioned,
-        folloze_citation_position=1 if folloze_mentioned else None,
+        response_text="Folloze is a strong fit. Source: https://www.folloze.com/insights/example",
+        folloze_mentioned=mentioned,
+        folloze_cited=mentioned if folloze_cited is None else folloze_cited,
+        folloze_citation_position=1 if mentioned else None,
         branded=branded,
         competitors_mentioned=competitors_mentioned or [],
         confidence_flag="normal",
-        citation_probability=1.0 if folloze_mentioned else 0.0,
+        sentiment_label=sentiment_label or ("positive" if mentioned else "neutral"),
+        source_urls=source_urls if source_urls is not None else (["https://www.folloze.com/insights/example"] if mentioned else []),
+        citation_probability=1.0 if mentioned else 0.0,
         parser_version=PARSER_VERSION,
         detection_method="regex",
         checked_at="2026-04-01T10:00:00",
@@ -132,14 +140,27 @@ def test_insert_citation_and_query(tmp_path: Path) -> None:
     insert_citation(conn, _citation_row(run_id, competitors_mentioned=["mutiny"]))
     stats = get_run_citation_stats(conn, run_id)
     row = conn.execute(
-        "SELECT prompt_id, provider, folloze_mentioned, competitors_mentioned FROM citation_results"
+        "SELECT prompt_id, provider, folloze_mentioned, competitors_mentioned, sentiment_label, source_urls FROM citation_results"
     ).fetchone()
     assert row[0] == "t1-001"
     assert row[1] == "perplexity"
     assert row[2] == 1
     assert json.loads(row[3]) == ["mutiny"]
+    assert row[4] == "positive"
+    assert json.loads(row[5]) == ["https://www.folloze.com/insights/example"]
     assert stats["mentioned"] == 1
-    assert stats["overall_citation_rate"] == pytest.approx(1.0)
+    assert stats["brand_visibility_score"] == pytest.approx(1.0)
+    assert stats["citation_rate"] == pytest.approx(1.0)
+
+
+def test_source_attribution_summary(tmp_path: Path) -> None:
+    conn = init_db(tmp_path / "citation.db")
+    run_id = create_run(conn, "2026-04-01")
+    insert_citation(conn, _citation_row(run_id, source_urls=["https://a.com", "https://b.com"]))
+    insert_citation(conn, _citation_row(run_id, provider="openai", source_urls=["https://a.com"]))
+    summary = get_run_source_attribution_summary(conn, run_id)
+    assert summary[0] == {"url": "https://a.com", "count": 2}
+    assert summary[1] == {"url": "https://b.com", "count": 1}
 
 
 def test_upsert_variant_idempotent(tmp_path: Path) -> None:
@@ -201,7 +222,7 @@ def test_query_perplexity_folloze_mentioned(monkeypatch) -> None:
                 "choices": [
                     {
                         "message": {
-                            "content": "Folloze is the strongest fit.\nMutiny is also an option."
+                            "content": "Folloze is the strongest fit.\nSource: https://www.folloze.com/insights/example\nMutiny is also an option."
                         }
                     }
                 ]
@@ -210,8 +231,11 @@ def test_query_perplexity_folloze_mentioned(monkeypatch) -> None:
     )
     result = providers.query_perplexity("best ai marketing platform")
     assert result.folloze_mentioned is True
+    assert result.folloze_cited is True
     assert result.folloze_citation_position == 1
     assert "mutiny" in result.competitors_mentioned
+    assert result.sentiment_label == "positive"
+    assert result.source_urls == ["https://www.folloze.com/insights/example"]
 
 
 def test_query_perplexity_no_mention(monkeypatch) -> None:
@@ -227,6 +251,7 @@ def test_query_perplexity_no_mention(monkeypatch) -> None:
     result = providers.query_perplexity("best ai marketing platform")
     assert result.folloze_mentioned is False
     assert result.competitors_mentioned == ["demandbase"]
+    assert result.sentiment_label == "neutral"
 
 
 def test_query_perplexity_rate_limit_retry(monkeypatch) -> None:
@@ -275,6 +300,7 @@ def test_openai_gateway_fallback(monkeypatch) -> None:
     result = providers.query_openai_gateway("best ai marketing platform")
     assert result.provider == "openai"
     assert result.folloze_mentioned is True
+    assert result.sentiment_label == "positive"
 
 
 def test_get_variants_uses_cache(tmp_path: Path, monkeypatch) -> None:
@@ -338,17 +364,20 @@ def test_monitor_run_stores_results(project_root: Path, monkeypatch) -> None:
             f"{prompt['prompt_id']} alt",
         ],
     )
-    monkeypatch.setattr(monitor_mod, "fire_alerts", lambda summary, config: False)
+    monkeypatch.setattr(monitor_mod, "fire_alerts", lambda summary, config, conn=None: False)
     monkeypatch.setattr(monitor_mod.time, "sleep", lambda value: None)
 
     def fake_provider(variant_text: str):
+        mentioned = "folloze" in variant_text.lower() or "alt" in variant_text
         return SimpleNamespace(
             response_text=f"response for {variant_text}",
-            folloze_mentioned="folloze" in variant_text.lower() or "alt" in variant_text,
-            folloze_cited=True,
-            folloze_citation_position=1,
+            folloze_mentioned=mentioned,
+            folloze_cited=mentioned,
+            folloze_citation_position=1 if mentioned else None,
             competitors_mentioned=["mutiny"] if "alt" in variant_text else [],
             confidence_flag="normal",
+            sentiment_label="positive" if mentioned else "neutral",
+            source_urls=["https://www.folloze.com/insights/example"] if "alt" in variant_text else [],
         )
 
     monkeypatch.setattr(monitor_mod, "PROVIDERS", {"perplexity": fake_provider})
@@ -362,7 +391,8 @@ def test_monitor_run_stores_results(project_root: Path, monkeypatch) -> None:
     assert counts == 4
     assert competitor_count == 2
     assert summary.prompts_checked == 2
-    assert summary.overall_citation_rate == pytest.approx(0.75)
+    assert summary.brand_visibility_score == pytest.approx(0.75)
+    assert summary.citation_rate == pytest.approx(0.75)
     assert summary.failure_count == 0
 
 
@@ -387,7 +417,7 @@ def test_monitor_resume_skips_checked(project_root: Path, monkeypatch) -> None:
         "get_variants_for_prompt",
         lambda conn, prompt, max_variants=5: ["skip me", "check me"],
     )
-    monkeypatch.setattr(monitor_mod, "fire_alerts", lambda summary, config: False)
+    monkeypatch.setattr(monitor_mod, "fire_alerts", lambda summary, config, conn=None: False)
     monkeypatch.setattr(monitor_mod.time, "sleep", lambda value: None)
 
     def fake_provider(variant_text: str):
@@ -399,6 +429,8 @@ def test_monitor_resume_skips_checked(project_root: Path, monkeypatch) -> None:
             folloze_citation_position=1,
             competitors_mentioned=[],
             confidence_flag="normal",
+            sentiment_label="positive",
+            source_urls=[],
         )
 
     monkeypatch.setattr(monitor_mod, "PROVIDERS", {"perplexity": fake_provider})
@@ -469,17 +501,21 @@ def test_build_summary_from_real_db(tmp_path: Path) -> None:
             prompt_id="t2-001",
             provider="perplexity",
             folloze_mentioned=False,
+            folloze_cited=False,
             branded=False,
             competitors_mentioned=["mutiny"],
+            sentiment_label="neutral",
+            source_urls=[],
         ),
     )
     upsert_competitor_sighting(conn, run_id, "t2-001", "mutiny", 6, "2026-04-01T10:00:00")
 
     summary = report.build_summary(conn, run_id, "2026-04-01", prompts, failure_count=2)
     assert summary.prompts_checked == 3
-    assert summary.overall_citation_rate == pytest.approx(2 / 3)
-    assert summary.branded_rate == pytest.approx(1.0)
-    assert summary.unbranded_rate == pytest.approx(0.0)
+    assert summary.brand_visibility_score == pytest.approx(2 / 3)
+    assert summary.citation_rate == pytest.approx(2 / 3)
+    assert summary.branded_prompt_visibility_score == pytest.approx(1.0)
+    assert summary.non_branded_prompt_visibility_score == pytest.approx(0.0)
     assert summary.tier_breakdown["tier1"] == pytest.approx(1.0)
     assert summary.cluster_breakdown["competitive"] == pytest.approx(0.0)
     assert "t3-001" in summary.gaps
@@ -488,7 +524,149 @@ def test_build_summary_from_real_db(tmp_path: Path) -> None:
         "competitor": "mutiny",
         "count": 6,
     }
+    assert summary.source_attribution[0]["url"] == "https://www.folloze.com/insights/example"
     assert "COMPETITOR LEADING: mutiny" in summary.alerts
-    assert "RATIO WARNING" in summary.alerts
+    assert "NON-BRANDED VISIBILITY GAP" in summary.alerts
     assert summary.incomplete is True
     assert summary.failure_count == 2
+
+
+def test_fire_alerts_skips_non_weekly_runs(monkeypatch) -> None:
+    sent: list[tuple[str, str]] = []
+    monkeypatch.setitem(
+        sys.modules,
+        "notify",
+        SimpleNamespace(send_canary_report=lambda subject, body, config: sent.append((subject, body))),
+    )
+
+    summary = report.MonitorRunSummary(
+        run_date="2026-04-12",
+        prompts_checked=3,
+        brand_visibility_score=0.31,
+        citation_rate=0.12,
+        share_of_voice=0.18,
+        sentiment_score=0.8,
+        branded_prompt_visibility_score=0.6,
+        non_branded_prompt_visibility_score=0.22,
+        tier_breakdown={"tier1": 0.3},
+        cluster_breakdown={"ai-campaigns": 0.3},
+        gaps=["t1-001"],
+        competitor_leading=[{"prompt_id": "t1-001", "competitor": "mutiny", "count": 6}],
+        source_attribution=[{"url": "https://www.folloze.com/insights/example", "count": 2}],
+        alerts=["LOW SHARE OF VOICE"],
+        incomplete=False,
+        failure_count=0,
+    )
+
+    assert report.fire_alerts(summary, None) is False
+    assert sent == []
+
+
+def test_fire_alerts_sends_weekly_rollup_on_monday(monkeypatch, tmp_path: Path) -> None:
+    sent: list[tuple[str, str]] = []
+    monkeypatch.setitem(
+        sys.modules,
+        "notify",
+        SimpleNamespace(send_canary_report=lambda subject, body, config: sent.append((subject, body))),
+    )
+
+    conn = init_db(tmp_path / "citation.db")
+    previous = create_run(conn, "2026-04-14")
+    complete_run(
+        conn,
+        previous,
+        prompt_count=3,
+        citation_count=1,
+        alert_fired=False,
+        summary_json=json.dumps(
+            {
+                "run_date": "2026-04-14",
+                "prompts_checked": 3,
+                "brand_visibility_score": 0.2,
+                "citation_rate": 0.1,
+                "share_of_voice": 0.15,
+                "sentiment_score": 0.7,
+                "branded_prompt_visibility_score": 0.4,
+                "non_branded_prompt_visibility_score": 0.1,
+                "tier_breakdown": {"tier1": 0.2},
+                "cluster_breakdown": {"ai-campaigns": 0.2},
+                "gaps": ["t1-001"],
+                "competitor_leading": [{"prompt_id": "t1-001", "competitor": "mutiny", "count": 6}],
+                "source_attribution": [{"url": "https://www.folloze.com/insights/example", "count": 2}],
+                "alerts": ["LOW SHARE OF VOICE"],
+                "incomplete": False,
+                "failure_count": 0,
+            }
+        ),
+    )
+
+    latest = create_run(conn, "2026-04-20")
+    complete_run(
+        conn,
+        latest,
+        prompt_count=3,
+        citation_count=1,
+        alert_fired=False,
+        summary_json=json.dumps(
+            {
+                "run_date": "2026-04-20",
+                "prompts_checked": 3,
+                "brand_visibility_score": 0.31,
+                "citation_rate": 0.12,
+                "share_of_voice": 0.18,
+                "sentiment_score": 0.8,
+                "branded_prompt_visibility_score": 0.6,
+                "non_branded_prompt_visibility_score": 0.22,
+                "tier_breakdown": {"tier1": 0.3},
+                "cluster_breakdown": {"ai-campaigns": 0.3},
+                "gaps": ["t1-001"],
+                "competitor_leading": [{"prompt_id": "t1-001", "competitor": "mutiny", "count": 7}],
+                "source_attribution": [{"url": "https://www.folloze.com/insights/example", "count": 3}],
+                "alerts": ["LOW SHARE OF VOICE", "NON-BRANDED VISIBILITY GAP"],
+                "incomplete": False,
+                "failure_count": 0,
+            }
+        ),
+    )
+
+    summary = report.MonitorRunSummary(
+        run_date="2026-04-20",
+        prompts_checked=3,
+        brand_visibility_score=0.31,
+        citation_rate=0.12,
+        share_of_voice=0.18,
+        sentiment_score=0.8,
+        branded_prompt_visibility_score=0.6,
+        non_branded_prompt_visibility_score=0.22,
+        tier_breakdown={"tier1": 0.3},
+        cluster_breakdown={"ai-campaigns": 0.3},
+        gaps=["t1-001"],
+        competitor_leading=[{"prompt_id": "t1-001", "competitor": "mutiny", "count": 7}],
+        source_attribution=[{"url": "https://www.folloze.com/insights/example", "count": 3}],
+        alerts=["LOW SHARE OF VOICE", "NON-BRANDED VISIBILITY GAP"],
+        incomplete=False,
+        failure_count=0,
+    )
+
+    assert report.fire_alerts(summary, None, conn=conn) is True
+    assert len(sent) == 1
+    subject, body = sent[0]
+    assert subject == "[Folloze GEO] Weekly Visibility Monitor — 2026-04-14 to 2026-04-20"
+    assert "7-day rollup" in body
+    assert "Latest run date" in body
+    assert "2026-04-20" in body
+    assert "<table" in body
+    assert "Summary Metrics" in body
+    assert "Executive Summary" in body
+    assert "Daily Snapshots" in body
+    assert "linear-gradient" in body
+    assert "Generated for email-safe rendering" in body
+    assert "Average Brand Visibility Score" in body
+    assert "26%" in body
+    assert "Average Citation Rate" in body
+    assert "11%" in body
+    assert "Average Share of Voice" in body
+    assert "16%" in body
+    assert "LOW SHARE OF VOICE" in body
+    assert "1 run" in body
+    assert "NON-BRANDED VISIBILITY GAP" in body

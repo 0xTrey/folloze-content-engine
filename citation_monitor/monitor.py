@@ -74,7 +74,7 @@ class CitationMonitor:
                 prompts=prompts,
                 failure_count=self._failure_count,
             )
-            alert_fired = False if self.dry_run else fire_alerts(summary, self.config)
+            alert_fired = False if self.dry_run else fire_alerts(summary, self.config, conn=conn)
             stats = get_run_citation_stats(conn, run_id)
             complete_run(
                 conn=conn,
@@ -134,6 +134,8 @@ class CitationMonitor:
                             branded="folloze" in variant_text.lower(),
                             competitors_mentioned=result.competitors_mentioned,
                             confidence_flag=result.confidence_flag,
+                            sentiment_label=result.sentiment_label,
+                            source_urls=result.source_urls,
                             citation_probability=1.0 if result.folloze_mentioned else 0.0,
                             parser_version=PARSER_VERSION,
                             detection_method="regex",
@@ -193,6 +195,8 @@ class CitationMonitor:
             branded=branded,
             competitors_mentioned=[],
             confidence_flag="normal",
+            sentiment_label="positive" if mentioned else "neutral",
+            source_urls=[],
             citation_probability=1.0 if mentioned else 0.0,
             parser_version=PARSER_VERSION,
             detection_method="dry-run",

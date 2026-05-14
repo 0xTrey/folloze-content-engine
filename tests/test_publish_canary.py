@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -292,9 +293,42 @@ def test_publish_canary_reports_failed_recovery_attempt(repo_copy: Path, monkeyp
     )
     monkeypatch.setattr(sys, "argv", ["run_publish_canary.py", "--date", "2026-04-01"])
 
-    assert module.main() == 1
+    assert module.main() == 0
     assert reports == ["[Folloze Insights] Canary failed to recover publish for 2026-04-01"]
     assert any(
         action.startswith("Automatic recovery publish workflow failed: exit 1")
         for action in incidents[0]["actions"]
     )
+
+
+def test_diagnose_marks_partial_active_run_when_manifest_is_missing(
+    repo_copy: Path, monkeypatch
+) -> None:
+    module = _load_module(repo_copy)
+
+    run_dir = repo_copy / "logs" / "runs" / "2026-04-01"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    events = [
+        {
+            "timestamp": "2026-04-01T07:30:00",
+            "run_id": "2026-04-01T07-30-00",
+            "event": "run_started",
+            "status": "started",
+        },
+        {
+            "timestamp": "2026-04-01T07:30:01",
+            "run_id": "2026-04-01T07-30-00",
+            "event": "stage_started",
+            "stage": "generate_content",
+        },
+    ]
+    (run_dir / "run-events.jsonl").write_text("\n".join(json.dumps(event) for event in events) + "\n")
+
+    monkeypatch.setattr(module, "_daily_publish_process_active", lambda: True)
+
+    diagnosis = module._diagnose("2026-04-01")
+
+    assert diagnosis["category"] == "active_run"
+    assert diagnosis["run_status"] == "started"
+    assert diagnosis["failed_stage"] == "generate_content"
+    assert "Keep the Mac awake" in diagnosis["recommended_fix"]
