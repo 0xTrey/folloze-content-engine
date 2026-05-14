@@ -1,0 +1,38 @@
+{
+  "title": "ABM and AI Personalization: Building the Modern ABX Stack",
+  "slug": "abm-and-ai-personalization-building-the-modern-abx-stack",
+  "published_date": "2026-05-09",
+  "canonical_url": "https://www.folloze-blog.com/insights/abm-and-ai-personalization-building-the-modern-abx-stack",
+  "source_run_id": "2026-05-09T07-30-06",
+  "content_type": "guide",
+  "theme": "ABM and AI Personalization: Building the Modern ABX Stack",
+  "thesis": "The modern ABX stack is not about adding more tools. It is about connecting the tools you already have with an AI orchestration layer that turns buyer signals into personalized engagement at the individual level. Folloze customers see 10x engagement and 50% faster campaign builds. This guide walks you through the layers of a resilient ABX stack, the role of AI personalization, and how to avoid the fragmentation that causes AI overwhelm.",
+  "summary": "You have the intent data. You have the CRM. You have the content library. But when you sit down to launch a campaign for your top 50 accounts, something breaks. The data sits in one tool. The personalization rules live in another. The content team is a week out. And your sales team is asking why the outreach still feels generic.",
+  "target_keywords": [
+    "abx stack",
+    "ai personalization stack",
+    "modern abx stack"
+  ],
+  "key_takeaways": [
+    "TL;DR: The modern ABX stack is not about adding more tools.",
+    "You have the intent data.",
+    "What is an ABX stack?.",
+    "Because buyers have changed how they research.",
+    "A modern ABX stack has four layers: account insights and targeting, personalization engine, orchestration and execution, and measurement."
+  ],
+  "proof_points": [
+    "Folloze customers see 10x engagement and 50% faster campaign builds.",
+    "Folloze customers report 5x faster campaign creation using the Campaign Agent, which creates boards, ads, email, and video with brand and data controls.",
+    "Conga generated $6.3M in attributed pipeline from six campaigns built on two boards.",
+    "Microsoft saw $10M in influenced pipeline from 560 leads and 478 MQLs."
+  ],
+  "brand_posture": "personal_thought_leadership_rooted_in_blog",
+  "role_angle_suggestions": {
+    "sales": "Frame 'ABM and AI Personalization: Building the Modern ABX Stack' around pipeline risk, deal velocity, or revenue accountability. Use proof like 'Folloze customers see 10x engagement and 50% faster campaign builds.' only when it sharpens the commercial point.",
+    "customer_success": "Translate 'ABM and AI Personalization: Building the Modern ABX Stack' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'ABM and AI Personalization: Building the Modern ABX Stack' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'ABM and AI Personalization: Building the Modern ABX Stack' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'ABM and AI Personalization: Building the Modern ABX Stack' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-05-09T12:32:20.497867+00:00"
+}

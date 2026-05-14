@@ -1,0 +1,38 @@
+{
+  "title": "What Is ABX? Account-Based Experience, Explained for B2B Revenue Teams",
+  "slug": "what-is-abx",
+  "published_date": "2026-04-10",
+  "canonical_url": "https://www.folloze-blog.com/insights/what-is-abx",
+  "source_run_id": "2026-04-10T07-30-05",
+  "content_type": "glossary",
+  "theme": "What Is ABX?",
+  "thesis": "Account-Based Experience (ABX) is a go-to-market strategy that orchestrates personalized engagement for target accounts across their entire lifecycle. It requires an AI orchestration platform to activate individual-level signals and prove revenue impact. According to Forrester, companies with mature ABX strategies see a 30% higher customer lifetime value.",
+  "summary": "B2B revenue teams face AI overwhelm and campaign chaos, struggling to connect personalized engagement to pipeline. Static websites and siloed tools fail to orchestrate the coordinated experiences today's buying committees demand. What is ABX is the strategic answer: a revenue-aligned approach to delivering personalized journeys across target accounts, powered by operational AI orchestration.",
+  "target_keywords": [
+    "what is abx",
+    "account based experience",
+    "abx marketing"
+  ],
+  "key_takeaways": [
+    "TL;DR: Account-Based Experience (ABX) is a go-to-market strategy that orchestrates personalized engagement for target accounts across their entire lifecycle.",
+    "B2B revenue teams face AI overwhelm and campaign chaos, struggling to connect personalized engagement to pipeline.",
+    "ABM selects where to focus, while ABX determines what to do next based on individual engagement.",
+    "ABX extends the strategy beyond acquisition to include retention and expansion.",
+    "Website personalization is a single-tactic, while ABX is a cross-channel orchestration strategy."
+  ],
+  "proof_points": [
+    "According to Forrester, companies with mature ABX strategies see a 30% higher customer lifetime value.",
+    "According to Gartner, 70% of B2B buying decisions are made before a sales rep is contacted, making strategic, signal-activated orchestration essential for modern sellers.",
+    "The Campaign Agent creates boards and content 5x faster.",
+    "For example, Conga generated $6.3M in attributed pipeline using this orchestrated approach on Folloze."
+  ],
+  "brand_posture": "personal_thought_leadership_rooted_in_blog",
+  "role_angle_suggestions": {
+    "sales": "Frame 'What Is ABX?' around pipeline risk, deal velocity, or revenue accountability. Use proof like 'According to Forrester, companies with mature ABX strategies see a 30% higher customer lifetime value.' only when it sharpens the commercial point.",
+    "customer_success": "Translate 'What Is ABX?' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'What Is ABX?' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'What Is ABX?' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'What Is ABX?' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-04-10T12:33:46.570704+00:00"
+}

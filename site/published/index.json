@@ -1,6 +1,61 @@
 {
   "artifacts": [
     {
+      "slug": "6sense-personalization-for-abm-programs",
+      "title": "6sense Personalization for ABM Programs: How Folloze Activates Intent into Pipeline",
+      "route": "/insights/6sense-personalization-for-abm-programs",
+      "path": "6sense-personalization-for-abm-programs.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/6sense-personalization-for-abm-programs",
+      "source_run_id": "2026-04-20T07-30-06",
+      "promoted_at": "2026-04-20T12:34:58.654241+00:00",
+      "social_brief_path": "social-briefs/6sense-personalization-for-abm-programs.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/6sense-personalization-for-abm-programs.json"
+    },
+    {
+      "slug": "abm-and-ai-personalization-building-the-modern-abx-stack",
+      "title": "ABM and AI Personalization: Building the Modern ABX Stack",
+      "route": "/insights/abm-and-ai-personalization-building-the-modern-abx-stack",
+      "path": "abm-and-ai-personalization-building-the-modern-abx-stack.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/abm-and-ai-personalization-building-the-modern-abx-stack",
+      "source_run_id": "2026-05-09T07-30-06",
+      "promoted_at": "2026-05-09T12:32:20.827095+00:00",
+      "social_brief_path": "social-briefs/abm-and-ai-personalization-building-the-modern-abx-stack.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/abm-and-ai-personalization-building-the-modern-abx-stack.json"
+    },
+    {
+      "slug": "abm-kpis-that-actually-predict-pipeline",
+      "title": "ABM KPIs That Predict Pipeline: Stop Tracking Vanity Metrics and Drive Revenue",
+      "route": "/insights/abm-kpis-that-actually-predict-pipeline",
+      "path": "abm-kpis-that-actually-predict-pipeline.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/abm-kpis-that-actually-predict-pipeline",
+      "source_run_id": "2026-05-08T13-25-13",
+      "promoted_at": "2026-05-08T18:26:55.721516+00:00",
+      "social_brief_path": "social-briefs/abm-kpis-that-actually-predict-pipeline.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/abm-kpis-that-actually-predict-pipeline.json"
+    },
+    {
+      "slug": "abm-landing-pages-for-b2b-teams",
+      "title": "ABM Landing Pages: The Folloze Guide to Scalable Personalization and Pipeline Impact",
+      "route": "/insights/abm-landing-pages-for-b2b-teams",
+      "path": "abm-landing-pages-for-b2b-teams.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/abm-landing-pages-for-b2b-teams",
+      "source_run_id": "2026-04-06T07-30-05",
+      "promoted_at": "2026-04-06T12:34:32.192131+00:00",
+      "social_brief_path": "social-briefs/abm-landing-pages-for-b2b-teams.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/abm-landing-pages-for-b2b-teams.json"
+    },
+    {
+      "slug": "abm-platform-vs-landing-page-builder",
+      "title": "ABX Platform vs Personalized Campaign Destination: The Orchestration Layer You Need",
+      "route": "/insights/abm-platform-vs-landing-page-builder",
+      "path": "abm-platform-vs-landing-page-builder.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/abm-platform-vs-landing-page-builder",
+      "source_run_id": "2026-05-11T07-30-06",
+      "promoted_at": "2026-05-11T12:33:27.970372+00:00",
+      "social_brief_path": "social-briefs/abm-platform-vs-landing-page-builder.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/abm-platform-vs-landing-page-builder.json"
+    },
+    {
       "slug": "account-engagement-signals-every-b2b-marketer-should-track",
       "title": "Account Engagement Signals: Your FAQ Guide to B2B Pipeline Growth",
       "route": "/insights/account-engagement-signals-every-b2b-marketer-should-track",
@@ -8,6 +63,138 @@
       "canonical_url": "https://www.folloze-blog.com/insights/account-engagement-signals-every-b2b-marketer-should-track",
       "source_run_id": "2026-03-25T09-05-05",
       "promoted_at": "2026-03-25T14:06:13.296782+00:00"
+    },
+    {
+      "slug": "b2b-buyer-journey-personalization-a-practical-playbook",
+      "title": "B2B Buyer Journey Personalization: A Practical Playbook",
+      "route": "/insights/b2b-buyer-journey-personalization-a-practical-playbook",
+      "path": "b2b-buyer-journey-personalization-a-practical-playbook.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/b2b-buyer-journey-personalization-a-practical-playbook",
+      "source_run_id": "2026-05-13T07-30-06",
+      "promoted_at": "2026-05-13T12:32:18.271046+00:00",
+      "social_brief_path": "social-briefs/b2b-buyer-journey-personalization-a-practical-playbook.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/b2b-buyer-journey-personalization-a-practical-playbook.json"
+    },
+    {
+      "slug": "b2b-microsite-platform-for-abm-and-sales",
+      "title": "B2B Microsite Platform Guide: Orchestrate ABM Campaigns from Prompt to Pipeline",
+      "route": "/insights/b2b-microsite-platform-for-abm-and-sales",
+      "path": "b2b-microsite-platform-for-abm-and-sales.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/b2b-microsite-platform-for-abm-and-sales",
+      "source_run_id": "2026-04-13T10-54-22",
+      "promoted_at": "2026-04-13T17:06:32.328883+00:00",
+      "social_brief_path": "social-briefs/b2b-microsite-platform-for-abm-and-sales.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/b2b-microsite-platform-for-abm-and-sales.json"
+    },
+    {
+      "slug": "b2b-website-personalization-that-drives-pipeline",
+      "title": "B2B Website Personalization That Drives Pipeline",
+      "route": "/insights/b2b-website-personalization-that-drives-pipeline",
+      "path": "b2b-website-personalization-that-drives-pipeline.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/b2b-website-personalization-that-drives-pipeline",
+      "source_run_id": "2026-04-08T07-42-14",
+      "promoted_at": "2026-04-08T14:31:25.577876+00:00",
+      "social_brief_path": "social-briefs/b2b-website-personalization-that-drives-pipeline.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/b2b-website-personalization-that-drives-pipeline.json"
+    },
+    {
+      "slug": "best-abm-landing-page-tools-for-b2b",
+      "title": "Best ABM Landing Page Tools for B2B: Beyond Static Pages to Dynamic Journeys",
+      "route": "/insights/best-abm-landing-page-tools-for-b2b",
+      "path": "best-abm-landing-page-tools-for-b2b.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/best-abm-landing-page-tools-for-b2b",
+      "source_run_id": "2026-05-12T07-30-06",
+      "promoted_at": "2026-05-12T12:36:03.963753+00:00",
+      "social_brief_path": "social-briefs/best-abm-landing-page-tools-for-b2b.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/best-abm-landing-page-tools-for-b2b.json"
+    },
+    {
+      "slug": "building-automated-digital-sales-rooms-from-crm-context",
+      "title": "Building Automated Digital Sales Rooms from CRM Context: The AI Orchestration Guide",
+      "route": "/insights/building-automated-digital-sales-rooms-from-crm-context",
+      "path": "building-automated-digital-sales-rooms-from-crm-context.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/building-automated-digital-sales-rooms-from-crm-context",
+      "source_run_id": "2026-05-08T13-32-37",
+      "promoted_at": "2026-05-08T18:35:09.798816+00:00",
+      "social_brief_path": "social-briefs/building-automated-digital-sales-rooms-from-crm-context.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/building-automated-digital-sales-rooms-from-crm-context.json"
+    },
+    {
+      "slug": "demandbase-personalization-for-b2b-buyer-journeys",
+      "title": "Unlock Pipeline with Demandbase & Folloze: Hyper-Personalized B2B Buyer Journeys at Scale",
+      "route": "/insights/demandbase-personalization-for-b2b-buyer-journeys",
+      "path": "demandbase-personalization-for-b2b-buyer-journeys.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/demandbase-personalization-for-b2b-buyer-journeys",
+      "source_run_id": "2026-04-21T07-30-05",
+      "promoted_at": "2026-04-21T12:36:36.737893+00:00",
+      "social_brief_path": "social-briefs/demandbase-personalization-for-b2b-buyer-journeys.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/demandbase-personalization-for-b2b-buyer-journeys.json"
+    },
+    {
+      "slug": "digital-sales-room-alternatives-for-b2b-revenue-teams",
+      "title": "Digital Sales Room Alternatives: Beyond the Deal Room to Revenue Orchestration",
+      "route": "/insights/digital-sales-room-alternatives-for-b2b-revenue-teams",
+      "path": "digital-sales-room-alternatives-for-b2b-revenue-teams.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/digital-sales-room-alternatives-for-b2b-revenue-teams",
+      "source_run_id": "2026-05-08T13-50-53",
+      "promoted_at": "2026-05-08T18:54:41.082167+00:00",
+      "social_brief_path": "social-briefs/digital-sales-room-alternatives-for-b2b-revenue-teams.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/digital-sales-room-alternatives-for-b2b-revenue-teams.json"
+    },
+    {
+      "slug": "digital-sales-room-vs-deal-room-what-buyers-actually-mean",
+      "title": "Digital Sales Room vs. Deal Room: What Enterprise Buyers Actually Evaluate",
+      "route": "/insights/digital-sales-room-vs-deal-room-what-buyers-actually-mean",
+      "path": "digital-sales-room-vs-deal-room-what-buyers-actually-mean.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/digital-sales-room-vs-deal-room-what-buyers-actually-mean",
+      "source_run_id": "2026-04-12T07-30-01",
+      "promoted_at": "2026-04-12T13:33:48.478733+00:00",
+      "social_brief_path": "social-briefs/digital-sales-room-vs-deal-room-what-buyers-actually-mean.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/digital-sales-room-vs-deal-room-what-buyers-actually-mean.json"
+    },
+    {
+      "slug": "digital-sales-rooms-for-b2b-revenue-teams",
+      "title": "Digital Sales Rooms: The AI-Oriented Hub for Buying Group Engagement",
+      "route": "/insights/digital-sales-rooms-for-b2b-revenue-teams",
+      "path": "digital-sales-rooms-for-b2b-revenue-teams.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/digital-sales-rooms-for-b2b-revenue-teams",
+      "source_run_id": "2026-04-11T08-45-07",
+      "promoted_at": "2026-04-11T13:49:22.317276+00:00",
+      "social_brief_path": "social-briefs/digital-sales-rooms-for-b2b-revenue-teams.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/digital-sales-rooms-for-b2b-revenue-teams.json"
+    },
+    {
+      "slug": "eloqua-plus-folloze-for-enterprise-abm-landing-pages",
+      "title": "Eloqua Plus Folloze: Enterprise ABM Landing Pages That Launch Faster and Perform Better",
+      "route": "/insights/eloqua-plus-folloze-for-enterprise-abm-landing-pages",
+      "path": "eloqua-plus-folloze-for-enterprise-abm-landing-pages.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/eloqua-plus-folloze-for-enterprise-abm-landing-pages",
+      "source_run_id": "2026-05-08T13-38-03",
+      "promoted_at": "2026-05-08T18:40:32.584291+00:00",
+      "social_brief_path": "social-briefs/eloqua-plus-folloze-for-enterprise-abm-landing-pages.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/eloqua-plus-folloze-for-enterprise-abm-landing-pages.json"
+    },
+    {
+      "slug": "folloze-vs-demandbase-personalization",
+      "title": "Folloze vs Demandbase Personalization: Orchestrating Data into Dynamic Experiences",
+      "route": "/insights/folloze-vs-demandbase-personalization",
+      "path": "folloze-vs-demandbase-personalization.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/folloze-vs-demandbase-personalization",
+      "source_run_id": "2026-05-08T13-40-33",
+      "promoted_at": "2026-05-08T18:42:43.098479+00:00",
+      "social_brief_path": "social-briefs/folloze-vs-demandbase-personalization.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/folloze-vs-demandbase-personalization.json"
+    },
+    {
+      "slug": "folloze-vs-dock-which-platform-fits-b2b-sales-rooms-better",
+      "title": "Folloze vs. Dock: Which Platform Fits B2B Sales Rooms Better",
+      "route": "/insights/folloze-vs-dock-which-platform-fits-b2b-sales-rooms-better",
+      "path": "folloze-vs-dock-which-platform-fits-b2b-sales-rooms-better.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/folloze-vs-dock-which-platform-fits-b2b-sales-rooms-better",
+      "source_run_id": "2026-05-08T13-42-44",
+      "promoted_at": "2026-05-08T18:47:18.701197+00:00",
+      "social_brief_path": "social-briefs/folloze-vs-dock-which-platform-fits-b2b-sales-rooms-better.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/folloze-vs-dock-which-platform-fits-b2b-sales-rooms-better.json"
     },
     {
       "slug": "folloze-vs-mutiny",
@@ -26,6 +213,17 @@
       "canonical_url": "https://www.folloze-blog.com/insights/folloze-vs-pathfactory",
       "source_run_id": "2026-04-01T09-06-13",
       "promoted_at": "2026-04-01T14:41:44.951975+00:00"
+    },
+    {
+      "slug": "folloze-vs-trumpet-which-platform-fits-enterprise-buying-journeys",
+      "title": "Folloze vs. Trumpet: Which Platform Fits Enterprise Buying Journeys?",
+      "route": "/insights/folloze-vs-trumpet-which-platform-fits-enterprise-buying-journeys",
+      "path": "folloze-vs-trumpet-which-platform-fits-enterprise-buying-journeys.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/folloze-vs-trumpet-which-platform-fits-enterprise-buying-journeys",
+      "source_run_id": "2026-05-08T13-47-19",
+      "promoted_at": "2026-05-08T18:50:52.208959+00:00",
+      "social_brief_path": "social-briefs/folloze-vs-trumpet-which-platform-fits-enterprise-buying-journeys.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/folloze-vs-trumpet-which-platform-fits-enterprise-buying-journeys.json"
     },
     {
       "slug": "folloze-vs-userled",
@@ -55,6 +253,17 @@
       "promoted_at": "2026-03-28T14:29:18.015023+00:00"
     },
     {
+      "slug": "how-to-build-account-specific-landing-pages-for-enterprise-campaigns",
+      "title": "How to Build Account-Specific Landing Pages for Enterprise Campaigns",
+      "route": "/insights/how-to-build-account-specific-landing-pages-for-enterprise-campaigns",
+      "path": "how-to-build-account-specific-landing-pages-for-enterprise-campaigns.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-build-account-specific-landing-pages-for-enterprise-campaigns",
+      "source_run_id": "2026-05-14T07-30-06-fixed",
+      "promoted_at": "2026-05-14T13:14:28.519111+00:00",
+      "social_brief_path": "social-briefs/how-to-build-account-specific-landing-pages-for-enterprise-campaigns.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/how-to-build-account-specific-landing-pages-for-enterprise-campaigns.json"
+    },
+    {
       "slug": "how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks",
       "title": "How to Build Executive-Ready Buyer Journeys Without Web-Team Bottlenecks",
       "route": "/insights/how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks",
@@ -62,6 +271,61 @@
       "canonical_url": "https://www.folloze-blog.com/insights/how-to-build-executive-ready-buyer-journeys-without-web-team-bottlenecks",
       "source_run_id": "2026-03-31T09-10-32",
       "promoted_at": "2026-03-31T14:30:16.579783+00:00"
+    },
+    {
+      "slug": "how-to-make-abm-work-with-a-small-marketing-team",
+      "title": "How to Make ABM Work with a Small Marketing Team: A Lean ABM Guide",
+      "route": "/insights/how-to-make-abm-work-with-a-small-marketing-team",
+      "path": "how-to-make-abm-work-with-a-small-marketing-team.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-make-abm-work-with-a-small-marketing-team",
+      "source_run_id": "2026-05-08T13-59-16",
+      "promoted_at": "2026-05-08T19:03:09.593668+00:00",
+      "social_brief_path": "social-briefs/how-to-make-abm-work-with-a-small-marketing-team.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/how-to-make-abm-work-with-a-small-marketing-team.json"
+    },
+    {
+      "slug": "how-to-measure-abx-roi-when-traditional-metrics-fail",
+      "title": "How to Measure ABX ROI When Traditional Marketing Metrics Fail",
+      "route": "/insights/how-to-measure-abx-roi-when-traditional-metrics-fail",
+      "path": "how-to-measure-abx-roi-when-traditional-metrics-fail.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-measure-abx-roi-when-traditional-metrics-fail",
+      "source_run_id": "2026-05-08T13-20-58",
+      "promoted_at": "2026-05-08T18:25:12.561954+00:00",
+      "social_brief_path": "social-briefs/how-to-measure-abx-roi-when-traditional-metrics-fail.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/how-to-measure-abx-roi-when-traditional-metrics-fail.json"
+    },
+    {
+      "slug": "how-to-measure-account-engagement-score",
+      "title": "How to Measure Account Engagement Score: From Signals to Pipeline",
+      "route": "/insights/how-to-measure-account-engagement-score",
+      "path": "how-to-measure-account-engagement-score.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-measure-account-engagement-score",
+      "source_run_id": "2026-05-08T13-17-20",
+      "promoted_at": "2026-05-08T18:20:57.306710+00:00",
+      "social_brief_path": "social-briefs/how-to-measure-account-engagement-score.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/how-to-measure-account-engagement-score.json"
+    },
+    {
+      "slug": "how-to-personalize-b2b-landing-pages-at-scale-without-more-headcount",
+      "title": "How to Personalize B2B Landing Pages at Scale Without More Headcount",
+      "route": "/insights/how-to-personalize-b2b-landing-pages-at-scale-without-more-headcount",
+      "path": "how-to-personalize-b2b-landing-pages-at-scale-without-more-headcount.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-personalize-b2b-landing-pages-at-scale-without-more-headcount",
+      "source_run_id": "2026-04-05T09-05-05",
+      "promoted_at": "2026-04-05T14:07:30.838422+00:00",
+      "social_brief_path": "social-briefs/how-to-personalize-b2b-landing-pages-at-scale-without-more-headcount.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/how-to-personalize-b2b-landing-pages-at-scale-without-more-headcount.json"
+    },
+    {
+      "slug": "how-to-personalize-content-for-different-accounts-without-hiring-more-people",
+      "title": "How to Personalize Content for Different Accounts Without Hiring More People",
+      "route": "/insights/how-to-personalize-content-for-different-accounts-without-hiring-more-people",
+      "path": "how-to-personalize-content-for-different-accounts-without-hiring-more-people.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-personalize-content-for-different-accounts-without-hiring-more-people",
+      "source_run_id": "2026-05-08T13-08-41",
+      "promoted_at": "2026-05-08T18:10:47.874966+00:00",
+      "social_brief_path": "social-briefs/how-to-personalize-content-for-different-accounts-without-hiring-more-people.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/how-to-personalize-content-for-different-accounts-without-hiring-more-people.json"
     },
     {
       "slug": "how-to-turn-buyer-intent-into-campaign-action-with-folloze",
@@ -73,6 +337,94 @@
       "promoted_at": "2026-04-02T14:11:59.553473+00:00"
     },
     {
+      "slug": "how-to-use-intent-data-to-drive-personalization-without-more-tools",
+      "title": "How to Use Intent Data for Personalization Without More Tools: An Orchestration Guide",
+      "route": "/insights/how-to-use-intent-data-to-drive-personalization-without-more-tools",
+      "path": "how-to-use-intent-data-to-drive-personalization-without-more-tools.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/how-to-use-intent-data-to-drive-personalization-without-more-tools",
+      "source_run_id": "2026-04-19T07-30-07",
+      "promoted_at": "2026-04-19T12:39:05.132933+00:00",
+      "social_brief_path": "social-briefs/how-to-use-intent-data-to-drive-personalization-without-more-tools.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/how-to-use-intent-data-to-drive-personalization-without-more-tools.json"
+    },
+    {
+      "slug": "intent-data-and-first-party-data-activation-for-b2b",
+      "title": "Accelerate Pipeline: How Folloze Activates Intent and First-Party Data for B2B Personalization",
+      "route": "/insights/intent-data-and-first-party-data-activation-for-b2b",
+      "path": "intent-data-and-first-party-data-activation-for-b2b.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/intent-data-and-first-party-data-activation-for-b2b",
+      "source_run_id": "2026-05-08T13-54-42",
+      "promoted_at": "2026-05-08T18:56:52.809837+00:00",
+      "social_brief_path": "social-briefs/intent-data-and-first-party-data-activation-for-b2b.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/intent-data-and-first-party-data-activation-for-b2b.json"
+    },
+    {
+      "slug": "marketo-plus-folloze-for-personalized-campaign-journeys",
+      "title": "Marketo + Folloze: Your Guide to Personalized Campaign Journeys",
+      "route": "/insights/marketo-plus-folloze-for-personalized-campaign-journeys",
+      "path": "marketo-plus-folloze-for-personalized-campaign-journeys.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/marketo-plus-folloze-for-personalized-campaign-journeys",
+      "source_run_id": "2026-05-08T13-35-10",
+      "promoted_at": "2026-05-08T18:38:02.004143+00:00",
+      "social_brief_path": "social-briefs/marketo-plus-folloze-for-personalized-campaign-journeys.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/marketo-plus-folloze-for-personalized-campaign-journeys.json"
+    },
+    {
+      "slug": "microsite-vs-landing-page-for-b2b-campaigns",
+      "title": "Microsite vs Landing Page for B2B Campaigns: The Orchestration Imperative",
+      "route": "/insights/microsite-vs-landing-page-for-b2b-campaigns",
+      "path": "microsite-vs-landing-page-for-b2b-campaigns.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/microsite-vs-landing-page-for-b2b-campaigns",
+      "source_run_id": "2026-04-14T07-30-07",
+      "promoted_at": "2026-04-14T12:37:37.931106+00:00",
+      "social_brief_path": "social-briefs/microsite-vs-landing-page-for-b2b-campaigns.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/microsite-vs-landing-page-for-b2b-campaigns.json"
+    },
+    {
+      "slug": "multi-channel-sales-engagement-and-gtm-efficiency",
+      "title": "From Campaign Chaos to GTM Clarity: Mastering Multi-Channel Sales Engagement",
+      "route": "/insights/multi-channel-sales-engagement-and-gtm-efficiency",
+      "path": "multi-channel-sales-engagement-and-gtm-efficiency.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/multi-channel-sales-engagement-and-gtm-efficiency",
+      "source_run_id": "2026-05-10T07-30-06",
+      "promoted_at": "2026-05-10T12:31:55.514791+00:00",
+      "social_brief_path": "social-briefs/multi-channel-sales-engagement-and-gtm-efficiency.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/multi-channel-sales-engagement-and-gtm-efficiency.json"
+    },
+    {
+      "slug": "no-code-b2b-campaign-landing-pages-how-to-launch-faster-without-web-tickets",
+      "title": "No-Code B2B Campaign Landing Pages: How to Launch Faster Without Web Tickets",
+      "route": "/insights/no-code-b2b-campaign-landing-pages-how-to-launch-faster-without-web-tickets",
+      "path": "no-code-b2b-campaign-landing-pages-how-to-launch-faster-without-web-tickets.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/no-code-b2b-campaign-landing-pages-how-to-launch-faster-without-web-tickets",
+      "source_run_id": "2026-04-07T08-45-05",
+      "promoted_at": "2026-04-07T13:49:51.912651+00:00",
+      "social_brief_path": "social-briefs/no-code-b2b-campaign-landing-pages-how-to-launch-faster-without-web-tickets.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/no-code-b2b-campaign-landing-pages-how-to-launch-faster-without-web-tickets.json"
+    },
+    {
+      "slug": "outreach-plus-folloze-for-personalized-sales-experiences",
+      "title": "Boost Outreach with Folloze: Digital Sales Rooms & Personalized Landing Pages",
+      "route": "/insights/outreach-plus-folloze-for-personalized-sales-experiences",
+      "path": "outreach-plus-folloze-for-personalized-sales-experiences.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/outreach-plus-folloze-for-personalized-sales-experiences",
+      "source_run_id": "2026-04-22T08-37-12",
+      "promoted_at": "2026-04-22T14:09:33.029544+00:00",
+      "social_brief_path": "social-briefs/outreach-plus-folloze-for-personalized-sales-experiences.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/outreach-plus-folloze-for-personalized-sales-experiences.json"
+    },
+    {
+      "slug": "personalized-landing-pages-for-sales-outreach",
+      "title": "Personalized Landing Pages for Sales Outreach: The AI Orchestration Guide",
+      "route": "/insights/personalized-landing-pages-for-sales-outreach",
+      "path": "personalized-landing-pages-for-sales-outreach.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/personalized-landing-pages-for-sales-outreach",
+      "source_run_id": "2026-04-17T07-30-07",
+      "promoted_at": "2026-04-17T12:35:06.484653+00:00",
+      "social_brief_path": "social-briefs/personalized-landing-pages-for-sales-outreach.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/personalized-landing-pages-for-sales-outreach.json"
+    },
+    {
       "slug": "prompt-to-pipeline-reporting-faq",
       "title": "Prompt-to-Pipeline Reporting FAQ: Attribution, Revenue Proof & Campaign Impact",
       "route": "/insights/prompt-to-pipeline-reporting-faq",
@@ -80,6 +432,28 @@
       "canonical_url": "https://www.folloze-blog.com/insights/prompt-to-pipeline-reporting-faq",
       "source_run_id": "2026-03-30T09-59-55",
       "promoted_at": "2026-03-30T15:02:09.189390+00:00"
+    },
+    {
+      "slug": "salesforce-plus-folloze-for-account-level-engagement-tracking",
+      "title": "Salesforce Plus Folloze: Account-Level Engagement Tracking for Pipeline Clarity",
+      "route": "/insights/salesforce-plus-folloze-for-account-level-engagement-tracking",
+      "path": "salesforce-plus-folloze-for-account-level-engagement-tracking.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/salesforce-plus-folloze-for-account-level-engagement-tracking",
+      "source_run_id": "2026-05-08T13-28-40",
+      "promoted_at": "2026-05-08T18:32:36.426231+00:00",
+      "social_brief_path": "social-briefs/salesforce-plus-folloze-for-account-level-engagement-tracking.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/salesforce-plus-folloze-for-account-level-engagement-tracking.json"
+    },
+    {
+      "slug": "scaling-abm-with-a-two-person-marketing-team",
+      "title": "Scaling ABM with a Two-Person Marketing Team: The Scalable ABM Playbook",
+      "route": "/insights/scaling-abm-with-a-two-person-marketing-team",
+      "path": "scaling-abm-with-a-two-person-marketing-team.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/scaling-abm-with-a-two-person-marketing-team",
+      "source_run_id": "2026-05-08T12-58-36",
+      "promoted_at": "2026-05-08T18:00:38.345717+00:00",
+      "social_brief_path": "social-briefs/scaling-abm-with-a-two-person-marketing-team.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/scaling-abm-with-a-two-person-marketing-team.json"
     },
     {
       "slug": "the-power-of-individual-level-engagement-in-folloze",
@@ -91,6 +465,28 @@
       "promoted_at": "2026-03-20T22:51:20.908927+00:00"
     },
     {
+      "slug": "using-buyer-engagement-data-to-prioritize-sales-outreach",
+      "title": "How to Use Buyer Engagement Data to Prioritize Sales Outreach",
+      "route": "/insights/using-buyer-engagement-data-to-prioritize-sales-outreach",
+      "path": "using-buyer-engagement-data-to-prioritize-sales-outreach.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/using-buyer-engagement-data-to-prioritize-sales-outreach",
+      "source_run_id": "2026-05-08T13-26-57",
+      "promoted_at": "2026-05-08T18:28:39.581973+00:00",
+      "social_brief_path": "social-briefs/using-buyer-engagement-data-to-prioritize-sales-outreach.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/using-buyer-engagement-data-to-prioritize-sales-outreach.json"
+    },
+    {
+      "slug": "website-personalization-vs-abx-what-is-the-difference",
+      "title": "Website Personalization vs. ABX: The Definitive Guide for B2B Marketers",
+      "route": "/insights/website-personalization-vs-abx-what-is-the-difference",
+      "path": "website-personalization-vs-abx-what-is-the-difference.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/website-personalization-vs-abx-what-is-the-difference",
+      "source_run_id": "2026-04-09T07-44-46",
+      "promoted_at": "2026-04-09T14:12:58.059117+00:00",
+      "social_brief_path": "social-briefs/website-personalization-vs-abx-what-is-the-difference.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/website-personalization-vs-abx-what-is-the-difference.json"
+    },
+    {
       "slug": "welcome-to-folloze-insights",
       "title": "Welcome to Folloze Insights",
       "route": "/insights/welcome-to-folloze-insights",
@@ -98,6 +494,39 @@
       "canonical_url": "https://www.folloze-blog.com/insights/welcome-to-folloze-insights",
       "source_run_id": "seed-welcome-post",
       "promoted_at": "2026-03-20T00:00:00+00:00"
+    },
+    {
+      "slug": "what-is-a-b2b-buyer-experience-platform",
+      "title": "What Is a B2B Buyer Experience Platform?",
+      "route": "/insights/what-is-a-b2b-buyer-experience-platform",
+      "path": "what-is-a-b2b-buyer-experience-platform.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/what-is-a-b2b-buyer-experience-platform",
+      "source_run_id": "2026-04-18T08-33-16",
+      "promoted_at": "2026-04-18T13:39:40.798102+00:00",
+      "social_brief_path": "social-briefs/what-is-a-b2b-buyer-experience-platform.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/what-is-a-b2b-buyer-experience-platform.json"
+    },
+    {
+      "slug": "what-is-a-b2b-microsite-platform",
+      "title": "What Is a B2B Microsite Platform?",
+      "route": "/insights/what-is-a-b2b-microsite-platform",
+      "path": "what-is-a-b2b-microsite-platform.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/what-is-a-b2b-microsite-platform",
+      "source_run_id": "2026-04-15T07-30-05",
+      "promoted_at": "2026-04-15T12:31:52.371913+00:00",
+      "social_brief_path": "social-briefs/what-is-a-b2b-microsite-platform.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/what-is-a-b2b-microsite-platform.json"
+    },
+    {
+      "slug": "what-is-abx",
+      "title": "What Is ABX? Account-Based Experience, Explained for B2B Revenue Teams",
+      "route": "/insights/what-is-abx",
+      "path": "what-is-abx.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/what-is-abx",
+      "source_run_id": "2026-04-10T07-30-05",
+      "promoted_at": "2026-04-10T12:33:47.031804+00:00",
+      "social_brief_path": "social-briefs/what-is-abx.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/what-is-abx.json"
     },
     {
       "slug": "what-is-ai-orchestration-for-b2b-go-to-market-teams",
@@ -116,6 +545,28 @@
       "canonical_url": "https://www.folloze-blog.com/insights/what-is-content-intelligence-in-b2b-marketing",
       "source_run_id": "2026-03-29T09-06-19",
       "promoted_at": "2026-03-29T14:33:28.164779+00:00"
+    },
+    {
+      "slug": "what-is-first-party-intent-data",
+      "title": "What Is First-Party Intent Data? Folloze Glossary",
+      "route": "/insights/what-is-first-party-intent-data",
+      "path": "what-is-first-party-intent-data.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/what-is-first-party-intent-data",
+      "source_run_id": "2026-04-16T07-30-07",
+      "promoted_at": "2026-04-16T12:35:51.222617+00:00",
+      "social_brief_path": "social-briefs/what-is-first-party-intent-data.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/what-is-first-party-intent-data.json"
+    },
+    {
+      "slug": "what-tools-help-marketers-create-personalized-buying-journeys",
+      "title": "What Tools Help Marketers Create Personalized Buying Journeys? A Comparison",
+      "route": "/insights/what-tools-help-marketers-create-personalized-buying-journeys",
+      "path": "what-tools-help-marketers-create-personalized-buying-journeys.json",
+      "canonical_url": "https://www.folloze-blog.com/insights/what-tools-help-marketers-create-personalized-buying-journeys",
+      "source_run_id": "2026-05-08T13-14-43",
+      "promoted_at": "2026-05-08T18:17:19.312160+00:00",
+      "social_brief_path": "social-briefs/what-tools-help-marketers-create-personalized-buying-journeys.json",
+      "social_brief_url": "https://www.folloze-blog.com/social-briefs/what-tools-help-marketers-create-personalized-buying-journeys.json"
     },
     {
       "slug": "why-account-based-marketing-breaks-at-the-individual-level",

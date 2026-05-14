@@ -26,6 +26,22 @@ FOLLOZE_LINK_RE = re.compile(
 )
 
 
+def _json_ld_entities(json_ld_str: str) -> list[dict[str, object]]:
+    try:
+        payload = json.loads(json_ld_str)
+    except (json.JSONDecodeError, TypeError):
+        return []
+    entities: list[dict[str, object]] = []
+    if isinstance(payload, dict):
+        entities.append(payload)
+        graph = payload.get("@graph")
+        if isinstance(graph, list):
+            entities.extend(node for node in graph if isinstance(node, dict))
+    elif isinstance(payload, list):
+        entities.extend(node for node in payload if isinstance(node, dict))
+    return entities
+
+
 @dataclass(slots=True)
 class QualityResult:
     passed: bool
@@ -35,6 +51,7 @@ class QualityResult:
     aeo_score: int = 0
     geo_score: int = 0
     geo_failures: list[str] | None = None
+    seo_warnings: list[str] | None = None
 
 
 def gate(content: OptimizedContent, config: Config, brand_context: str) -> QualityResult:
@@ -88,6 +105,17 @@ def gate(content: OptimizedContent, config: Config, brand_context: str) -> Quali
     # Hard GEO failures block regardless of score
     hard_geo_failures = [f for f in geo_failures if any(tag in f for tag in ("[HARD]",))]
 
+    seo_checks = [
+        _check_title_quality(content.generated.title, content.generated.primary_keyword),
+        _check_meta_description_quality(content.generated.meta_description, content.generated.primary_keyword),
+        _check_keyword_in_intro(content.body_html, content.generated.primary_keyword),
+    ]
+    seo_warnings: list[str] = []
+    for label, failure in seo_checks:
+        reasons.append(f"seo_{label}: {'pass' if failure is None else 'warn'}")
+        if failure:
+            seo_warnings.append(failure)
+
     all_failures = failures + geo_failures
     brand_fails = _brand_failures(content.generated, content.body_html)
     all_failures.extend(brand_fails)
@@ -107,12 +135,16 @@ def gate(content: OptimizedContent, config: Config, brand_context: str) -> Quali
         aeo_score=aeo_score,
         geo_score=geo_score,
         geo_failures=geo_failures,
+        seo_warnings=seo_warnings,
     )
 
 
 def _check_definition_block(html: str) -> tuple[int, str, str | None]:
     text = _first_words(html, 100).lower()
-    valid = any(phrase in text for phrase in (" is a ", " is an ", " refers to ", " defined as "))
+    valid = any(
+        phrase in text
+        for phrase in (" is a ", " is an ", " are ", " refers to ", " defined as ")
+    )
     return (15 if valid else 0, "definition_block", None if valid else "Missing definition block")
 
 
@@ -275,7 +307,7 @@ def _check_heading_density(html: str) -> tuple[int, str, str | None]:
 
 
 def _check_answer_first_paragraphs(html: str) -> tuple[int, str, str | None]:
-    """>=60% of H2s followed by a declarative paragraph. 10 pts, soft."""
+    """>=60% of H2s followed by a declarative answer-first lead. 10 pts, soft."""
     soup = BeautifulSoup(html, "html.parser")
     h2s = soup.find_all("h2")
     if not h2s:
@@ -286,8 +318,9 @@ def _check_answer_first_paragraphs(html: str) -> tuple[int, str, str | None]:
         if not next_p:
             continue
         text = next_p.get_text(" ", strip=True)
-        words = text.split()
-        if len(words) <= 40 and "?" not in text and len(words) >= 3:
+        lead = _first_sentence(text)
+        words = lead.split()
+        if len(words) <= 40 and "?" not in lead and len(words) >= 3:
             declarative_count += 1
     ratio = declarative_count / len(h2s)
     if ratio >= 0.6:
@@ -300,6 +333,17 @@ def _check_answer_first_paragraphs(html: str) -> tuple[int, str, str | None]:
             f"(need >=60%)"
         ),
     )
+
+
+def _first_sentence(text: str) -> str:
+    """Return the first sentence in a paragraph-like string for answer-first checks."""
+    normalized = re.sub(r"\s+", " ", text).strip()
+    if not normalized:
+        return ""
+    match = re.match(r"^(.+?[.!?])(?:\s|$)", normalized)
+    if match:
+        return match.group(1).strip()
+    return normalized
 
 
 def _check_citation_format(html: str) -> tuple[int, str, str | None]:
@@ -327,12 +371,9 @@ def _check_kill_list(html: str) -> tuple[int, str, str | None]:
 
 def _check_freshness_signal(html: str, json_ld_str: str) -> tuple[int, str, str | None]:
     """Freshness marker: dateModified, 'Updated Month Year', or <time>. 10 pts, soft."""
-    try:
-        payload = json.loads(json_ld_str)
-        if payload.get("dateModified"):
+    for entity in _json_ld_entities(json_ld_str):
+        if entity.get("dateModified"):
             return 10, "freshness_signal", None
-    except (json.JSONDecodeError, AttributeError):
-        pass
     soup = BeautifulSoup(html, "html.parser")
     if soup.find("time"):
         return 10, "freshness_signal", None
@@ -352,15 +393,12 @@ def _check_author_attribution(html: str, json_ld_str: str) -> tuple[int, str, st
     meta_author = soup.find("meta", attrs={"name": "author"})
     if meta_author and meta_author.get("content", "").strip():
         return 10, "author_attribution", None
-    try:
-        payload = json.loads(json_ld_str)
-        author = payload.get("author", {})
+    for entity in _json_ld_entities(json_ld_str):
+        author = entity.get("author", {})
         if isinstance(author, dict) and author.get("name"):
             return 10, "author_attribution", None
         if isinstance(author, list) and any(a.get("name") for a in author if isinstance(a, dict)):
             return 10, "author_attribution", None
-    except (json.JSONDecodeError, AttributeError):
-        pass
     for tag in soup.find_all(["span", "p", "div", "a"]):
         class_attr = " ".join(tag.get("class", []))
         if any(marker in class_attr.lower() for marker in ("author", "byline", "writer")):
@@ -399,6 +437,38 @@ def _check_emdash(html: str) -> tuple[int, str, str | None]:
     if "—" not in text:
         return 10, "emdash", None
     return 0, "emdash", "[HARD] Contains em dash"
+
+
+# --- SEO checks (warning-only, no gate impact yet) ---
+
+
+def _check_title_quality(title: str, primary_keyword: str) -> tuple[str, str | None]:
+    normalized_title = title.strip()
+    if len(normalized_title) < 40:
+        return "title_quality", "Meta title is short; target roughly 40-65 characters"
+    if len(normalized_title) > 65:
+        return "title_quality", "Meta title is long; target roughly 40-65 characters"
+    if primary_keyword.lower() not in normalized_title.lower():
+        return "title_quality", "Meta title is missing the exact primary keyword"
+    return "title_quality", None
+
+
+def _check_meta_description_quality(meta_description: str, primary_keyword: str) -> tuple[str, str | None]:
+    normalized_description = meta_description.strip()
+    if len(normalized_description) < 140:
+        return "meta_description_quality", "Meta description is short; target roughly 140-160 characters"
+    if len(normalized_description) > 160:
+        return "meta_description_quality", "Meta description is long; target roughly 140-160 characters"
+    if primary_keyword.lower() not in normalized_description.lower():
+        return "meta_description_quality", "Meta description is missing the exact primary keyword"
+    return "meta_description_quality", None
+
+
+def _check_keyword_in_intro(html: str, primary_keyword: str) -> tuple[str, str | None]:
+    intro = _first_words(html, 100).lower()
+    if primary_keyword.lower() in intro:
+        return "keyword_in_intro", None
+    return "keyword_in_intro", "Primary keyword does not appear in the first 100 words"
 
 
 # --- Helpers ---

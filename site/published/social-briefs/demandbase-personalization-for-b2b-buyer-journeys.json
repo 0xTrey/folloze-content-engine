@@ -1,0 +1,38 @@
+{
+  "title": "Unlock Pipeline with Demandbase & Folloze: Hyper-Personalized B2B Buyer Journeys at Scale",
+  "slug": "demandbase-personalization-for-b2b-buyer-journeys",
+  "published_date": "2026-04-21",
+  "canonical_url": "https://www.folloze-blog.com/insights/demandbase-personalization-for-b2b-buyer-journeys",
+  "source_run_id": "2026-04-21T07-30-05",
+  "content_type": "guide",
+  "theme": "Demandbase Personalization for B2B Buyer Journeys",
+  "thesis": "Demandbase personalization, when activated by Folloze, transforms account intelligence into dynamic, individual-level content experiences that directly address pipeline anxiety. By combining Demandbase's insights with Folloze's AI orchestration, B2B marketers can achieve 10x engagement and accelerate campaign creation by 50%, driving measurable pipeline growth. For example, Conga generated $6.3M attributed pipeline from six campaigns built on Folloze boards.",
+  "summary": "Demandbase personalization is a strategic approach that uses advanced account intelligence to tailor B2B marketing content and experiences for specific accounts and individuals. Yet, many B2B marketing teams continue to grapple with pipeline anxiety, struggling to translate rich account intelligence into actionable, personalized engagement at scale.",
+  "target_keywords": [
+    "demandbase personalization",
+    "demandbase website personalization",
+    "demandbase folloze integration"
+  ],
+  "key_takeaways": [
+    "Demandbase personalization is a strategic approach that uses advanced account intelligence to tailor B2B marketing content and experiences for specific accounts and individuals.",
+    "TL;DR: Demandbase personalization, when activated by Folloze, transforms account intelligence into dynamic, individual-level content experiences that directly address pipeline anxiety.",
+    "This guide explores how Folloze, an AI orchestration platform , becomes the essential execution layer for Demandbase personalization.",
+    "Demandbase personalization uses advanced account intelligence and buyer signals to tailor content and experiences for specific B2B accounts and individuals.",
+    "This approach ensures that every interaction resonates with the buyer's unique context, industry, and buying stage."
+  ],
+  "proof_points": [
+    "By combining Demandbase's insights with Folloze's AI orchestration, B2B marketers can achieve 10x engagement and accelerate campaign creation by 50%, driving measurable pipeline growth.",
+    "For example, Conga generated $6.3M attributed pipeline from six campaigns built on Folloze boards.",
+    "According to Forrester (2024), 67% of B2B buyers prefer personalized content, yet many marketers struggle to deliver it consistently and at the necessary velocity.",
+    "For example, RingCentral achieved 98% target account engagement and 50% C-suite engagement in 60 days using dynamic experiences orchestrated by Folloze."
+  ],
+  "brand_posture": "specific_folloze_branded_ok",
+  "role_angle_suggestions": {
+    "sales": "Frame 'Demandbase Personalization for B2B Buyer Journeys' around pipeline risk, deal velocity, or revenue accountability. Use proof like \"By combining Demandbase's insights with Folloze's AI orchestration, B2B marketers can achieve 10x engagement and accelerate campaign creation by 50%, driving measurable pipeline growth.\" only when it sharpens the commercial point.",
+    "customer_success": "Translate 'Demandbase Personalization for B2B Buyer Journeys' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'Demandbase Personalization for B2B Buyer Journeys' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'Demandbase Personalization for B2B Buyer Journeys' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'Demandbase Personalization for B2B Buyer Journeys' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-04-21T12:36:36.345916+00:00"
+}

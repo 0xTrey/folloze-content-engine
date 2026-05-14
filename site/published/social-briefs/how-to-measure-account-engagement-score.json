@@ -1,0 +1,39 @@
+{
+  "title": "How to Measure Account Engagement Score: From Signals to Pipeline",
+  "slug": "how-to-measure-account-engagement-score",
+  "published_date": "2026-05-08",
+  "canonical_url": "https://www.folloze-blog.com/insights/how-to-measure-account-engagement-score",
+  "source_run_id": "2026-05-08T13-17-20",
+  "content_type": "guide",
+  "theme": "How to Measure Account Engagement Score",
+  "thesis": "Measuring account engagement score (AES) provides a reliable signal for sales prioritization and pipeline confidence. A weighted, time-decayed score combining individual-level behaviors and account-level data helps you move from guesswork to action. Companies using structured engagement scoring see up to 22% lower churn and significantly higher win rates on high-scoring accounts.",
+  "summary": "Pipeline anxiety is a constant challenge for B2B demand gen and ABM leaders. You are investing heavily in target accounts, but you cannot confidently tell sales which ones are ready to talk. Generic outreach often fails. Handoffs feel slow. Without a clear signal, you risk wasting budget on accounts that will never convert and missing the ones that are actively buying.",
+  "target_keywords": [
+    "how to measure account engagement score",
+    "account engagement score",
+    "account engagement scoring",
+    "account engagement measurement"
+  ],
+  "key_takeaways": [
+    "TL;DR: Measuring account engagement score (AES) provides a reliable signal for sales prioritization and pipeline confidence.",
+    "Pipeline anxiety is a constant challenge for B2B demand gen and ABM leaders.",
+    "Account engagement score (AES) is a composite metric, typically on a 0 to 100 scale, that quantifies how actively a target account interacts with your brand across various channels and touchpoints.",
+    "Measuring AES provides a data-driven answer to the question sales asks most: which accounts should we call today?.",
+    "Account engagement scores incorporate individual-level behaviors and account-level data, including high-value actions, content consumption, and intent signals."
+  ],
+  "proof_points": [
+    "Companies using structured engagement scoring see up to 22% lower churn and significantly higher win rates on high-scoring accounts.",
+    "According to Gartner (2024), organizations that implement structured engagement scoring see a 20% improvement in sales and marketing alignment.",
+    "For example, Conga generated $6.3M in attributed pipeline from six campaigns built on two Folloze boards, proving that structured engagement measurement directly drives pipeline outcomes.",
+    "RingCentral achieved 98% target account engagement and 50% C-suite engagement in 60 days using Folloze, demonstrating what strong engagement looks like when you have the right measurement and activation in place."
+  ],
+  "brand_posture": "personal_thought_leadership_rooted_in_blog",
+  "role_angle_suggestions": {
+    "sales": "Frame 'How to Measure Account Engagement Score' around pipeline risk, deal velocity, or revenue accountability. Use proof like 'Companies using structured engagement scoring see up to 22% lower churn and significantly higher win rates on high-scoring accounts.' only when it sharpens the commercial point.",
+    "customer_success": "Translate 'How to Measure Account Engagement Score' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'How to Measure Account Engagement Score' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'How to Measure Account Engagement Score' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'How to Measure Account Engagement Score' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-05-08T18:20:56.901736+00:00"
+}

@@ -88,23 +88,30 @@ def _generate_from_prompt(topic: Topic, prompt: str, config: Config) -> Generate
     # Gemini exhausted — fall back to LLMGateway using the best available writing profiles.
     LOGGER.warning("Gemini failed after all retries (%s); falling back to LLMGateway", last_error)
     for gw_profile in GATEWAY_PROFILES:
-        try:
-            text = _call_gateway(prompt, gw_profile)
-            if REFUSAL_RE.search(text):
-                raise RefusalError("Gateway refused the content request")
-            payload = _extract_json_payload(text)
-            content = _build_content(topic, payload)
-            if content.word_count < minimum_words:
-                raise ValidationError(
-                    f"Generated content too short: {content.word_count} < {minimum_words}"
+        for attempt_prompt in prompt_attempts:
+            try:
+                text = _call_gateway(attempt_prompt, gw_profile)
+                if REFUSAL_RE.search(text):
+                    raise RefusalError("Gateway refused the content request")
+                payload = _extract_json_payload(text)
+                content = _build_content(topic, payload)
+                if content.word_count < minimum_words:
+                    raise ValidationError(
+                        f"Generated content too short: {content.word_count} < {minimum_words}"
+                    )
+                LOGGER.info("Gateway fallback succeeded via profile=%s", gw_profile)
+                return content
+            except RefusalError:
+                raise
+            except ValidationError as exc:
+                LOGGER.warning(
+                    "Gateway profile=%s content too short, retrying with expansion prompt", gw_profile
                 )
-            LOGGER.info("Gateway fallback succeeded via profile=%s", gw_profile)
-            return content
-        except RefusalError:
-            raise
-        except Exception as exc:
-            LOGGER.warning("Gateway profile=%s failed: %s", gw_profile, exc)
-            last_error = exc
+                last_error = exc
+            except Exception as exc:
+                LOGGER.warning("Gateway profile=%s failed: %s", gw_profile, exc)
+                last_error = exc
+                break  # provider unavailable — skip to next profile
 
     raise ProviderUnavailableError(f"All providers failed: {last_error}")
 
@@ -317,9 +324,14 @@ def _quality_repair_instructions(topic: Topic, failures: list[str], minimum_word
     ]
     if any("Missing definition block" in failure for failure in failures):
         instructions.append(
-            "- Within the first 100 words, include a sentence using this exact "
-            f'pattern: "{topic.keywords[0]} is a ..." or "{topic.keywords[0]} '
-            'refers to ...".'
+            f'- The very first sentence of body_html MUST match one of these exact patterns: '
+            f'"{topic.keywords[0]} is a ..." or "{topic.keywords[0]} refers to ..." unless '
+            f'the keyword itself contains forbidden entity language. If it does, write the first '
+            f'definitional sentence with an approved substitute such as "ABX platform" or '
+            f'"AI orchestration platform" instead, and do not repeat the forbidden phrase in body_html. '
+            f'This sentence must appear before any other content. '
+            f'Example: "{topic.keywords[0]} is a personalized, campaign-specific web destination '
+            f'designed for account-based marketing and sales outreach."'
         )
     if any("Fewer than two cited sources" in failure for failure in failures):
         instructions.append(
@@ -415,9 +427,12 @@ def _geo_repair_instructions(failures: list[str]) -> list[str]:
             instructions.append("- Remove all marketing buzzwords from the kill list.")
     if any("Forbidden entity" in f for f in failures):
         instructions.append(
-            "- Remove forbidden entity terms. Use 'Folloze' as the product name. "
-            "Do not use 'microsite builder', 'buyer experience platform', 'agentic', "
-            "or 'page builder'."
+            "- Remove ALL forbidden entity terms including plural and variant forms. "
+            "Search for and delete every instance of: 'page builder', 'page builders', "
+            "'microsite builder', 'microsite builders', 'buyer experience platform', 'agentic'. "
+            "Replace with: 'personalized campaign destination', 'ABM content hub', or 'Folloze'. "
+            "Do not use forbidden terms even in negations, comparisons, rebuttals, or FAQ questions "
+            "such as 'not just a page builder'. Do a thorough check — even one occurrence fails the gate."
         )
     if any("emotion" in f.lower() or "pain" in f.lower() for f in failures):
         instructions.append(
@@ -427,9 +442,11 @@ def _geo_repair_instructions(failures: list[str]) -> list[str]:
         )
     if any("citation_format" in f.lower() or "According to" in f for f in failures):
         instructions.append(
-            "- Add at least one citation in this exact format: "
-            "'According to [Source Name] (2024), [specific claim with number].' "
-            "Use a real, verifiable source."
+            "- Add at least one citation matching this exact pattern: "
+            "'According to [Source Name] (YYYY), [specific claim with number].' "
+            "The parenthesized four-digit year is mandatory — the gate rejects citations without it. "
+            "Example: 'According to Forrester (2024), 67% of B2B buyers prefer personalized content.' "
+            "Use a real, verifiable source and year."
         )
     if any("heading density" in f.lower() for f in failures):
         instructions.append(
@@ -437,8 +454,9 @@ def _geo_repair_instructions(failures: list[str]) -> list[str]:
         )
     if any("answer-first" in f.lower() or "answer_first" in f for f in failures):
         instructions.append(
-            "- After each H2 heading, start with a short declarative sentence (under "
-            "40 words, no question marks) that directly answers the section topic."
+            "- After each H2 heading, start with a short declarative answer-first sentence (under "
+            "40 words, no question marks) that directly answers the section topic. Prefer making "
+            "that first paragraph one sentence only, then continue detail in a following paragraph."
         )
     if any("freshness" in f.lower() for f in failures):
         instructions.append(

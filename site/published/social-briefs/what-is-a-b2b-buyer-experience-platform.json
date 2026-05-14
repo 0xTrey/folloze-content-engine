@@ -1,0 +1,38 @@
+{
+  "title": "What Is a B2B Buyer Experience Platform?",
+  "slug": "what-is-a-b2b-buyer-experience-platform",
+  "published_date": "2026-04-18",
+  "canonical_url": "https://www.folloze-blog.com/insights/what-is-a-b2b-buyer-experience-platform",
+  "source_run_id": "2026-04-18T08-33-16",
+  "content_type": "glossary",
+  "theme": "What Is a B2B Buyer Experience Platform?",
+  "thesis": "TL;DR: Marketing leaders face a credibility risk when campaigns launch slowly and fail to prove revenue impact.",
+  "summary": "TL;DR: Marketing leaders face a credibility risk when campaigns launch slowly and fail to prove revenue impact. Modern go-to-market success requires an AI orchestration platform for B2B that automates the entire campaign lifecycle. Folloze enables one marketer to run programs that used to require a team, launching campaigns 50% faster and connecting engagement to revenue.",
+  "target_keywords": [
+    "abx platform",
+    "ai orchestration platform for b2b",
+    "account-based experience platform"
+  ],
+  "key_takeaways": [
+    "TL;DR: Marketing leaders face a credibility risk when campaigns launch slowly and fail to prove revenue impact.",
+    "An ABX platform is a technology solution designed to orchestrate personalized, account-based interactions across the buyer journey.",
+    "This platform connects content, campaigns, buyer signals, and revenue proof into one operating layer.",
+    "Legacy tools created significant operational bottlenecks and measurement gaps.",
+    "Campaign execution required heavy manual effort and web team dependencies."
+  ],
+  "proof_points": [
+    "Folloze enables one marketer to run programs that used to require a team, launching campaigns 50% faster and connecting engagement to revenue.",
+    "According to ServiceNow, they achieved $750K in annual savings by moving to a more orchestrated approach.",
+    "According to RingCentral, they achieved 98% target account engagement and 50% C-suite engagement in 60 days using Folloze.",
+    "The platform helps teams launch campaigns 50% faster without adding headcount."
+  ],
+  "brand_posture": "personal_thought_leadership_rooted_in_blog",
+  "role_angle_suggestions": {
+    "sales": "Frame 'What Is a B2B Buyer Experience Platform?' around pipeline risk, deal velocity, or revenue accountability. Use proof like 'Folloze enables one marketer to run programs that used to require a team, launching campaigns 50% faster and connecting engagement to revenue.' only when it sharpens the commercial point.",
+    "customer_success": "Translate 'What Is a B2B Buyer Experience Platform?' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'What Is a B2B Buyer Experience Platform?' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'What Is a B2B Buyer Experience Platform?' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'What Is a B2B Buyer Experience Platform?' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-04-18T13:39:40.364666+00:00"
+}

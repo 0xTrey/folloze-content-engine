@@ -273,3 +273,77 @@ def test_quality_repair_instructions_cover_brand_and_style_failures() -> None:
     assert "cap exact-match repetition below 3% of words" in instructions
     assert "buyer experience platform" in instructions
     assert "Checklist: Missing approved proof point" in instructions
+
+
+def test_blog_prompt_contract_emphasizes_tldr_faq_quotability_and_caveats() -> None:
+    topic = Topic(
+        "Why AI Marketing Orchestration Needs Governance",
+        "blog",
+        "why-ai-marketing-orchestration-needs-governance",
+        ["ai marketing orchestration", "marketing governance"],
+        3,
+        "pending",
+        notes="Point-of-view post with practical guidance.",
+    )
+    prompt = generator._render_prompt(topic, _research_context(topic))
+
+    assert "Target 700 to 1000 words" in prompt
+    assert "TL;DR or Key Takeaways block" in prompt
+    assert "3 to 5 FAQ pairs" in prompt
+    assert "quote-worthy declarative lines" in prompt
+    assert 'trade-off, caveat, or "where this breaks down"' in prompt
+    assert "concrete workflow, example, or scenario" in prompt
+    assert "both searchable and citable" in prompt
+    assert "first 100 words clearly relevant" in prompt
+    assert "40 and 60 words" in prompt
+    assert "mirror natural search/query phrasing" in prompt
+
+
+def test_glossary_prompt_contract_handles_tldr_and_forbidden_search_intent_terms() -> None:
+    topic = Topic(
+        "What Is a B2B Buyer Experience Platform?",
+        "glossary",
+        "what-is-a-b2b-buyer-experience-platform",
+        ["abx platform", "ai orchestration platform for b2b"],
+        4,
+        "pending",
+        notes=(
+            "Treat the title as search-intent framing only. Use approved language in the body "
+            "and never repeat forbidden entity terms."
+        ),
+    )
+    prompt = generator._render_prompt(topic, _research_context(topic))
+
+    assert "Start body_html with a short TL;DR or Key Takeaways block" in prompt
+    assert "search-intent input only" in prompt
+    assert "Do not repeat forbidden phrases anywhere in body_html" in prompt
+    assert "If the exact phrase contains forbidden entity language, use it 0 times in body_html" in prompt
+    assert "Updated [Month] [Year]" in prompt or "<time>" in prompt
+    assert "meta name=\"author\"" in prompt or "byline" in prompt
+    assert "According to [Source] (Year)" in prompt or "According to [Source] (YYYY)" in prompt
+    assert "pain point or emotional territory before mentioning Folloze" in prompt
+    assert "avoid kill-list words" in prompt or "Do not use kill-list marketing words" in prompt
+
+
+def test_guide_prompt_contract_handles_emotion_first_answer_first_and_forbidden_comparisons() -> None:
+    topic = Topic(
+        "Outreach + Folloze for Personalized Sales Experiences",
+        "guide",
+        "outreach-plus-folloze-for-personalized-sales-experiences",
+        ["outreach digital sales room", "outreach personalized landing pages"],
+        4,
+        "pending",
+        notes="Emotional territory: pipeline anxiety. Integration page for sales-facing personalization.",
+    )
+    prompt = generator._render_prompt(topic, _research_context(topic))
+
+    assert "Start body_html with a short TL;DR or Key Takeaways block" in prompt
+    assert "buyer pain or emotional territory" in prompt
+    assert "before mentioning Folloze, product, platform, solution, or feature language" in prompt
+    assert "very first sentence immediately under the H2 must be a short declarative answer-first sentence under 40 words" in prompt
+    assert "FAQ must appear inside body_html" in prompt
+    assert "Put a short overview paragraph directly under that FAQ H2" in prompt
+    assert "According to [Source] (Year)" in prompt
+    assert "concrete workflow, example, or scenario" in prompt
+    assert "quote-worthy declarative lines" in prompt
+    assert "Never use \"microsite builder,\" \"buyer experience platform,\" \"agentic,\" or \"page builder,\" even in comparisons, negations, or FAQ questions" in prompt

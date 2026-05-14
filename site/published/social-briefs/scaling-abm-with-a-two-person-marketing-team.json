@@ -1,0 +1,38 @@
+{
+  "title": "Scaling ABM with a Two-Person Marketing Team: The Scalable ABM Playbook",
+  "slug": "scaling-abm-with-a-two-person-marketing-team",
+  "published_date": "2026-05-08",
+  "canonical_url": "https://www.folloze-blog.com/insights/scaling-abm-with-a-two-person-marketing-team",
+  "source_run_id": "2026-05-08T12-58-36",
+  "content_type": "guide",
+  "theme": "Scaling ABM with a Two-Person Marketing Team",
+  "thesis": "You are staring at a spreadsheet of 200 target accounts.",
+  "summary": "You are staring at a spreadsheet of 200 target accounts. Your pipeline is flat. Your CRO wants ABM results next quarter. But your entire marketing team is two people. The old playbook says you need five to eight people to run ABM on 30 to 50 accounts. That math does not work for you. Campaign chaos is real when every manual step from research to content creation to reporting lands on the same two desks.",
+  "target_keywords": [
+    "scalable abm",
+    "small team abm",
+    "abm with small team"
+  ],
+  "key_takeaways": [
+    "You are staring at a spreadsheet of 200 target accounts.",
+    "Scalable ABM is an account-based marketing approach that uses AI orchestration to automate campaign creation, personalization, and measurement so a small team can manage hundreds of accounts without adding headcount.",
+    "AI orchestration removes the manual bottlenecks that made ABM a team sport.",
+    "Traditional ABM required dedicated roles for copywriting, design, web development, and analytics.",
+    "Two roles cover the full ABM cycle when AI handles the execution layer."
+  ],
+  "proof_points": [
+    "According to Folloze internal data, teams using this approach achieve 5x faster campaign creation and 50% faster campaign builds.",
+    "According to Conga (2024), a six-campaign program built on two Folloze boards generated $6.3 million in attributed pipeline.",
+    "According to RingCentral (2023), the company achieved 98 percent target account engagement and 50 percent C-suite engagement within 60 days using Folloze.",
+    "Use the Conga example as a benchmark."
+  ],
+  "brand_posture": "personal_thought_leadership_rooted_in_blog",
+  "role_angle_suggestions": {
+    "sales": "Frame 'Scaling ABM with a Two-Person Marketing Team' around pipeline risk, deal velocity, or revenue accountability. Use proof like 'According to Folloze internal data, teams using this approach achieve 5x faster campaign creation and 50% faster campaign builds.' only when it sharpens the commercial point.",
+    "customer_success": "Translate 'Scaling ABM with a Two-Person Marketing Team' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'Scaling ABM with a Two-Person Marketing Team' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'Scaling ABM with a Two-Person Marketing Team' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'Scaling ABM with a Two-Person Marketing Team' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-05-08T18:00:37.907431+00:00"
+}

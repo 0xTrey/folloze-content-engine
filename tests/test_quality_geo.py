@@ -8,6 +8,7 @@ from generator import GeneratedContent
 from optimizer import OptimizedContent
 from quality import (
     _check_answer_first_paragraphs,
+    _check_definition_block,
     _check_author_attribution,
     _check_citation_format,
     _check_emdash,
@@ -16,7 +17,10 @@ from quality import (
     _check_freshness_signal,
     _check_heading_density,
     _check_kill_list,
+    _check_keyword_in_intro,
+    _check_meta_description_quality,
     _check_tldr_present,
+    _check_title_quality,
     gate,
 )
 
@@ -58,6 +62,17 @@ def _make_optimized(
         json_ld=json_ld,
         schema_type="Article",
     )
+
+
+# --- _check_definition_block ---
+
+
+class TestDefinitionBlock:
+    def test_accepts_plural_are_definition(self):
+        html = "<p>Account-specific landing pages are personalized web destinations for target accounts.</p>"
+        points, _, failure = _check_definition_block(html)
+        assert points == 15
+        assert failure is None
 
 
 # --- _check_tldr_present ---
@@ -177,6 +192,19 @@ class TestAnswerFirstParagraphs:
         # Only 1/3 is declarative and short enough
         assert "answer-first" in (failure or "").lower() or points == 10
 
+    def test_accepts_short_declarative_first_sentence_in_longer_paragraph(self):
+        html = (
+            "<h2>Why do enterprise teams need account-specific landing pages?</h2>"
+            "<p>Enterprise teams need account-specific landing pages because generic content fails. "
+            "Longer explanation can follow after the answer-first sentence without breaking the gate.</p>"
+            "<h2>How do teams build them?</h2>"
+            "<p>Teams build them by connecting content, governance, and revenue data. "
+            "The rest of the paragraph can add context for human readers.</p>"
+        )
+        points, _, failure = _check_answer_first_paragraphs(html)
+        assert points == 10
+        assert failure is None
+
     def test_no_h2s(self):
         html = "<p>Just a paragraph with no headings at all.</p>"
         points, _, failure = _check_answer_first_paragraphs(html)
@@ -247,6 +275,22 @@ class TestFreshnessSignal:
         assert points == 10
         assert failure is None
 
+    def test_date_modified_in_graph_json_ld(self):
+        graph_json_ld = json.dumps(
+            {
+                "@context": "https://schema.org",
+                "@graph": [
+                    {
+                        "@type": "Article",
+                        "dateModified": "2026-03-31",
+                    }
+                ],
+            }
+        )
+        points, _, failure = _check_freshness_signal("<p>text</p>", graph_json_ld)
+        assert points == 10
+        assert failure is None
+
     def test_updated_text(self):
         html = "<p>Updated March 2026. This article covers...</p>"
         points, _, failure = _check_freshness_signal(html, MINIMAL_JSON_LD)
@@ -264,6 +308,37 @@ class TestFreshnessSignal:
         assert "freshness" in failure.lower()
 
 
+# --- SEO warning checks ---
+
+
+class TestSeoWarningChecks:
+    def test_title_quality_pass(self):
+        label, failure = _check_title_quality(
+            "AI Marketing Orchestration Governance Guide",
+            "marketing orchestration",
+        )
+        assert label == "title_quality"
+        assert failure is None
+
+    def test_title_quality_warns_when_keyword_missing(self):
+        _, failure = _check_title_quality(
+            "Governance Guide for Enterprise Marketing Teams and Leaders",
+            "marketing orchestration",
+        )
+        assert "primary keyword" in (failure or "")
+
+    def test_meta_description_quality_warns_when_short(self):
+        _, failure = _check_meta_description_quality("Too short", "marketing orchestration")
+        assert "short" in (failure or "")
+
+    def test_keyword_in_intro_warns_when_missing(self):
+        _, failure = _check_keyword_in_intro(
+            "<p>This introduction talks about governance and approvals.</p>",
+            "marketing orchestration",
+        )
+        assert "first 100 words" in (failure or "")
+
+
 # --- _check_author_attribution ---
 
 
@@ -276,6 +351,22 @@ class TestAuthorAttribution:
     def test_json_ld_author(self):
         html = "<p>Article.</p>"
         points, _, failure = _check_author_attribution(html, VALID_JSON_LD)
+        assert points == 10
+
+    def test_graph_json_ld_author(self):
+        html = "<p>Article.</p>"
+        graph_json_ld = json.dumps(
+            {
+                "@context": "https://schema.org",
+                "@graph": [
+                    {
+                        "@type": "BlogPosting",
+                        "author": {"@type": "Organization", "name": "Folloze"},
+                    }
+                ],
+            }
+        )
+        points, _, failure = _check_author_attribution(html, graph_json_ld)
         assert points == 10
 
     def test_byline_class(self):

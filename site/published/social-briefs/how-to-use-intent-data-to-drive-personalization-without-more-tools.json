@@ -1,0 +1,38 @@
+{
+  "title": "How to Use Intent Data for Personalization Without More Tools: An Orchestration Guide",
+  "slug": "how-to-use-intent-data-to-drive-personalization-without-more-tools",
+  "published_date": "2026-04-19",
+  "canonical_url": "https://www.folloze-blog.com/insights/how-to-use-intent-data-to-drive-personalization-without-more-tools",
+  "source_run_id": "2026-04-19T07-30-07",
+  "content_type": "guide",
+  "theme": "How to Use Intent Data to Drive Personalization Without More Tools",
+  "thesis": "Intent data personalization fails when activation is slow and fragmented across tools. By using an AI orchestration platform as your central operating layer, you can connect existing intent signals from 6sense, Bombora, and your CRM to launch dynamic campaigns 50% faster and prove direct pipeline impact. According to Informa TechTarget, using intent data and recency of activity can result in a 1.7x increase in response rates (Informa TechTarget).",
+  "summary": "Intent data personalization is the practice of using signals of buyer research activity to tailor marketing and sales experiences in real time. The goal is to deliver the most relevant content and messaging to accounts and individuals showing active interest. B2B marketers are drowning in signals. Third-party intent data pours in from providers like 6sense and Bombora.",
+  "target_keywords": [
+    "intent data personalization",
+    "use intent data for personalization",
+    "first-party intent data for abm"
+  ],
+  "key_takeaways": [
+    "Intent data personalization is the practice of using signals of buyer research activity to tailor marketing and sales experiences in real time.",
+    "TL;DR: Intent data personalization fails when activation is slow and fragmented across tools.",
+    "B2B marketers are drowning in signals.",
+    "You do not need another point solution to activate this data.",
+    "Activation fails because data lives in silos and point solutions create fragmentation."
+  ],
+  "proof_points": [
+    "By using an AI orchestration platform as your central operating layer, you can connect existing intent signals from 6sense, Bombora, and your CRM to launch dynamic campaigns 50% faster and prove direct pipeline impact.",
+    "According to Informa TechTarget, using intent data and recency of activity can result in a 1.7x increase in response rates (Informa TechTarget).",
+    "This is how teams like Microsoft used Folloze to influence $10M in pipeline from targeted campaigns.",
+    "You launch campaigns 50% faster because you are orchestrating with AI, not building from scratch each time."
+  ],
+  "brand_posture": "personal_thought_leadership_rooted_in_blog",
+  "role_angle_suggestions": {
+    "sales": "Frame 'How to Use Intent Data to Drive Personalization Without More Tools' around pipeline risk, deal velocity, or revenue accountability. Use proof like 'By using an AI orchestration platform as your central operating layer, you can connect existing intent signals from 6sense, Bombora, and your CRM to launch dynamic campaigns 50% faster and prove direct pipeline impact.' only when it sharpens the commercial point.",
+    "customer_success": "Translate 'How to Use Intent Data to Drive Personalization Without More Tools' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'How to Use Intent Data to Drive Personalization Without More Tools' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'How to Use Intent Data to Drive Personalization Without More Tools' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'How to Use Intent Data to Drive Personalization Without More Tools' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-04-19T12:39:04.675826+00:00"
+}

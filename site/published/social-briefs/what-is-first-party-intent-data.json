@@ -1,0 +1,38 @@
+{
+  "title": "What Is First-Party Intent Data? Folloze Glossary",
+  "slug": "what-is-first-party-intent-data",
+  "published_date": "2026-04-16",
+  "canonical_url": "https://www.folloze-blog.com/insights/what-is-first-party-intent-data",
+  "source_run_id": "2026-04-16T07-30-07",
+  "content_type": "glossary",
+  "theme": "What Is First-Party Intent Data?",
+  "thesis": "First-party intent data is behavioral information collected directly from your website, email, CRM, and product that signals an individual's specific interests and buying readiness. It's the most reliable signal for personalization, yet only 25% of B2B companies use it effectively. Folloze's AI orchestration platform enables teams to activate these signals from prompt to pipeline, driving measurable outcomes like RingCentral's 50% C-suite engagement.",
+  "summary": "B2B marketing teams face AI overwhelm and campaign chaos, drowning in signals but struggling to act. The pressure to connect engagement to pipeline is intense, yet most tools create more noise than clarity. First-party intent data cuts through this confusion. What is first-party intent data refers to behavioral information collected directly from your owned digital properties.",
+  "target_keywords": [
+    "what is first-party intent data",
+    "first-party intent data",
+    "first-party intent data for abm"
+  ],
+  "key_takeaways": [
+    "TL;DR: First-party intent data is behavioral information collected directly from your website, email, CRM, and product that signals an individual's specific interests and buying readiness.",
+    "B2B marketing teams face AI overwhelm and campaign chaos, drowning in signals but struggling to act.",
+    "What is first-party intent data refers to behavioral information collected directly from your owned digital properties.",
+    "Unlike broader market trends, this data tells you precisely what a specific person within a target account is doing on your channels.",
+    "First-party intent data encompasses direct interactions buyers have with your brand."
+  ],
+  "proof_points": [
+    "It's the most reliable signal for personalization, yet only 25% of B2B companies use it effectively.",
+    "Folloze's AI orchestration platform enables teams to activate these signals from prompt to pipeline, driving measurable outcomes like RingCentral's 50% C-suite engagement.",
+    "Activating these precise individual signals allowed RingCentral to achieve 50% C-suite engagement within 60 days, demonstrating the power of focused, intent-driven outreach.",
+    "Our Campaign Agent helps launch personalized campaigns 50% faster, eliminating manual bottlenecks and reducing reliance on dev teams."
+  ],
+  "brand_posture": "specific_folloze_branded_ok",
+  "role_angle_suggestions": {
+    "sales": "Frame 'What Is First-Party Intent Data?' around pipeline risk, deal velocity, or revenue accountability. Use proof like \"It's the most reliable signal for personalization, yet only 25% of B2B companies use it effectively.\" only when it sharpens the commercial point.",
+    "customer_success": "Translate 'What Is First-Party Intent Data?' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'What Is First-Party Intent Data?' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'What Is First-Party Intent Data?' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'What Is First-Party Intent Data?' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-04-16T12:35:50.774046+00:00"
+}
