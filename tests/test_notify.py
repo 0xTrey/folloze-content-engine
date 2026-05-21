@@ -9,6 +9,7 @@ from content_calendar import Topic
 from notify import (
     _format_discord_message,
     _resolve_recipients,
+    _should_send_email,
     send_canary_report,
     send_error,
     send_published,
@@ -159,6 +160,49 @@ def test_resolve_recipients_uses_weekly_geo_list(project_root) -> None:
     assert recipients == [
         "trey.harnden@folloze.com",
         "kristi.tutt@folloze.com",
+    ]
+
+
+def test_weekly_geo_subject_sends_email() -> None:
+    assert _should_send_email(
+        "[Folloze GEO] Weekly Visibility Monitor — 2026-04-14 to 2026-04-20"
+    )
+
+
+def test_weekly_geo_uses_agentmail_not_cloudflare(project_root, monkeypatch, tmp_path) -> None:
+    agentmail_cli = tmp_path / "agentmail.py"
+    agentmail_cli.write_text("print('ok')\n")
+    cloudflare_calls = []
+    agentmail_calls = []
+
+    def fake_cloudflare(subject, body, recipients, from_address):
+        cloudflare_calls.append((subject, recipients, from_address))
+        return True
+
+    def fake_agentmail(subject, body, recipients, from_address):
+        agentmail_calls.append((subject, recipients, from_address))
+        return True
+
+    monkeypatch.delenv("SMTP_PASSWORD", raising=False)
+    monkeypatch.delenv("ALLOW_CLOUDFLARE_EMAIL_SEND", raising=False)
+    monkeypatch.setattr("notify._resolve_agentmail_cli", lambda: agentmail_cli)
+    monkeypatch.setattr("notify._send_via_cloudflare", fake_cloudflare)
+    monkeypatch.setattr("notify._send_via_agentmail", fake_agentmail)
+    monkeypatch.setattr(
+        "notify.subprocess.run",
+        lambda *args, **kwargs: FakeCompletedProcess(args[0]),
+    )
+
+    subject = "[Folloze GEO] Weekly Visibility Monitor — 2026-04-14 to 2026-04-20"
+    send_canary_report(subject, "<p>Weekly GEO report</p>", Config.load())
+
+    assert cloudflare_calls == []
+    assert agentmail_calls == [
+        (
+            subject,
+            ["trey.harnden@folloze.com", "kristi.tutt@folloze.com"],
+            "hermes@elevationengine.co",
+        )
     ]
 
 

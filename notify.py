@@ -133,13 +133,17 @@ def _send_email(subject: str, body: str, config: Config) -> None:
         )
         return
 
-    if _send_via_cloudflare(subject, body, recipients, config.notifications.email.from_address):
-        return
-
     if not password:
         if _send_via_agentmail(subject, body, recipients, config.notifications.email.from_address):
             return
-        LOGGER.warning("SMTP_PASSWORD missing, skipping email send for subject=%s", subject)
+        if _allow_cloudflare_email(subject) and _send_via_cloudflare(
+            subject,
+            body,
+            recipients,
+            config.notifications.email.from_address,
+        ):
+            return
+        LOGGER.warning("SMTP_PASSWORD missing and AgentMail send failed for subject=%s", subject)
         return
 
     message = MIMEMultipart("alternative")
@@ -284,7 +288,18 @@ def _extract_section_items(text: str, section_name: str, stop_headers: set[str])
 
 
 def _should_send_email(subject: str) -> bool:
+    if subject.startswith("[Folloze GEO] Weekly"):
+        return True
     return any(pattern.search(subject) for pattern in EMAIL_ONLY_ON_FAILURE_SUBJECT_PATTERNS)
+
+
+def _allow_cloudflare_email(subject: str) -> bool:
+    # Cloudflare Email Sending requires every destination recipient to be verified.
+    # Do not use it for Folloze stakeholder reports or arbitrary outbound email.
+    # Keep it only as an explicitly enabled diagnostic/internal-agent fallback.
+    return get_secret("ALLOW_CLOUDFLARE_EMAIL_SEND") == "1" and not subject.startswith(
+        "[Folloze GEO]"
+    )
 
 
 def _resolve_recipients(subject: str, config: Config) -> list[str]:

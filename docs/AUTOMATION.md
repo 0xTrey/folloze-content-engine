@@ -55,14 +55,32 @@ The citation monitor LaunchAgent plist lives at `launchd/com.folloze.content-eng
 - The project virtualenv must exist at `.venv`
 - `config.yaml` must point to the active Vercel URLs
 - Notifications post directly to the Juno Discord channel configured in `config.yaml`
-- Email notifications use SMTP if `SMTP_PASSWORD` exists. Otherwise they fall back to Juno via AgentMail when `agentmail-api` is in Keychain.
+- Email notifications use SMTP if `SMTP_PASSWORD` exists. Otherwise they send through the local AgentMail CLI.
+- Cloudflare Email Sending is not a production path for Folloze stakeholder reports because every destination recipient must verify first.
 
 ## Notification routing
 
 - Content-engine release, published, and error events post directly to Discord target `channel:1480677039169081434`
 - The direct Discord path uses the local `openclaw` CLI and does not depend on SMTP
+- Stakeholder email, including Weekly GEO reports, should use SMTP or AgentMail; do not route arbitrary Folloze recipients through Cloudflare Email Sending.
 - Juno inbox mirroring runs through a separate AgentMail poller LaunchAgent every five minutes
 - A local AgentMail webhook server is installed for future public webhook ingress, but it will only receive live webhooks once a public URL is pointed at the Mac
+
+## Manual Weekly GEO resend
+
+Render without sending:
+
+```bash
+.venv/bin/python scripts/send_latest_weekly_geo_report.py --dry-run
+```
+
+Send through the configured notification path, currently AgentMail when SMTP is unavailable:
+
+```bash
+.venv/bin/python scripts/send_latest_weekly_geo_report.py \
+  --to trey.harnden@folloze.com,kristi.tutt@folloze.com \
+  --subject-suffix "manual resend"
+```
 
 ## Install on macOS
 

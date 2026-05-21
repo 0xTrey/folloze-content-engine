@@ -7,7 +7,8 @@
 - `GEMINI_API_KEY`: primary Gemini key used for research and first-pass generation.
 - `AI_OPENAI_KEY`, `AI_DEEPSEEK_KEY`, `AI_GEMINI_KEY`, `AI_KIMI_KEY`, `AI_MINIMAX_KEY`: optional cloud fallback keys for `LLMGateway` when Gemini output is unusable.
 - `SMTP_PASSWORD`: optional SMTP password for release and error emails.
-- `agentmail-api` in macOS Keychain: preferred notification path for `juno@elevationengine.co` and inbox relay polling.
+- Local AgentMail CLI at `/Users/treyharnden/.openclaw/workspace/skills/agentmail/agentmail.py`: primary fallback notification path when SMTP is not configured.
+- `agentmail-api` in macOS Keychain: AgentMail API credential for `juno@elevationengine.co` and inbox relay polling.
 
 ## macOS Keychain fallback
 
@@ -21,6 +22,7 @@
 - `AI_MINIMAX_KEY` falls back to `minimax-api`
 - `SMTP_PASSWORD` falls back to `smtp-password`, `gmail-app-password`, and `gmail-smtp`
 - Notification delivery falls back to AgentMail automatically when SMTP is not configured and the local AgentMail CLI is available.
+- Cloudflare Email Sending must not be used for arbitrary stakeholder reports; it requires destination-recipient verification and is only suitable for explicitly enabled diagnostics/internal-agent transport.
 - Discord notifications use `openclaw` directly and read the target channel from `config.yaml`
 
 ## Commit-safe configuration
