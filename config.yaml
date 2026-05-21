@@ -25,7 +25,7 @@ notifications:
     enabled: true
     smtp_host: "smtp.gmail.com"
     smtp_port: 587
-    from_address: "hermes@elevationengine.co"
+    from_address: "juno@elevationengine.co"
     # Default email recipients for Folloze Insights pipeline mail.
     # This covers error/failure notifications and any other non-weekly-GEO email sends.
     to_addresses:

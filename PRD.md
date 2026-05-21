@@ -216,7 +216,7 @@ notifications:
     enabled: true
     smtp_host: "smtp.gmail.com"
     smtp_port: 587
-    from_address: "hermes@elevationengine.co"
+    from_address: "juno@elevationengine.co"
     # Default Folloze Insights email recipients (errors/failures and non-weekly-GEO mail)
     to_addresses:
       - "trey.harnden@folloze.com"

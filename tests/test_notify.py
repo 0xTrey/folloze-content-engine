@@ -201,7 +201,7 @@ def test_weekly_geo_uses_agentmail_not_cloudflare(project_root, monkeypatch, tmp
         (
             subject,
             ["trey.harnden@folloze.com", "kristi.tutt@folloze.com"],
-            "hermes@elevationengine.co",
+            "juno@elevationengine.co",
         )
     ]
 
