@@ -140,9 +140,12 @@ def gate(content: OptimizedContent, config: Config, brand_context: str) -> Quali
 
 
 def _check_definition_block(html: str) -> tuple[int, str, str | None]:
-    text = _first_words(html, 100).lower()
+    soup = BeautifulSoup(html, "html.parser")
+    first_p = soup.find("p")
+    source_text = first_p.get_text(" ", strip=True) if first_p else _body_text(html)
+    first_sentence = _first_sentence(source_text).lower()
     valid = any(
-        phrase in text
+        phrase in f" {first_sentence} "
         for phrase in (" is a ", " is an ", " are ", " refers to ", " defined as ")
     )
     return (15 if valid else 0, "definition_block", None if valid else "Missing definition block")
@@ -363,7 +366,11 @@ def _check_citation_format(html: str) -> tuple[int, str, str | None]:
 def _check_kill_list(html: str) -> tuple[int, str, str | None]:
     """No kill-list marketing words. 10 pts, HARD."""
     text = _body_text(html).lower()
-    found = [word for word in GEO_KILL_LIST if word in text]
+    found = [
+        word
+        for word in GEO_KILL_LIST
+        if re.search(rf"\b{re.escape(word.lower())}\b", text)
+    ]
     if not found:
         return 10, "kill_list", None
     return 0, "kill_list", f"[HARD] Kill-list words found: {', '.join(found)}"

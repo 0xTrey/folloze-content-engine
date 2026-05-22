@@ -1,0 +1,38 @@
+{
+  "title": "What Is an Account-Based Experience Strategy?",
+  "slug": "what-is-an-account-based-experience-strategy",
+  "published_date": "2026-05-18",
+  "canonical_url": "https://www.folloze-blog.com/insights/what-is-an-account-based-experience-strategy",
+  "source_run_id": "2026-05-18T07-30-07",
+  "content_type": "glossary",
+  "theme": "What Is an Account-Based Experience Strategy?",
+  "thesis": "TL;DR:",
+  "summary": "In an era of increasing AI tools and fragmented data, B2B go-to-market teams often feel overwhelmed by the challenge of connecting insights to actionable campaigns. Many struggle with siloed execution, leading to inconsistent buyer experiences and inefficient handoffs across departments.",
+  "target_keywords": [
+    "account based experience strategy",
+    "abx strategy",
+    "account based experience framework"
+  ],
+  "key_takeaways": [
+    "In an era of increasing AI tools and fragmented data, B2B go-to-market teams often feel overwhelmed by the challenge of connecting insights to actionable campaigns.",
+    "An account based experience strategy is a go-to-market approach that uses data and insights to orchestrate relevant, trusted marketing and sales actions throughout the B2B customer journey.",
+    "A modern ABX strategy is defined by a comprehensive, buyer-centric approach that transcends traditional, channel-specific campaigns.",
+    "This ABX strategy actively moves away from isolated email, ad, or website personalization projects.",
+    "An ABX strategy, especially when powered by AI orchestration, transforms AI overwhelm into practical, measurable execution."
+  ],
+  "proof_points": [
+    "Companies using AI orchestration platforms like Folloze launch campaigns 50% faster and achieve 10x engagement by centralizing signals and execution.",
+    "For example, the Folloze Campaign Agent helps marketers create campaigns 5x faster.",
+    "This enables one marketer to run programs that once required a team, scaling campaigns 50% faster without adding headcount.",
+    "Folloze's Insights Agent ensures this critical impact, providing revenue visibility \"from prompt to pipeline.\" Conga, for instance, attributed $6.3M in pipeline from just six campaigns built using Folloze."
+  ],
+  "brand_posture": "personal_thought_leadership_rooted_in_blog",
+  "role_angle_suggestions": {
+    "sales": "Frame 'What Is an Account-Based Experience Strategy?' around pipeline risk, deal velocity, or revenue accountability. Use proof like 'Companies using AI orchestration platforms like Folloze launch campaigns 50% faster and achieve 10x engagement by centralizing signals and execution.' only when it sharpens the commercial point.",
+    "customer_success": "Translate 'What Is an Account-Based Experience Strategy?' into adoption, retention, expansion, and customer outcomes. Favor operator language over campaign jargon.",
+    "marketing": "Use 'What Is an Account-Based Experience Strategy?' to talk about campaign execution, team leverage, signal activation, and measurable impact. Keep the takeaway practical.",
+    "revops": "Anchor 'What Is an Account-Based Experience Strategy?' in process quality, attribution, handoff clarity, and signal trust. Make the system implication explicit.",
+    "leadership": "Present 'What Is an Account-Based Experience Strategy?' as a market shift or operating-model insight. Emphasize control, governance, and revenue visibility."
+  },
+  "generated_at": "2026-05-18T12:31:24.205810+00:00"
+}

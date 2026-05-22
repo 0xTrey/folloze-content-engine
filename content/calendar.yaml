@@ -874,7 +874,9 @@ topics:
     engagement to deal progression, buyer activity, and influenced pipeline.'
   slug: digital-sales-room-roi-how-to-measure-influence-on-pipeline
   planned_date: '2026-05-15'
-  status: pending
+  status: published
+  published_url: https://www.folloze-blog.com/insights/digital-sales-room-roi-how-to-measure-influence-on-pipeline
+  published_date: '2026-05-15'
 - title: HubSpot + Folloze for Personalized B2B Campaign Experiences
   content_type: guide
   keywords:
@@ -887,7 +889,9 @@ topics:
     campaign experiences and cleaner handoff into sales.'
   slug: hubspot-folloze-for-personalized-b2b-campaign-experiences
   planned_date: '2026-05-16'
-  status: pending
+  status: published
+  published_url: https://www.folloze-blog.com/insights/hubspot-folloze-for-personalized-b2b-campaign-experiences
+  published_date: '2026-05-16'
 - title: Salesloft + Folloze for Buyer Engagement Workflows
   content_type: guide
   keywords:
@@ -900,7 +904,9 @@ topics:
     can work together without losing context.'
   slug: salesloft-folloze-for-buyer-engagement-workflows
   planned_date: '2026-05-17'
-  status: pending
+  status: published
+  published_url: https://www.folloze-blog.com/insights/salesloft-folloze-for-buyer-engagement-workflows
+  published_date: '2026-05-17'
 - title: What Is an Account-Based Experience Strategy?
   content_type: glossary
   keywords:
@@ -913,7 +919,9 @@ topics:
     distinguish it from channel-by-channel campaign planning.'
   slug: what-is-an-account-based-experience-strategy
   planned_date: '2026-05-18'
-  status: pending
+  status: published
+  published_url: https://www.folloze-blog.com/insights/what-is-an-account-based-experience-strategy
+  published_date: '2026-05-18'
 - title: ABM Microsite Examples for Enterprise Marketing Teams
   content_type: guide
   keywords:
@@ -926,7 +934,9 @@ topics:
     with clear use cases and build patterns.'
   slug: abm-microsite-examples-for-enterprise-marketing-teams
   planned_date: '2026-05-19'
-  status: pending
+  status: published
+  published_url: https://www.folloze-blog.com/insights/abm-microsite-examples-for-enterprise-marketing-teams
+  published_date: '2026-05-19'
 - title: Folloze vs Highspot for Buyer Journey Personalization
   content_type: comparison
   keywords:
@@ -939,7 +949,9 @@ topics:
     strengths versus orchestrated campaign experiences.'
   slug: folloze-vs-highspot-for-buyer-journey-personalization
   planned_date: '2026-05-20'
-  status: pending
+  status: published
+  published_url: https://www.folloze-blog.com/insights/folloze-vs-highspot-for-buyer-journey-personalization
+  published_date: '2026-05-20'
 - title: How to Operationalize Buying Group Engagement Across Marketing and Sales
   content_type: guide
   keywords:
@@ -952,7 +964,9 @@ topics:
     actions.'
   slug: how-to-operationalize-buying-group-engagement-across-marketing-and-sales
   planned_date: '2026-05-21'
-  status: pending
+  status: published
+  published_url: https://www.folloze-blog.com/insights/how-to-operationalize-buying-group-engagement-across-marketing-and-sales
+  published_date: '2026-05-21'
 - title: Personalized Follow-Up Pages for B2B Sales Teams
   content_type: guide
   keywords:
@@ -965,7 +979,10 @@ topics:
     and post-outreach destinations.'
   slug: personalized-follow-up-pages-for-b2b-sales-teams
   planned_date: '2026-05-22'
-  status: pending
+  status: published
+  retry_count: 1
+  published_url: https://www.folloze-blog.com/insights/personalized-follow-up-pages-for-b2b-sales-teams
+  published_date: '2026-05-22'
 - title: What Metrics Matter for Personalized B2B Experiences?
   content_type: faq
   keywords:
@@ -978,7 +995,9 @@ topics:
     experience metrics to pipeline outcomes.'
   slug: what-metrics-matter-for-personalized-b2b-experiences
   planned_date: '2026-05-23'
-  status: pending
+  status: published
+  published_url: https://www.folloze-blog.com/insights/what-metrics-matter-for-personalized-b2b-experiences
+  published_date: '2026-05-22'
 - title: Pardot + Folloze for Account-Based Campaign Journeys
   content_type: guide
   keywords:

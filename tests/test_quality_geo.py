@@ -495,6 +495,22 @@ class TestGateGeoIntegration:
         assert result.passed is False
         assert any("Kill-list" in f for f in result.failures)
 
+    def test_kill_list_does_not_false_positive_on_disruption(self, project_root):
+        html = (
+            '<div class="tldr"><p>TL;DR: 98% improvement.</p></div>'
+            "<p>Teams struggle with manual follow-up and workflow disruption before finding Folloze.</p>"
+            "<p>Test topic refers to a practical approach. According to Gartner (2024), 78% need this.</p>"
+            "<p>According to Forrester (2024), $6.3M matters.</p>"
+            "<h2>What?</h2><p>It helps.</p>"
+            "<h2>FAQ</h2><p>Questions about test topic.</p>"
+            '<a href="https://www.folloze.com/a">A</a>'
+            '<a href="https://www.folloze.com/b">B</a>'
+            '<meta name="author" content="Trey"><time>2026</time>'
+        )
+        optimized = _make_optimized(html, VALID_JSON_LD)
+        result = gate(optimized, Config.load(), "brand")
+        assert not any("Kill-list" in f for f in result.failures)
+
     def test_hard_fail_entity_blocks(self, project_root):
         """Forbidden entity terms block regardless of score."""
         html = (

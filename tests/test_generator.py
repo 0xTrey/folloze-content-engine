@@ -191,6 +191,49 @@ def test_generate_merges_substantive_sections_into_body_html(project_root, monke
     assert content.word_count >= config.content.min_words_by_type["comparison"]
 
 
+@responses.activate
+def test_generate_self_heals_definition_lead(project_root, monkeypatch) -> None:
+    monkeypatch.setenv("GEMINI_API_KEY", "gemini")
+    config = Config.load()
+    body = (
+        '<meta name="author" content="Team"><div class="tldr"><p>TL;DR: short summary.</p></div>'
+        "<p>" + "word " * 1100 + "</p>"
+    )
+    responses.add(
+        responses.POST,
+        re.compile(r"https://generativelanguage\.googleapis\.com/.*"),
+        json=_gemini_payload(body, []),
+        status=200,
+    )
+    topic = Topic("Hello", "guide", "hello", ["personalized follow up pages"], 5, "pending")
+    content = generate(topic, _research_context(topic), config)
+    assert "personalized follow up pages refers to" in content.body_html.lower()
+
+
+@responses.activate
+def test_generate_self_heals_kill_list_words(project_root, monkeypatch) -> None:
+    monkeypatch.setenv("GEMINI_API_KEY", "gemini")
+    config = Config.load()
+    body = (
+        "<p>Personalized follow up pages refers to tailored destinations for sales teams.</p>"
+        "<p>These pages help teams leverage context and build a seamless handoff.</p>"
+        "<p>" + "word " * 1100 + "</p>"
+    )
+    responses.add(
+        responses.POST,
+        re.compile(r"https://generativelanguage\.googleapis\.com/.*"),
+        json=_gemini_payload(body, []),
+        status=200,
+    )
+    topic = Topic("Hello", "guide", "hello", ["personalized follow up pages"], 5, "pending")
+    content = generate(topic, _research_context(topic), config)
+    lowered = content.body_html.lower()
+    assert " leverage " not in lowered
+    assert " seamless " not in lowered
+    assert "use context" in lowered
+    assert "smooth handoff" in lowered
+
+
 def test_generate_tries_multiple_gateway_profiles_after_gemini_failure(
     project_root, monkeypatch
 ) -> None:
@@ -273,6 +316,26 @@ def test_quality_repair_instructions_cover_brand_and_style_failures() -> None:
     assert "cap exact-match repetition below 3% of words" in instructions
     assert "buyer experience platform" in instructions
     assert "Checklist: Missing approved proof point" in instructions
+
+
+def test_self_heal_common_quality_blockers_removes_mechanical_gate_failures() -> None:
+    topic = Topic(
+        "Personalized Follow-Up Pages for B2B Sales Teams",
+        "guide",
+        "personalized-follow-up-pages-for-b2b-sales-teams",
+        ["personalized follow up pages"],
+        3,
+        "pending",
+    )
+    html = "<p>Folloze helps teams disrupt generic follow-up with a page builder.</p>"
+
+    healed = generator._self_heal_common_quality_blockers(topic, html)
+    text = healed.lower()
+
+    assert "disrupt" not in text
+    assert "page builder" not in text
+    assert "personalized follow up pages refers to" in text
+    assert "pipeline anxiety is a warning sign that sales follow-up is too slow" in text
 
 
 def test_blog_prompt_contract_emphasizes_tldr_faq_quotability_and_caveats() -> None:
