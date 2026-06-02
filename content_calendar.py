@@ -6,6 +6,7 @@ from datetime import date
 from pathlib import Path
 
 import yaml
+from yaml.error import YAMLError
 
 from exceptions import CalendarExhaustedError
 
@@ -31,7 +32,7 @@ def slugify(value: str) -> str:
 
 
 def load_calendar(path: Path) -> list[Topic]:
-    raw = yaml.safe_load(path.read_text()) or {}
+    raw = _read_calendar_yaml(path)
     items = raw.get("topics", [])
     topics: list[Topic] = []
     for item in items:
@@ -127,7 +128,7 @@ def mark_skipped(path: Path, topic: Topic, reason: str) -> None:
 
 
 def mark_retry_pending(path: Path, topic: Topic, reason: str, failed_date: str) -> None:
-    raw = yaml.safe_load(path.read_text()) or {}
+    raw = _read_calendar_yaml(path)
     for item in raw.get("topics", []):
         item_slug = item.get("slug") or slugify(item["title"])
         if item_slug != topic.slug:
@@ -144,7 +145,7 @@ def mark_retry_pending(path: Path, topic: Topic, reason: str, failed_date: str) 
 
 
 def _update_topic(path: Path, slug: str, updates: dict[str, object | None]) -> None:
-    raw = yaml.safe_load(path.read_text()) or {}
+    raw = _read_calendar_yaml(path)
     for item in raw.get("topics", []):
         item_slug = item.get("slug") or slugify(item["title"])
         if item_slug == slug:
@@ -159,6 +160,86 @@ def _update_topic(path: Path, slug: str, updates: dict[str, object | None]) -> N
         raise ValueError(f"Topic with slug '{slug}' not found in calendar")
 
     path.write_text(yaml.safe_dump(raw, sort_keys=False))
+
+
+def _read_calendar_yaml(path: Path) -> dict[str, object]:
+    text = path.read_text()
+    try:
+        return yaml.safe_load(text) or {}
+    except YAMLError:
+        repaired = _fold_unsafe_multiline_scalars(text)
+        if repaired == text:
+            raise
+        return yaml.safe_load(repaired) or {}
+
+
+def _fold_unsafe_multiline_scalars(text: str) -> str:
+    """Convert legacy plain multiline text fields to folded scalars.
+
+    A previous calendar version allowed entries like:
+
+      notes: ... frame
+        as search intent ... frame: personalized account experiences,
+
+    PyYAML treats the colon-space in the continuation line as a mapping value and
+    aborts before the pipeline can select a topic. Keep the recovery narrow to
+    known free-text fields so real structural YAML errors still fail loudly.
+    """
+    free_text_keys = {"notes", "skip_reason", "last_error"}
+    lines = text.splitlines()
+    output: list[str] = []
+    index = 0
+    changed = False
+
+    while index < len(lines):
+        line = lines[index]
+        match = re.match(r"^(\s*)([A-Za-z_][A-Za-z0-9_]*):\s+(.+)$", line)
+        if not match or match.group(2) not in free_text_keys:
+            output.append(line)
+            index += 1
+            continue
+
+        indent, key, value = match.groups()
+        stripped_value = value.strip()
+        if stripped_value.startswith(("'", '"', "|", ">", "[", "{")):
+            output.append(line)
+            index += 1
+            continue
+
+        continuation: list[str] = []
+        cursor = index + 1
+        child_indent = f"{indent}  "
+        while cursor < len(lines):
+            next_line = lines[cursor]
+            if not next_line.strip():
+                continuation.append("")
+                cursor += 1
+                continue
+            if not next_line.startswith(child_indent) or next_line.startswith(f"{child_indent}- "):
+                break
+            continuation.append(next_line[len(child_indent) :].strip())
+            cursor += 1
+
+        if not continuation or not _plain_scalar_needs_folding([stripped_value, *continuation]):
+            output.append(line)
+            index += 1
+            continue
+
+        output.append(f"{indent}{key}: >-")
+        output.append(f"{child_indent}{stripped_value}")
+        for continuation_line in continuation:
+            output.append(f"{child_indent}{continuation_line}" if continuation_line else "")
+        index = cursor
+        changed = True
+
+    repaired = "\n".join(output)
+    if text.endswith("\n"):
+        repaired += "\n"
+    return repaired if changed else text
+
+
+def _plain_scalar_needs_folding(lines: list[str]) -> bool:
+    return any(": " in line or line.endswith(":") for line in lines)
 
 
 def _planned_date_key(value: str) -> date:

@@ -130,6 +130,61 @@ def test_get_oldest_due_topic_includes_release_ready_and_in_progress(tmp_path: P
     assert topic.slug == "due-release-ready"
 
 
+def test_load_calendar_recovers_plain_multiline_notes_with_colon(tmp_path: Path) -> None:
+    calendar_path = tmp_path / "calendar.yaml"
+    calendar_path.write_text(
+        "topics:\n"
+        "- title: Unsafe Notes\n"
+        "  content_type: guide\n"
+        "  slug: unsafe-notes\n"
+        "  keywords:\n"
+        "  - unsafe notes\n"
+        "  priority: 5\n"
+        "  status: pending\n"
+        "  notes: Historical topic. If regenerated, treat AI orchestration\n"
+        "    as search intent only and use the v3.2 frame: personalized account experiences,\n"
+        "    first-party engagement signal, and Build. Activate. Signal.\n"
+    )
+
+    topics = content_calendar.load_calendar(calendar_path)
+
+    assert topics[0].slug == "unsafe-notes"
+    assert "v3.2 frame: personalized account experiences" in topics[0].notes
+
+
+def test_mark_published_rewrites_recovered_calendar_as_valid_yaml(tmp_path: Path) -> None:
+    calendar_path = tmp_path / "calendar.yaml"
+    calendar_path.write_text(
+        "topics:\n"
+        "- title: Unsafe Notes\n"
+        "  content_type: guide\n"
+        "  slug: unsafe-notes\n"
+        "  keywords:\n"
+        "  - unsafe notes\n"
+        "  priority: 5\n"
+        "  planned_date: '2026-03-28'\n"
+        "  status: pending\n"
+        "  notes: Historical topic. If regenerated, treat AI orchestration\n"
+        "    as search intent only and use the v3.2 frame: personalized account experiences,\n"
+        "    first-party engagement signal, and Build. Activate. Signal.\n"
+    )
+    topic = content_calendar.Topic(
+        "Unsafe Notes",
+        "guide",
+        "unsafe-notes",
+        ["unsafe notes"],
+        5,
+        "pending",
+    )
+
+    content_calendar.mark_published(calendar_path, topic, "https://example.com/unsafe-notes", "2026-03-28")
+
+    payload = yaml.safe_load(calendar_path.read_text())
+    item = payload["topics"][0]
+    assert item["status"] == "published"
+    assert "v3.2 frame: personalized account experiences" in item["notes"]
+
+
 def test_mark_published_updates_status(tmp_path: Path) -> None:
     calendar_path = tmp_path / "calendar.yaml"
     calendar_path.write_text(
