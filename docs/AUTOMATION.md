@@ -54,12 +54,12 @@ The citation monitor LaunchAgent plist lives at `launchd/com.folloze.content-eng
 - Vercel CLI must be installed and authenticated, or `VERCEL_TOKEN` must be available via env var or Keychain
 - The project virtualenv must exist at `.venv`
 - `config.yaml` must point to the active Vercel URLs
-- Notifications post directly to the Juno Discord channel configured in `config.yaml`
+- Notifications post directly to the Juno Discord channel configured in local `config.yaml`
 - Email notifications use SMTP if `SMTP_PASSWORD` exists. Otherwise they fall back to Juno via AgentMail when `agentmail-api` is in Keychain.
 
 ## Notification routing
 
-- Content-engine release, published, and error events post directly to Discord target `channel:1480677039169081434`
+- Content-engine release, published, and error events post directly to the Discord target configured in local `config.yaml`
 - The direct Discord path uses the local `openclaw` CLI and does not depend on SMTP
 - Juno inbox mirroring runs through a separate AgentMail poller LaunchAgent every five minutes
 - A local AgentMail webhook server is installed for future public webhook ingress, but it will only receive live webhooks once a public URL is pointed at the Mac
