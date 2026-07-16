@@ -69,6 +69,7 @@
   .section-head { display: flex; justify-content: space-between; gap: 40px; align-items: end; margin-bottom: 42px; }
   .section-head > div:first-child { max-width: 760px; }
   .section-head .side-note { max-width: 320px; color: var(--ink-soft); }
+  .section-head.full-rail > div:first-child { width: 100%; max-width: none; }
   .pipeline { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px; margin-bottom: 24px; }
   .stage-tab { position: relative; min-height: 142px; padding: 18px 14px; border: 1px solid #c8ddf3; border-radius: 6px; background: var(--white); color: var(--deep); text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
   .stage-tab::after { content: ""; position: absolute; top: 51px; right: -11px; width: 11px; height: 2px; background: #6f92d3; }
@@ -132,10 +133,6 @@
   .signal strong { display: block; margin-bottom: 3px; }
   .signal span { color: #b9c8d9; font-size: 14px; }
   .monitor { padding: 30px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; background: rgba(255,255,255,.07); }
-  .monitor-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
-  .monitor-row:last-child { border-bottom: 0; }
-  .monitor-row span { color: #b9c8d9; }
-  .monitor-row strong { color: var(--cyan); }
   .customer-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .input-card { padding: 28px; border: 1px solid var(--line); border-radius: 7px; }
   .input-card h3 { margin-bottom: 16px; }
@@ -271,7 +268,7 @@
 
   <section class="section" id="results">
     <div class="shell">
-      <div class="section-head"><div><p class="eyebrow">First 30 days of measured learning</p><h2>The first lift appeared in visibility, sentiment, and unbranded discovery.</h2></div></div>
+      <div class="section-head full-rail"><div><p class="eyebrow">First 30 days of measured learning</p><h2>The first lift appeared in visibility, sentiment, and unbranded discovery.</h2></div></div>
       <div class="visibility-story">
         <article class="trend-panel">
           <div class="trend-title"><h3>30-Day Snapshot</h3><span class="trend-window">Same definitions<br>Same prompt panel</span></div>
@@ -297,11 +294,6 @@
           <div class="signal"><span class="signal-dot"></span><div><strong>Content response</strong><span>Pages entered, CTA clicks, engagement depth, and next-step behavior.</span></div></div>
           <div class="signal"><span class="signal-dot"></span><div><strong>Gap analysis</strong><span>Questions with low visibility, competitor dominance, or weak coverage become next-cycle priorities.</span></div></div>
         </div>
-        <div class="monitor-row"><span>Buyer prompts monitored</span><strong>15</strong></div>
-        <div class="monitor-row"><span>Topic clusters</span><strong>5</strong></div>
-        <div class="monitor-row"><span>Latest completed monitor</span><strong>Jul 15, 2026</strong></div>
-        <div class="monitor-row"><span>Provider coverage</span><strong>Perplexity + Gemini</strong></div>
-        <div class="monitor-row"><span>Completed provider checks</span><strong>150 / 150</strong></div>
       </div>
     </div>
   </section>

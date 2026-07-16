@@ -46,6 +46,7 @@ Help a customer understand how a governed content workflow turns buyer questions
 - Local mobile QA: passed at 500 x 900 and 320 x 800 on 2026-07-16 with no horizontal overflow
 - Analytics pre-save check: external CTA safety and direct CTA analytics passed; stage tabs and shell-safe scroll interactions are tracked
 - MCP creation guide: read on 2026-07-16
+- Post-save local annotation pass on 2026-07-16: expanded the results headline to the full content rail and removed the five operational monitor rows so only the four measurement value cards remain. Board 247800 has not been repushed for this local-only pass.
 
 ## AI visibility evidence for the results section
 
