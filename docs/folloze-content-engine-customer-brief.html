@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How the Folloze content engine turns buyer questions into governed, AI-citable ABM content.">
+  <title>Folloze Content Engine | Customer Walkthrough</title>
+  <link rel="stylesheet" href="https://cdn.folloze.com/theme/135433/4.css?v=1764160175">
+</head>
+<body>
+<style>
+  :root {
+    --deep: #071428;
+    --navy: #142642;
+    --slate: #2c3d59;
+    --ink-soft: #526784;
+    --blue: #0048de;
+    --bright: #0077ff;
+    --cyan: #00ccff;
+    --green: #11a56f;
+    --pink: #ff469e;
+    --pale: #f3f9fd;
+    --ice: #eaf4ff;
+    --line: #d8e8f7;
+    --white: #ffffff;
+    --orange: #f98a1b;
+    --shadow: 0 18px 48px rgba(7, 20, 40, .1);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; color: var(--deep); background: var(--white); font-family: Inter, Arial, Helvetica, sans-serif; line-height: 1.5; }
+  button, a { font: inherit; }
+  button:focus-visible, a:focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+  img { max-width: 100%; }
+  .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+  .eyebrow { margin: 0 0 14px; color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  h1, h2, h3, p { margin-top: 0; }
+  h1, h2, h3 { letter-spacing: -.035em; }
+  h1 { margin-bottom: 22px; font-size: clamp(42px, 6vw, 76px); line-height: .98; }
+  h2 { margin-bottom: 18px; font-size: clamp(32px, 4.4vw, 56px); line-height: 1.02; }
+  h3 { margin-bottom: 10px; font-size: 22px; line-height: 1.15; }
+  .lede { max-width: 820px; color: var(--ink-soft); font-size: clamp(18px, 2vw, 22px); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 20px; border: 1px solid var(--blue); border-radius: 6px; background: var(--blue); color: var(--white); font-weight: 800; text-decoration: none; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease, background .18s ease; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 72, 222, .18); }
+  .btn.secondary { background: transparent; color: var(--blue); }
+  .btn.light { border-color: var(--white); background: var(--white); color: var(--deep); }
+  .site-header { position: sticky; top: 0; z-index: 30; border-bottom: 1px solid rgba(216,232,247,.9); background: rgba(255,255,255,.94); backdrop-filter: blur(14px); }
+  .header-inner { display: flex; min-height: 74px; align-items: center; justify-content: space-between; gap: 22px; }
+  .logo { width: 132px; height: auto; display: block; }
+  .nav { display: flex; align-items: center; gap: 4px; }
+  .nav button { padding: 10px 12px; border: 0; background: transparent; color: var(--slate); font-size: 14px; font-weight: 800; cursor: pointer; }
+  .nav button:hover { color: var(--blue); }
+  .header-cta { min-height: 42px; padding: 9px 16px; font-size: 14px; }
+  .hero { position: relative; overflow: hidden; padding: 94px 0 82px; background: linear-gradient(145deg, #eef6ff 0%, #ffffff 58%, #ecfbff 100%); }
+  .hero::after { content: ""; position: absolute; width: 520px; height: 520px; right: -230px; top: -240px; border-radius: 50%; background: rgba(0,119,255,.07); }
+  .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.35fr .65fr; gap: 70px; align-items: center; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .engine-brief { padding: 28px; border: 1px solid #bcd7f4; border-radius: 8px; background: rgba(255,255,255,.92); box-shadow: var(--shadow); }
+  .brief-label { color: var(--blue); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .brief-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 18px 0; font-weight: 800; }
+  .brief-flow span { padding: 7px 9px; border-radius: 4px; background: var(--ice); }
+  .brief-flow b { color: var(--bright); }
+  .brief-line { margin: 0; color: var(--ink-soft); }
+  .section { padding: 92px 0; scroll-margin-top: 86px; }
+  .section-pale { background: var(--pale); }
+  .section-dark { background: var(--deep); color: var(--white); }
+  .section-dark .eyebrow { color: var(--cyan); }
+  .section-dark .lede { color: #bfd0e3; }
+  .section-head { display: flex; justify-content: space-between; gap: 40px; align-items: end; margin-bottom: 42px; }
+  .section-head > div:first-child { max-width: 760px; }
+  .section-head .side-note { max-width: 320px; color: var(--ink-soft); }
+  .pipeline { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px; margin-bottom: 24px; }
+  .stage-tab { position: relative; min-height: 142px; padding: 18px 14px; border: 1px solid #c8ddf3; border-radius: 6px; background: var(--white); color: var(--deep); text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+  .stage-tab::after { content: ""; position: absolute; top: 51px; right: -11px; width: 11px; height: 2px; background: #6f92d3; }
+  .stage-tab:last-child::after { display: none; }
+  .stage-tab:hover { transform: translateY(-3px); border-color: var(--bright); }
+  .stage-tab[aria-selected="true"] { border-color: var(--blue); background: #eaf1ff; box-shadow: inset 0 0 0 1px var(--blue); }
+  .stage-index { display: grid; width: 30px; height: 30px; place-items: center; margin-bottom: 15px; border-radius: 50%; background: var(--blue); color: var(--white); font-size: 13px; font-weight: 800; }
+  .stage-tab:nth-child(even) .stage-index { background: #0ca6ac; }
+  .stage-tab strong { display: block; margin-bottom: 7px; font-size: 15px; }
+  .stage-tab small { display: block; color: var(--ink-soft); line-height: 1.4; }
+  .stage-detail { display: grid; grid-template-columns: .8fr 1.2fr; gap: 34px; min-height: 410px; padding: 36px; border-radius: 8px; background: var(--deep); color: var(--white); }
+  .detail-intro { display: flex; flex-direction: column; justify-content: space-between; }
+  .detail-kicker { color: var(--cyan); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+  .detail-intro h3 { margin: 12px 0 16px; font-size: clamp(28px, 3.5vw, 42px); }
+  .detail-intro p { color: #c3d1e1; font-size: 17px; }
+  .detail-value { padding-left: 18px; border-left: 3px solid var(--cyan); color: var(--white) !important; font-weight: 800; }
+  .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+  .detail-card { padding: 20px; border: 1px solid rgba(255,255,255,.16); border-radius: 6px; background: rgba(255,255,255,.06); }
+  .detail-card span { display: block; margin-bottom: 9px; color: #8cdfff; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .detail-card p { margin: 0; color: #d9e4ef; font-size: 15px; }
+  .loop-note { display: flex; align-items: center; gap: 14px; margin-top: 18px; padding: 16px 20px; border-left: 3px solid var(--green); background: #effbf6; color: var(--slate); }
+  .loop-note strong { color: var(--deep); }
+  .operations { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .op-card { padding: 28px; border: 1px solid var(--line); border-radius: 7px; background: var(--white); }
+  .op-card .num { display: grid; width: 36px; height: 36px; place-items: center; margin-bottom: 20px; border-radius: 50%; background: var(--deep); color: var(--white); font-weight: 800; }
+  .op-card ul { margin: 16px 0 0; padding-left: 18px; color: var(--ink-soft); }
+  .op-card li + li { margin-top: 8px; }
+  .controls-band { margin-top: 24px; padding: 28px; border-left: 4px solid var(--pink); background: var(--navy); color: var(--white); }
+  .controls-band h3 { margin-bottom: 8px; }
+  .controls-band p { max-width: 920px; margin-bottom: 0; color: #c9d6e4; }
+  .visibility-story { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: stretch; }
+  .trend-panel { min-width: 0; padding: 34px; border: 1px solid var(--line); border-radius: 7px; background: var(--white); }
+  .trend-title { display: flex; justify-content: space-between; gap: 20px; align-items: start; margin-bottom: 20px; }
+  .trend-title h3 { margin: 0; }
+  .trend-window { color: var(--ink-soft); font-size: 12px; text-align: right; }
+  .lift-axis { display: grid; grid-template-columns: minmax(170px,1.15fr) 78px minmax(90px,.8fr) 88px 96px; gap: 14px; align-items: end; padding: 0 0 9px; border-bottom: 1px solid var(--line); color: var(--ink-soft); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .lift-axis .axis-before { grid-column: 2; }
+  .lift-axis .axis-after { grid-column: 4; color: var(--blue); }
+  .lift-list { display: grid; }
+  .lift-row { display: grid; grid-template-columns: minmax(170px,1.15fr) 78px minmax(90px,.8fr) 88px 96px; gap: 14px; align-items: center; min-height: 112px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .lift-label strong { display: block; font-size: 16px; }
+  .lift-label small { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 11px; }
+  .lift-value { font-size: clamp(30px, 3.6vw, 44px); font-weight: 800; line-height: 1; letter-spacing: -.05em; }
+  .lift-line { position: relative; height: 2px; background: #a9c8f4; }
+  .lift-line::before, .lift-line::after { content: ""; position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%; transform: translateY(-50%); }
+  .lift-line::before { left: 0; background: #85a9dc; }
+  .lift-line::after { right: 0; background: var(--blue); }
+  .lift-line span { position: absolute; right: -1px; top: 50%; width: 8px; height: 8px; border-top: 2px solid var(--blue); border-right: 2px solid var(--blue); transform: translateY(-50%) rotate(45deg); }
+  .lift-value.after { color: var(--blue); }
+  .lift-delta { min-width: 92px; padding: 8px 10px; border-radius: 999px; background: #dff7ed; color: #087a54; font-size: 13px; font-weight: 800; text-align: center; white-space: nowrap; }
+  .gap-note { display: grid; grid-template-columns: auto 1fr; gap: 12px; margin-top: 18px; padding: 14px 0 0; border: 0; background: transparent; }
+  .gap-note strong { font-size: 13px; }
+  .gap-note span { color: var(--ink-soft); font-size: 13px; }
+  .learning-grid { display: grid; grid-template-columns: .85fr 1.15fr; gap: 42px; align-items: start; }
+  .signal-list { display: grid; gap: 12px; }
+  .signal { display: grid; grid-template-columns: 14px 1fr; gap: 14px; padding: 17px 18px; border: 1px solid rgba(255,255,255,.14); border-radius: 6px; background: rgba(255,255,255,.05); }
+  .signal-dot { width: 10px; height: 10px; margin-top: 7px; border-radius: 50%; background: var(--cyan); }
+  .signal:nth-child(2) .signal-dot { background: var(--green); }
+  .signal:nth-child(3) .signal-dot { background: var(--pink); }
+  .signal:nth-child(4) .signal-dot { background: var(--orange); }
+  .signal strong { display: block; margin-bottom: 3px; }
+  .signal span { color: #b9c8d9; font-size: 14px; }
+  .monitor { padding: 30px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; background: rgba(255,255,255,.07); }
+  .monitor-row { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .monitor-row:last-child { border-bottom: 0; }
+  .monitor-row span { color: #b9c8d9; }
+  .monitor-row strong { color: var(--cyan); }
+  .customer-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .input-card { padding: 28px; border: 1px solid var(--line); border-radius: 7px; }
+  .input-card h3 { margin-bottom: 16px; }
+  .checklist { list-style: none; margin: 0; padding: 0; }
+  .checklist li { position: relative; padding: 12px 0 12px 30px; border-bottom: 1px solid var(--line); color: var(--slate); }
+  .checklist li::before { content: "✓"; position: absolute; left: 0; top: 12px; color: var(--green); font-weight: 800; }
+  .checklist li:last-child { border-bottom: 0; }
+  .final-cta { padding: 80px 0; background: linear-gradient(120deg, var(--blue), #2d66ef); color: var(--white); }
+  .final-inner { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
+  .final-inner h2 { margin-bottom: 10px; }
+  .final-inner p { max-width: 760px; margin: 0; color: #dfeaff; font-size: 18px; }
+  footer { padding: 34px 0; background: var(--deep); color: #b9c8d9; }
+  .footer-inner { display: flex; justify-content: space-between; gap: 24px; align-items: center; }
+  .footer-inner img { filter: brightness(0) invert(1); width: 110px; }
+  .footer-inner p { margin: 0; font-size: 13px; }
+  @media (max-width: 980px) {
+    .nav { display: none; }
+    .hero-grid, .stage-detail, .learning-grid { grid-template-columns: 1fr; }
+    .pipeline { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .stage-tab:nth-child(3)::after, .stage-tab:nth-child(6)::after { display: none; }
+    .operations { grid-template-columns: 1fr 1fr; }
+    .visibility-story { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .shell { width: min(100% - 28px, 1180px); }
+    .header-inner { min-height: 66px; }
+    .logo { width: 112px; }
+    .header-cta { min-height: 38px; padding: 8px 11px; font-size: 12px; }
+    .hero { padding: 64px 0 58px; }
+    .section { padding: 68px 0; }
+    .section-head { display: block; }
+    .section-head .side-note { max-width: none; }
+    .pipeline { grid-template-columns: 1fr 1fr; }
+    .stage-tab:nth-child(2)::after, .stage-tab:nth-child(4)::after { display: none; }
+    .stage-tab:nth-child(3)::after { display: block; }
+    .stage-detail { padding: 24px; }
+    .detail-grid, .operations, .customer-inputs { grid-template-columns: 1fr; }
+    .trend-panel { padding: 24px; }
+    .lift-axis { display: none; }
+    .lift-row { grid-template-columns: 48px minmax(36px,1fr) 50px 68px; gap: 8px; min-width: 0; min-height: 0; padding: 19px 0; }
+    .lift-label { grid-column: 1 / -1; }
+    .lift-value { font-size: 26px; }
+    .lift-line { grid-column: 2; }
+    .lift-delta { min-width: 0; padding: 7px 5px; font-size: 11px; }
+    .trend-title { display: block; }
+    .trend-window { margin-top: 8px; text-align: left; }
+    .final-inner { grid-template-columns: 1fr; }
+    .footer-inner { display: grid; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; }
+  }
+</style>
+
+<header class="site-header">
+  <div class="shell header-inner">
+    <img class="logo" src="https://cdn.prod.website-files.com/6464087fdf877a12a8bd4cd6/6464087fdf877a12a8bd4d26_folloze-logo.svg" alt="Folloze">
+    <nav class="nav" aria-label="Page sections">
+      <button type="button" data-scroll-target="engine">How it works</button>
+      <button type="button" data-scroll-target="governance">Governance</button>
+      <button type="button" data-scroll-target="results">Results</button>
+      <button type="button" data-scroll-target="measurement">Measurement</button>
+    </nav>
+    <a class="btn header-cta" href="https://www.folloze.com/request-demo" target="_blank" rel="noopener" onclick="flzAnalytic('cta_click',{text:this.innerText.trim(),area:'header',url:this.href},this)">Book a meeting</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="shell hero-grid">
+      <div>
+        <p class="eyebrow">Folloze content engine | ABM blogs | GEO and AI SEO</p>
+        <h1>From customer questions to AI-citable ABM content.</h1>
+        <p class="lede">A governed system turns buyer themes into searchable, answer-ready articles, then measures what search and AI surfaces pick up.</p>
+        <div class="hero-actions">
+          <button class="btn" type="button" data-scroll-target="engine" onclick="flzAnalytic('cta_click',{text:this.innerText.trim(),area:'main hero banner'},this)">Walk through the engine</button>
+          <button class="btn secondary" type="button" data-scroll-target="results" onclick="flzAnalytic('cta_click',{text:this.innerText.trim(),area:'main hero banner'},this)">See the 30-day snapshot</button>
+        </div>
+      </div>
+      <aside class="engine-brief" aria-label="Content engine in one line">
+        <span class="brief-label">The engine in one line</span>
+        <div class="brief-flow"><span>Ask</span><b>→</b><span>Research</span><b>→</b><span>Write</span><b>→</b><span>Govern</span><b>→</b><span>Publish</span><b>→</b><span>Learn</span></div>
+        <p class="brief-line">The output is not a pile of posts. It is a governed answer library that compounds.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="engine">
+    <div class="shell">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">How the system works</p>
+          <h2>Every article moves through the same six decisions.</h2>
+        </div>
+        <p class="side-note">Select a stage to see its inputs, agent actions, controls, and customer-facing output.</p>
+      </div>
+      <div class="pipeline" role="tablist" aria-label="Content engine stages">
+        <button class="stage-tab" type="button" role="tab" aria-selected="true" data-stage="0"><span class="stage-index">1</span><strong>Strategy inputs</strong><small>Choose the buyer question worth owning.</small></button>
+        <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="1"><span class="stage-index">2</span><strong>Research brief</strong><small>Build an evidence-backed point of view.</small></button>
+        <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="2"><span class="stage-index">3</span><strong>Content agent</strong><small>Write for buyers and answer engines.</small></button>
+        <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="3"><span class="stage-index">4</span><strong>Quality gate</strong><small>Repair what is weak before release.</small></button>
+        <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="4"><span class="stage-index">5</span><strong>Publish + distribute</strong><small>Ship the complete discovery package.</small></button>
+        <button class="stage-tab" type="button" role="tab" aria-selected="false" data-stage="5"><span class="stage-index">6</span><strong>Measure + learn</strong><small>Turn signals into the next brief.</small></button>
+      </div>
+      <div class="stage-detail" id="stage-detail" role="tabpanel" aria-live="polite">
+        <div class="detail-intro">
+          <div><span class="detail-kicker">Stage 1 | Strategy inputs</span><h3>Choose the buyer question worth owning.</h3><p>Start with what the market needs answered, not with a generic publishing quota. The engine joins account themes, buyer pain, product truth, and topic opportunity into one priority.</p></div>
+          <p class="detail-value"><strong>Customer value:</strong> content spend concentrates on questions tied to real buying conversations.</p>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-card"><span>What goes in</span><p>ICP and account themes, ABM keywords, product POV, customer pain signals, campaign priorities.</p></div>
+          <div class="detail-card"><span>What the system does</span><p>Clusters related questions, maps them to buying stages, and chooses the clearest opportunity for a useful answer.</p></div>
+          <div class="detail-card"><span>Governance</span><p>Only approved product claims and buyer-safe inputs can move into the brief. Unsupported angles stop here.</p></div>
+          <div class="detail-card"><span>Output</span><p>A prioritized topic with target audience, search intent, buyer question, point of view, and success signal.</p></div>
+        </div>
+      </div>
+      <div class="loop-note"><strong>Closed loop:</strong><span>measurement gaps return to the strategy stage, so the next calendar reflects what buyers and answer engines still need.</span></div>
+    </div>
+  </section>
+
+  <section class="section section-pale" id="governance">
+    <div class="shell">
+      <div class="section-head"><div><p class="eyebrow">Inside the operating system</p><h2>The agent moves fast because the controls are explicit.</h2></div></div>
+      <div class="operations">
+        <article class="op-card"><span class="num">1</span><h3>Evidence before prose</h3><p>Research context comes first, so the draft starts from approved sources and a clear point of view.</p><ul><li>Search intent and competitive gaps</li><li>Approved sources and facts</li><li>Citation opportunities</li></ul></article>
+        <article class="op-card"><span class="num">2</span><h3>Answer-first structure</h3><p>Each article is designed to answer a real question quickly, then support the answer with useful depth.</p><ul><li>Direct opening answer</li><li>Question-led H2 paths</li><li>FAQ and snippet blocks</li></ul></article>
+        <article class="op-card"><span class="num">3</span><h3>Machine-readable release</h3><p>The published package gives search engines and AI assistants clear structure and context.</p><ul><li>Metadata and structured data</li><li>Internal links and sitemap coverage</li><li>Social distribution brief</li></ul></article>
+      </div>
+      <div class="controls-band"><h3>Human review stays in the loop.</h3><p>Brand voice, product truth, claims, source quality, AEO and GEO structure, freshness, links, and technical release checks are scored before publishing. Weak content enters a repair loop instead of shipping.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="results">
+    <div class="shell">
+      <div class="section-head"><div><p class="eyebrow">First 30 days of measured learning</p><h2>The first lift appeared in visibility, sentiment, and unbranded discovery.</h2></div></div>
+      <div class="visibility-story">
+        <article class="trend-panel">
+          <div class="trend-title"><h3>30-Day Snapshot</h3><span class="trend-window">Same definitions<br>Same prompt panel</span></div>
+          <div class="lift-axis" aria-hidden="true"><span class="axis-before">Start</span><span class="axis-after">Day 30</span><span>Change</span></div>
+          <div class="lift-list" role="img" aria-label="Across the fixed Perplexity prompt panel over 30 days, Folloze visibility increased from 27 to 29 percent, sentiment score increased from 50 to 68 percent, and non-branded visibility increased from 10 to 12 percent.">
+            <div class="lift-row"><div class="lift-label"><strong>AI answer visibility</strong><small>Folloze appeared in the response</small></div><span class="lift-value">27%</span><span class="lift-line" aria-hidden="true"><span></span></span><span class="lift-value after">29%</span><span class="lift-delta">+2 points</span></div>
+            <div class="lift-row"><div class="lift-label"><strong>Sentiment score</strong><small>How positively Folloze was represented</small></div><span class="lift-value">50%</span><span class="lift-line" aria-hidden="true"><span></span></span><span class="lift-value after">68%</span><span class="lift-delta">+18 points</span></div>
+            <div class="lift-row"><div class="lift-label"><strong>Non-branded visibility</strong><small>Folloze surfaced without being named</small></div><span class="lift-value">10%</span><span class="lift-line" aria-hidden="true"><span></span></span><span class="lift-value after">12%</span><span class="lift-delta">+2 points</span></div>
+          </div>
+          <div class="gap-note"><strong>The next gap</strong><span>Competitive share of voice moved from 27% to 20%, giving the engine a clear target for the next briefs.</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark" id="measurement">
+    <div class="shell learning-grid">
+      <div><p class="eyebrow">Measure and learn</p><h2>The content calendar becomes a response to evidence.</h2><p class="lede">The engine separates production quality from market response. Search and AI signals show where the answer library is gaining ground and where it still has gaps.</p></div>
+      <div class="monitor">
+        <div class="signal-list">
+          <div class="signal"><span class="signal-dot"></span><div><strong>Search visibility</strong><span>Queries, impressions, clicks, position, and page-level movement from Search Console.</span></div></div>
+          <div class="signal"><span class="signal-dot"></span><div><strong>AI visibility</strong><span>Mentions and citations across a fixed panel of buyer prompts and topic clusters.</span></div></div>
+          <div class="signal"><span class="signal-dot"></span><div><strong>Content response</strong><span>Pages entered, CTA clicks, engagement depth, and next-step behavior.</span></div></div>
+          <div class="signal"><span class="signal-dot"></span><div><strong>Gap analysis</strong><span>Questions with low visibility, competitor dominance, or weak coverage become next-cycle priorities.</span></div></div>
+        </div>
+        <div class="monitor-row"><span>Buyer prompts monitored</span><strong>15</strong></div>
+        <div class="monitor-row"><span>Topic clusters</span><strong>5</strong></div>
+        <div class="monitor-row"><span>Latest completed monitor</span><strong>Jul 15, 2026</strong></div>
+        <div class="monitor-row"><span>Provider coverage</span><strong>Perplexity + Gemini</strong></div>
+        <div class="monitor-row"><span>Completed provider checks</span><strong>150 / 150</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-pale" id="customer-model">
+    <div class="shell">
+      <div class="section-head"><div><p class="eyebrow">Make it yours</p><h2>The workflow stays consistent. The customer truth changes.</h2></div></div>
+      <div class="customer-inputs">
+        <article class="input-card"><h3>What the customer supplies</h3><ul class="checklist"><li>Priority accounts, segments, and buyer roles</li><li>Product POV and approved claims</li><li>Top buyer questions and sales objections</li><li>Existing content and trusted sources</li><li>Search Console and analytics baseline</li></ul></article>
+        <article class="input-card"><h3>What the engine returns</h3><ul class="checklist"><li>Prioritized content calendar</li><li>Research-backed ABM articles</li><li>Governed release and repair workflow</li><li>Structured discovery package</li><li>Search, AI visibility, and engagement learning loop</li></ul></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="shell final-inner">
+      <div><h2>Start showing up where your buyers are looking for you.</h2><p>Start with the questions your buyers already ask, then connect the engine to your product truth, search baseline, and AI visibility goals.</p></div>
+      <a class="btn light" href="https://www.folloze.com/request-demo" target="_blank" rel="noopener" onclick="flzAnalytic('cta_click',{text:this.innerText.trim(),area:'final call to action',url:this.href},this)">Launch your own content engine</a>
+    </div>
+  </section>
+</main>
+
+<footer><div class="shell footer-inner"><img src="https://cdn.prod.website-files.com/6464087fdf877a12a8bd4cd6/6464087fdf877a12a8bd4d26_folloze-logo.svg" alt="Folloze"><p>Folloze helps teams target and convert key accounts.</p></div></footer>
+
+<script>
+  window.flzAnalytic = window.flzAnalytic || function(){};
+  const stages = [
+    {k:'Stage 1 | Strategy inputs',t:'Choose the buyer question worth owning.',d:'Start with what the market needs answered, not with a generic publishing quota. The engine joins account themes, buyer pain, product truth, and topic opportunity into one priority.',v:'content spend concentrates on questions tied to real buying conversations.',cards:[['What goes in','ICP and account themes, ABM keywords, product POV, customer pain signals, campaign priorities.'],['What the system does','Clusters related questions, maps them to buying stages, and chooses the clearest opportunity for a useful answer.'],['Governance','Only approved product claims and buyer-safe inputs can move into the brief. Unsupported angles stop here.'],['Output','A prioritized topic with target audience, search intent, buyer question, point of view, and success signal.']]},
+    {k:'Stage 2 | Research brief',t:'Build an evidence-backed point of view.',d:'The engine researches the question before writing. It looks for intent, competitive gaps, useful sources, and the facts that make the answer distinct and credible.',v:'every draft begins with evidence and a reason to exist.',cards:[['What goes in','Selected topic, target query, buyer role, approved source boundaries, product capability references.'],['What the system does','Finds current sources, compares existing answers, extracts claims, and identifies citation opportunities.'],['Governance','Source dates, domains, claim support, and product accuracy are checked before generation.'],['Output','A structured research pack with thesis, evidence, source links, outline, and unanswered gaps.']]},
+    {k:'Stage 3 | Content agent',t:'Write for buyers and answer engines at the same time.',d:'The content agent turns the research pack into a clear ABM article. It answers first, then earns depth through structure, evidence, and useful next steps.',v:'the article is readable to a buyer and legible to search and AI systems.',cards:[['What goes in','Research pack, article template, brand voice, audience context, CTA path, and internal-link targets.'],['What the system does','Drafts an answer-first intro, question-led sections, FAQ blocks, citations, summary language, and a useful CTA.'],['Governance','The agent cannot invent proof, overstate Folloze, or bypass source and brand requirements.'],['Output','A complete article draft plus metadata, FAQ content, links, and structured publishing fields.']]},
+    {k:'Stage 4 | Quality gate',t:'Score, repair, and approve before release.',d:'Quality is a release condition, not an editorial preference. The engine tests the draft, explains failures, and routes weak sections back through targeted repair.',v:'speed does not come at the cost of brand, claims, or discoverability.',cards:[['What goes in','Draft article, brand rules, AEO and GEO rubric, technical requirements, link and freshness checks.'],['What the system does','Scores answerability, structure, evidence, claims, schema readiness, voice, links, and technical completeness.'],['Governance','Hard failures block release. Soft warnings lower the score and direct specific repair instructions.'],['Output','Passed release artifact, quality report, repair history, and an auditable reason the content shipped.']]},
+    {k:'Stage 5 | Publish and distribute',t:'Ship the full discovery package, not only the page.',d:'The engine releases the article with the technical and distribution assets needed to be found, understood, and reused across campaigns.',v:'every approved article becomes a reusable ABM asset and a discovery surface.',cards:[['What goes in','Passed release artifact, metadata, structured data, author details, internal links, CTA, and social brief.'],['What the system does','Renders the page, updates the index and sitemap, deploys production assets, and prepares distribution copy.'],['Governance','A publish canary checks the live release and preserves rollback evidence when delivery fails.'],['Output','Live Folloze Insights page, schema, sitemap coverage, social brief, and production deployment record.']]},
+    {k:'Stage 6 | Measure and learn',t:'Turn visibility signals into the next content decision.',d:'The engine monitors how content performs in search, AI answers, and buyer engagement. Gaps are translated into new briefs instead of sitting in a dashboard.',v:'the content calendar gets smarter because it responds to evidence.',cards:[['What goes in','Search Console data, AI prompt monitor results, page analytics, Folloze engagement, and competitor citations.'],['What the system does','Separates mentions from citations, tracks query movement, identifies coverage gaps, and compares clusters over time.'],['Governance','Improvement is not claimed from one provider, one prompt, or one run. Baselines and fixed panels keep comparisons honest.'],['Output','Visibility trend, gap list, competitor signal, priority recommendations, and the next content-calendar update.']]}
+  ];
+  const detail = document.getElementById('stage-detail');
+  document.querySelectorAll('[data-stage]').forEach((tab) => tab.addEventListener('click', () => {
+    const i = Number(tab.dataset.stage), s = stages[i];
+    document.querySelectorAll('[data-stage]').forEach((x) => x.setAttribute('aria-selected',String(x===tab)));
+    detail.innerHTML = `<div class="detail-intro"><div><span class="detail-kicker">${s.k}</span><h3>${s.t}</h3><p>${s.d}</p></div><p class="detail-value"><strong>Customer value:</strong> ${s.v}</p></div><div class="detail-grid">${s.cards.map(c=>`<div class="detail-card"><span>${c[0]}</span><p>${c[1]}</p></div>`).join('')}</div>`;
+    flzAnalytic('stage_select',{text:tab.innerText.trim(),area:'content engine walkthrough'});
+  }));
+  document.querySelectorAll('[data-scroll-target]').forEach((control) => control.addEventListener('click', () => {
+    const target = document.getElementById(control.dataset.scrollTarget);
+    if (target) { flzAnalytic('anchor_click',{text:control.innerText.trim(),area:'page navigation',target:control.dataset.scrollTarget},control); target.scrollIntoView({behavior:'smooth',block:'start'}); }
+  }));
+</script>
+</body>
+</html>
