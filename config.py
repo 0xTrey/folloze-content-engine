@@ -14,6 +14,7 @@ from exceptions import ConfigError
 class SiteConfig:
     origin: str
     insights_path: str
+    ga4_measurement_id: str | None = None
 
 
 @dataclass(slots=True)
@@ -35,6 +36,7 @@ class PipelineConfig:
     log_level: str
     max_log_age_days: int
     geo_quality_threshold: int = 0
+    pre_publish_llm_test: bool = True
 
 
 @dataclass(slots=True)

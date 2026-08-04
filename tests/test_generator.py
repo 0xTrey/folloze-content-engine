@@ -141,8 +141,13 @@ def test_generate_raises_on_empty_response(project_root, monkeypatch) -> None:
 
 
 @responses.activate
-def test_generate_raises_on_refusal(project_root, monkeypatch) -> None:
+def test_generate_raises_when_all_providers_fail_after_refusal(project_root, monkeypatch) -> None:
     monkeypatch.setenv("GEMINI_API_KEY", "gemini")
+    monkeypatch.setattr(
+        generator,
+        "_call_gateway",
+        lambda *args, **kwargs: (_ for _ in ()).throw(ProviderUnavailableError("down")),
+    )
     config = Config.load()
     responses.add(
         responses.POST,
@@ -153,8 +158,54 @@ def test_generate_raises_on_refusal(project_root, monkeypatch) -> None:
         status=200,
     )
     topic = Topic("Hello", "guide", "hello", ["hello"], 5, "pending")
-    with pytest.raises(Exception):
+    with pytest.raises(ProviderUnavailableError):
         generate(topic, _research_context(topic), config)
+
+
+@responses.activate
+def test_generate_does_not_misclassify_refusal_language_inside_valid_json(
+    project_root, monkeypatch
+) -> None:
+    monkeypatch.setenv("GEMINI_API_KEY", "gemini")
+    config = Config.load()
+    body = (
+        "<p>I can't measure stakeholder coverage without role-level engagement data.</p>"
+        "<p>" + "word " * 1100 + "</p>"
+    )
+    responses.add(
+        responses.POST,
+        re.compile(r"https://generativelanguage\.googleapis\.com/.*"),
+        json=_gemini_payload(body),
+        status=200,
+    )
+    topic = Topic("Coverage", "guide", "coverage", ["stakeholder coverage"], 5, "pending")
+
+    content = generate(topic, _research_context(topic), config)
+
+    assert "I can't measure stakeholder coverage" in content.body_html
+
+
+def test_generate_falls_back_to_gateway_after_gemini_refusal(project_root, monkeypatch) -> None:
+    config = Config.load()
+    monkeypatch.setattr(
+        generator,
+        "_call_gemini",
+        lambda *args, **kwargs: "I cannot assist with that request.",
+    )
+    gateway_body = json.dumps(
+        {
+            "title": "Stakeholder Coverage",
+            "meta_description": "A practical framework.",
+            "body_html": "<p>" + "word " * 1100 + "</p>",
+            "sections": [],
+        }
+    )
+    monkeypatch.setattr(generator, "_call_gateway", lambda *args, **kwargs: gateway_body)
+    topic = Topic("Coverage", "guide", "coverage", ["stakeholder coverage"], 5, "pending")
+
+    content = generate(topic, _research_context(topic), config)
+
+    assert content.word_count >= config.content.min_words_by_type["guide"]
 
 
 @responses.activate
@@ -309,8 +360,8 @@ def test_quality_repair_instructions_cover_brand_and_style_failures() -> None:
         ],
         700,
     )
-    assert "$6.3M" in instructions
-    assert "478 MQLs" in instructions
+    assert "$10M" in instructions
+    assert "516 net new leads" in instructions
     assert "Use commas or periods instead of em dashes." in instructions
     assert "Keep paragraphs to four sentences or fewer on average." in instructions
     assert "cap exact-match repetition below 3% of words" in instructions
@@ -335,7 +386,25 @@ def test_self_heal_common_quality_blockers_removes_mechanical_gate_failures() ->
     assert "disrupt" not in text
     assert "page builder" not in text
     assert "personalized follow up pages refers to" in text
-    assert "pipeline anxiety is a warning sign that sales follow-up is too slow" in text
+    assert "pipeline anxiety rises when sales follow-up is slow" in text
+
+
+def test_self_heal_definition_lead_satisfies_definition_and_emotion_gates() -> None:
+    topic = Topic(
+        "Personalized Follow-Up Pages for B2B Sales Teams",
+        "guide",
+        "personalized-follow-up-pages-for-b2b-sales-teams",
+        ["personalized follow up pages"],
+        3,
+        "pending",
+    )
+    html = "<div class=\"tldr\">TL;DR: Teams see 98% engagement.</div><p>Folloze helps teams change generic follow-up.</p>"
+
+    healed = generator._self_heal_common_quality_blockers(topic, html)
+
+    assert generator._opening_sentence_has_definition(healed)
+    assert "Pipeline anxiety rises" in healed
+    assert "personalized follow up pages refers to" in healed.lower()
 
 
 def test_blog_prompt_contract_emphasizes_tldr_faq_quotability_and_caveats() -> None:
@@ -409,4 +478,4 @@ def test_guide_prompt_contract_handles_emotion_first_answer_first_and_forbidden_
     assert "According to [Source] (Year)" in prompt
     assert "concrete workflow, example, or scenario" in prompt
     assert "quote-worthy declarative lines" in prompt
-    assert "Never use \"microsite builder,\" \"buyer experience platform,\" \"agentic,\" or \"page builder,\" even in comparisons, negations, or FAQ questions" in prompt
+    assert 'Never use "AI orchestration platform," "ABX platform," "BXP," "buyer experience platform," "activation layer," or "page builder," even in comparisons, negations, or FAQ questions' in prompt

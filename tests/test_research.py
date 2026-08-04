@@ -26,7 +26,17 @@ def test_research_success(project_root, monkeypatch) -> None:
     responses.add(
         responses.POST,
         PERPLEXITY_ENDPOINT,
-        json={"choices": [{"message": {"content": "Perplexity summary"}}]},
+        json={
+            "choices": [{"message": {"content": "Perplexity summary"}}],
+            "citations": ["https://primary.example/report"],
+            "search_results": [
+                {
+                    "title": "Primary report",
+                    "url": "https://primary.example/report",
+                    "snippet": "Primary evidence",
+                }
+            ],
+        },
         status=200,
     )
     responses.add(
@@ -49,6 +59,10 @@ def test_research_success(project_root, monkeypatch) -> None:
     assert context.gemini_brief == "Research brief"
     assert context.degraded is False
     assert context.brave_results[0]["title"] == "A"
+    assert {source.origin for source in context.source_candidates} == {
+        "brave",
+        "perplexity_search_result",
+    }
 
 
 @responses.activate

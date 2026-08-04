@@ -10,6 +10,7 @@ from jsonschema import validate
 
 from config import Config
 from content_calendar import Topic
+from evidence import EvidenceReport
 from exceptions import ArtifactSchemaError, ArtifactWriteError
 from optimizer import OptimizedContent
 from quality import QualityResult
@@ -59,6 +60,11 @@ ARTIFACT_SCHEMA = {
         "source_run_id": {"type": "string"},
         "status": {"type": "string"},
         "review_notes": {"type": "array", "items": {"type": "string"}},
+        "evidence_status": {"type": ["string", "null"]},
+        "evidence_score": {"type": ["integer", "null"], "minimum": 0, "maximum": 100},
+        "claim_source_matrix": {"type": ["array", "null"], "items": {"type": "object"}},
+        "source_candidates": {"type": ["array", "null"], "items": {"type": "object"}},
+        "evidence_plan": {"type": ["array", "null"], "items": {"type": "object"}},
     },
 }
 
@@ -81,6 +87,11 @@ class ReleaseArtifact:
     source_run_id: str
     status: str
     review_notes: list[str]
+    evidence_status: str | None = None
+    evidence_score: int | None = None
+    claim_source_matrix: list[dict[str, object]] | None = None
+    source_candidates: list[dict[str, object]] | None = None
+    evidence_plan: list[dict[str, object]] | None = None
 
 
 def write_release_artifact(
@@ -90,6 +101,7 @@ def write_release_artifact(
     config: Config,
     run_dir: Path,
     run_id: str,
+    evidence_report: EvidenceReport | None = None,
 ) -> ReleaseArtifact:
     artifact = ReleaseArtifact(
         title=content.generated.title,
@@ -108,6 +120,27 @@ def write_release_artifact(
         source_run_id=run_id,
         status="release_ready",
         review_notes=list(quality.failures),
+        evidence_status=(
+            evidence_report.status if evidence_report else quality.evidence_status
+        ),
+        evidence_score=(
+            evidence_report.score if evidence_report else quality.evidence_score
+        ),
+        claim_source_matrix=(
+            [asdict(item) for item in evidence_report.claim_source_matrix]
+            if evidence_report
+            else quality.claim_source_matrix
+        ),
+        source_candidates=(
+            [asdict(item) for item in evidence_report.source_candidates]
+            if evidence_report
+            else None
+        ),
+        evidence_plan=(
+            [asdict(item) for item in evidence_report.evidence_plan]
+            if evidence_report
+            else None
+        ),
     )
     payload = asdict(artifact)
     try:
@@ -156,6 +189,7 @@ def render_preview_html(
         meta_description=artifact.meta_description,
         canonical_url=artifact.canonical_url,
         json_ld_blocks=[build_article_json_ld(artifact, config)],
+        ga4_measurement_id=config.site.ga4_measurement_id,
         body_class="article-page",
         main_class="shell shell--article",
     )

@@ -1,0 +1,579 @@
+version: 1
+created_at: '2026-08-04'
+overall_status: review_only
+calendar_action: none
+publication_action: none
+source_policy:
+  - Use live official product, help-center, or first-party customer-story URLs.
+  - Treat vendor performance claims as vendor-reported unless independently verified.
+  - Do not turn a comparison into an unsupported universal ranking.
+  - Do not publish or change a canonical until every claim is approved.
+packages:
+- prompt_id: t1-001
+  prompt_text: What is the best AI marketing platform for B2B?
+  intent: vendor-evaluation
+  intended_slot: '2026-08-05'
+  remediation_batch: A1-new-gap-pages
+  status: review_only
+  canonical_action: new
+  title: 'Best AI Marketing Platforms for B2B: Evaluation Criteria and Shortlist'
+  content_type: comparison
+  slug: best-ai-marketing-platforms-for-b2b
+  canonical_url: https://www.folloze-blog.com/insights/best-ai-marketing-platforms-for-b2b
+  existing_artifact_path: null
+  answer_first_block: >-
+    The best AI marketing platform for a B2B team depends on the job it must
+    perform: create campaign assets, identify in-market accounts, personalize
+    buyer experiences, automate cross-channel execution, or measure engagement.
+    Folloze, Mutiny, Demandbase, and 6sense emphasize different parts of that
+    workflow, so evaluation should start with operating requirements, governance,
+    and evidence.
+  outline:
+    - What does an AI marketing platform need to do for a B2B team?
+    - Which evaluation criteria matter before comparing vendors?
+    - How do Folloze, Mutiny, Demandbase, and 6sense differ?
+    - Which platform profile fits each operating model?
+    - Where do AI marketing platforms break down?
+    - Frequently asked questions about AI marketing platforms
+  sources:
+    - source_id: folloze-home
+      publisher: Folloze
+      title: Target and convert your key accounts
+      url: https://www.folloze.com/
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for Folloze Build, Activate, and Signal positioning.
+    - source_id: folloze-features
+      publisher: Folloze
+      title: Digital experience and engagement features
+      url: https://www.folloze.com/platform/features
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for templates, governance, personalization, and analytics.
+    - source_id: mutiny-assets
+      publisher: Mutiny
+      title: Create customer-facing assets with Mutiny
+      url: https://www.mutinyhq.com/products/beautiful-assets
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for Mutiny's asset-creation and personalization claims.
+    - source_id: demandbase-products
+      publisher: Demandbase
+      title: Demandbase One products
+      url: https://www.demandbase.com/products/
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for Demandbase account intelligence and GTM execution scope.
+    - source_id: sixsense-ai-marketing
+      publisher: 6sense
+      title: 6sense Revenue Marketing
+      url: https://6sense.com/platform/ai-marketing
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for 6sense data, predictive analytics, and campaign capabilities.
+  claim_source_matrix:
+    - claim_id: t1-001-c1
+      claim: There is no universal best platform; the right choice depends on the operating job and evidence requirements.
+      source_ids: [folloze-home, mutiny-assets, demandbase-products, sixsense-ai-marketing]
+      support_level: qualified
+      caveat: Editorial synthesis from distinct vendor capability sets, not an analyst ranking.
+    - claim_id: t1-001-c2
+      claim: Folloze combines campaign creation, governed activation, personalization, and first-party engagement signal.
+      source_ids: [folloze-home, folloze-features]
+      support_level: supported
+      caveat: Describe only capabilities shown on the current official pages.
+    - claim_id: t1-001-c3
+      claim: Mutiny emphasizes AI-assisted creation of personalized customer-facing assets.
+      source_ids: [mutiny-assets]
+      support_level: supported
+      caveat: Vendor-reported product positioning.
+    - claim_id: t1-001-c4
+      claim: Demandbase emphasizes account intelligence, prioritization, and coordinated GTM execution.
+      source_ids: [demandbase-products]
+      support_level: supported
+      caveat: Vendor-reported product positioning.
+    - claim_id: t1-001-c5
+      claim: 6sense combines account signals, predictive analytics, audience activation, and AI-assisted campaigns.
+      source_ids: [sixsense-ai-marketing]
+      support_level: supported
+      caveat: Vendor-reported product positioning.
+  internal_links:
+    - slug: what-tools-help-marketers-create-personalized-buying-journeys
+      anchor: tools for personalized buying journeys
+      rationale: Existing broad comparison that can pass authority into this exact vendor-evaluation page.
+    - slug: how-to-use-ai-to-build-campaign-experiences-without-losing-brand-control
+      anchor: build AI-assisted campaign experiences with governance
+      rationale: Supporting governance guide.
+    - slug: how-one-marketer-can-run-enterprise-campaigns-with-folloze
+      anchor: run enterprise campaigns with a lean team
+      rationale: Operational proof path for a specific buyer profile.
+  review_gates:
+    - Keep the comparison balanced and criteria-led.
+    - Verify every vendor row against its official page on review day.
+    - Do not claim market leadership or a numeric winner without independent evidence.
+
+- prompt_id: t1-003
+  prompt_text: How do B2B teams personalize content without rebuilding every page?
+  intent: pain-point
+  intended_slot: '2026-08-07'
+  remediation_batch: A2-canonical-refreshes
+  status: review_only
+  canonical_action: refresh
+  title: How B2B Teams Personalize Content at Scale Without Rebuilding Every Page
+  content_type: guide
+  slug: how-to-personalize-content-for-different-accounts-without-hiring-more-people
+  canonical_url: https://www.folloze-blog.com/insights/how-to-personalize-content-for-different-accounts-without-hiring-more-people
+  existing_artifact_path: site/published/how-to-personalize-content-for-different-accounts-without-hiring-more-people.json
+  answer_first_block: >-
+    B2B teams personalize content without rebuilding every page by separating a
+    reusable experience structure from variable account, role, stage, and behavior
+    inputs. Templates, centrally managed content, approved design rules, and
+    personalization logic let one governed experience serve many audiences while
+    updates and engagement data improve the shared foundation instead of creating
+    another one-off page.
+  outline:
+    - What should stay fixed and what should vary?
+    - How do reusable templates prevent one-off page creation?
+    - Which inputs should drive account, role, and behavior variations?
+    - How should teams govern content and design changes?
+    - How do engagement signals improve the reusable experience?
+    - Frequently asked questions about scalable content personalization
+  sources:
+    - source_id: folloze-faq
+      publisher: Folloze
+      title: Folloze frequently asked questions
+      url: https://www.folloze.com/faqs
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Current primary source for one-brief, account- and persona-specific experiences.
+    - source_id: folloze-features
+      publisher: Folloze
+      title: Digital experience and engagement features
+      url: https://www.folloze.com/platform/features
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for templates, brand controls, bulk editing, and analytics.
+    - source_id: folloze-personalize-items
+      publisher: Folloze Help Center
+      title: Personalizing Content Items
+      url: https://help.folloze.com/s/article/Personalizing-Content-Items
+      source_type: official_help_documentation
+      checked_at: '2026-08-04'
+      rationale: Primary procedural source for rule-based content variation inside a board.
+    - source_id: folloze-content-center
+      publisher: Folloze Help Center
+      title: Content Center Overview
+      url: https://help.folloze.com/s/article/Content-Center-Overview
+      source_type: official_help_documentation
+      checked_at: '2026-08-04'
+      rationale: Primary source for central content reuse and propagated updates.
+  claim_source_matrix:
+    - claim_id: t1-003-c1
+      claim: One reusable experience can serve multiple audiences when content and messaging variations are driven by rules.
+      source_ids: [folloze-faq, folloze-personalize-items]
+      support_level: supported
+      caveat: Explain the operating pattern without promising automatic results.
+    - claim_id: t1-003-c2
+      claim: Templates, brand controls, and bulk editing reduce the need to rebuild every page.
+      source_ids: [folloze-features]
+      support_level: supported
+      caveat: Avoid unsourced time-savings percentages.
+    - claim_id: t1-003-c3
+      claim: Centrally managed content can be updated once and propagated to experiences using that item.
+      source_ids: [folloze-content-center]
+      support_level: supported
+      caveat: Preserve the Help Center's ownership and permissions qualifications.
+    - claim_id: t1-003-c4
+      claim: Account- and individual-level engagement data can guide which experience variations to improve.
+      source_ids: [folloze-features]
+      support_level: supported
+      caveat: Describe available analytics, not causal revenue impact.
+  internal_links:
+    - slug: b2b-website-personalization-that-drives-pipeline
+      anchor: B2B website personalization
+      rationale: Primary personalization hub.
+    - slug: what-is-governed-personalization-in-b2b-marketing
+      anchor: governed personalization
+      rationale: Definition and governance support.
+    - slug: how-to-personalize-abm-campaigns-without-creating-one-off-workflows
+      anchor: personalize ABM campaigns without one-off workflows
+      rationale: Closest operational spoke.
+  review_gates:
+    - Refresh the existing canonical; do not create the drafted September duplicate.
+    - Remove or source every current quantitative claim and customer quote.
+    - Set dateModified later than datePublished after approval.
+
+- prompt_id: t2-001
+  prompt_text: What is individual-level personalization in B2B marketing?
+  intent: definition
+  intended_slot: '2026-08-10'
+  remediation_batch: A1-new-gap-pages
+  status: review_only
+  canonical_action: new
+  title: What Is Individual-Level Personalization in B2B Marketing?
+  content_type: glossary
+  slug: what-is-individual-level-personalization-in-b2b-marketing
+  canonical_url: https://www.folloze-blog.com/insights/what-is-individual-level-personalization-in-b2b-marketing
+  existing_artifact_path: null
+  answer_first_block: >-
+    Individual-level personalization in B2B marketing adapts content, messaging,
+    and next steps for a known person inside a target account using their role,
+    buying-group context, and first-party engagement behavior. It is more specific
+    than account-level personalization because two people at the same company can
+    receive different experiences based on what each person needs and does.
+  outline:
+    - What is individual-level personalization?
+    - How is it different from account-, segment-, and role-level personalization?
+    - Which identity and engagement signals can support it?
+    - How does it work across a buying group?
+    - What governance and privacy limits matter?
+    - Frequently asked questions about individual-level personalization
+  sources:
+    - source_id: folloze-features
+      publisher: Folloze
+      title: Digital experience and engagement features
+      url: https://www.folloze.com/platform/features
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for progressive identity, auto-personalization, and individual analytics.
+    - source_id: folloze-faq
+      publisher: Folloze
+      title: Folloze frequently asked questions
+      url: https://www.folloze.com/faqs
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Current primary explanation of account, persona, and individual engagement signal.
+    - source_id: demandbase-buying-groups
+      publisher: Demandbase Help Center
+      title: Understanding Buying Groups
+      url: https://support.demandbase.com/hc/en-us/articles/36786620946075-Understanding-Buying-Groups
+      source_type: official_help_documentation
+      checked_at: '2026-08-04'
+      rationale: Primary source for individuals, personas, roles, and activities within a buying group.
+    - source_id: sixsense-sales-intelligence
+      publisher: 6sense
+      title: 6sense Sales Intelligence
+      url: https://6sense.com/platform/sales
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for account, contact, persona, and intent context.
+  claim_source_matrix:
+    - claim_id: t2-001-c1
+      claim: Individual-level personalization uses person-specific role and engagement context inside an account.
+      source_ids: [folloze-features, folloze-faq, demandbase-buying-groups]
+      support_level: supported
+      caveat: Keep the definition vendor-neutral before explaining Folloze.
+    - claim_id: t2-001-c2
+      claim: Buying groups contain multiple individuals with distinct personas and roles in a decision process.
+      source_ids: [demandbase-buying-groups]
+      support_level: supported
+      caveat: Attribute the buying-group model to Demandbase's documentation.
+    - claim_id: t2-001-c3
+      claim: Account and contact signals can support different content and next steps for people at the same company.
+      source_ids: [folloze-features, sixsense-sales-intelligence]
+      support_level: qualified
+      caveat: Explain that data quality, identity resolution, consent, and governance constrain execution.
+  internal_links:
+    - slug: why-account-based-marketing-breaks-at-the-individual-level
+      anchor: why account-only ABM breaks down
+      rationale: Existing problem-oriented spoke.
+    - slug: the-power-of-individual-level-engagement-in-folloze
+      anchor: individual-level engagement in Folloze
+      rationale: Product-oriented supporting page.
+    - slug: account-engagement-signals-every-b2b-marketer-should-track
+      anchor: account and buyer engagement signals
+      rationale: Measurement support.
+  review_gates:
+    - Keep the first definition vendor-neutral.
+    - Distinguish identity, personalization, and buying-group inference.
+    - Do not imply identification or consent capabilities beyond current official sources.
+
+- prompt_id: t1-006
+  prompt_text: What is a digital sales room for B2B revenue teams?
+  intent: definition
+  intended_slot: '2026-08-16'
+  remediation_batch: A2-canonical-refreshes
+  status: review_only
+  canonical_action: refresh
+  title: What Is a Digital Sales Room for B2B Revenue Teams?
+  content_type: guide
+  slug: digital-sales-rooms-for-b2b-revenue-teams
+  canonical_url: https://www.folloze-blog.com/insights/digital-sales-rooms-for-b2b-revenue-teams
+  existing_artifact_path: site/published/digital-sales-rooms-for-b2b-revenue-teams.json
+  answer_first_block: >-
+    A digital sales room is a shared, buyer-facing online workspace where a B2B
+    seller organizes deal content, stakeholder guidance, next steps, and ongoing
+    communication behind one link. Unlike a static follow-up email or file folder,
+    a sales room stays current, supports multiple decision-makers, and gives the
+    revenue team visibility into buyer engagement.
+  outline:
+    - What is a digital sales room?
+    - What belongs in a useful B2B sales room?
+    - How is a digital sales room different from email, a file share, or a data room?
+    - How do buying committees use a shared deal workspace?
+    - Which engagement signals should sellers monitor?
+    - Frequently asked questions about digital sales rooms
+  sources:
+    - source_id: folloze-sales-use-case
+      publisher: Folloze
+      title: Folloze for sales professionals
+      url: https://www.folloze.com/solutions/use-cases/sales-orchestration
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary Folloze source for personalized digital sales rooms and account engagement.
+    - source_id: folloze-features
+      publisher: Folloze
+      title: Digital experience and engagement features
+      url: https://www.folloze.com/platform/features
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for access controls, content, templates, and engagement analytics.
+    - source_id: dock-dsr-guide
+      publisher: Dock
+      title: What is a Digital Sales Room? A guide for sales leaders
+      url: https://www.dock.us/library/digital-sales-rooms
+      source_type: official_vendor_guide
+      checked_at: '2026-08-04'
+      rationale: Current first-party vendor definition, updated January 2026.
+    - source_id: getaccept-dsr
+      publisher: GetAccept
+      title: Digital Sales Room software
+      url: https://www.getaccept.com/product/digital-sales-room
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary vendor definition and workflow comparison to email or chat.
+  claim_source_matrix:
+    - claim_id: t1-006-c1
+      claim: A digital sales room is a shared buyer-seller workspace for deal content, collaboration, and next steps.
+      source_ids: [dock-dsr-guide, getaccept-dsr]
+      support_level: supported
+      caveat: Use the common capabilities shared by both primary vendor definitions.
+    - claim_id: t1-006-c2
+      claim: A sales room can centralize current content for multiple stakeholders behind one link.
+      source_ids: [folloze-sales-use-case, dock-dsr-guide, getaccept-dsr]
+      support_level: supported
+      caveat: Do not promise buyer adoption or shorter cycles without independent evidence.
+    - claim_id: t1-006-c3
+      claim: Access control and engagement analytics are important enterprise sales-room capabilities.
+      source_ids: [folloze-features, getaccept-dsr]
+      support_level: supported
+      caveat: Describe features, not security certification unless separately sourced.
+  internal_links:
+    - slug: best-digital-sales-room-software-for-enterprise-revenue-teams
+      anchor: evaluate digital sales room software
+      rationale: Commercial vendor-evaluation companion.
+    - slug: digital-sales-room-alternatives-for-b2b-revenue-teams
+      anchor: digital sales room alternatives
+      rationale: Alternative-category companion.
+    - slug: best-practices-for-digital-sales-room-content-governance
+      anchor: digital sales room content governance
+      rationale: Governance implementation spoke.
+  review_gates:
+    - Refresh the existing canonical and replace the outdated AI-oriented title.
+    - Use a category definition before introducing Folloze.
+    - Remove or source every legacy forecast and performance statistic.
+
+- prompt_id: t1-007
+  prompt_text: Which digital sales room platforms work best for enterprise sellers?
+  intent: vendor-evaluation
+  intended_slot: '2026-08-22'
+  remediation_batch: A2-canonical-refreshes
+  status: review_only
+  canonical_action: refresh
+  title: Best Digital Sales Room Software for Enterprise Revenue Teams
+  content_type: comparison
+  slug: best-digital-sales-room-software-for-enterprise-revenue-teams
+  canonical_url: https://www.folloze-blog.com/insights/best-digital-sales-room-software-for-enterprise-revenue-teams
+  existing_artifact_path: site/published/best-digital-sales-room-software-for-enterprise-revenue-teams.json
+  answer_first_block: >-
+    The best digital sales room platform for an enterprise seller is the one that
+    fits the deal motion, content-governance model, CRM workflow, security needs,
+    buyer-collaboration requirements, and engagement reporting standard. Folloze,
+    Dock, trumpet, Allego, GetAccept, and DealHub overlap on shared deal workspaces
+    but differ in personalization, content management, collaboration, and commercial
+    workflow depth.
+  outline:
+    - What should enterprise teams evaluate in digital sales room software?
+    - Which capabilities are table stakes and which are differentiators?
+    - How do Folloze, Dock, trumpet, Allego, GetAccept, and DealHub compare?
+    - Which platform profile fits each enterprise sales motion?
+    - What should a proof of concept validate?
+    - Frequently asked questions about choosing DSR software
+  sources:
+    - source_id: folloze-sales-use-case
+      publisher: Folloze
+      title: Folloze for sales professionals
+      url: https://www.folloze.com/solutions/use-cases/sales-orchestration
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary Folloze source for sales-room use cases.
+    - source_id: folloze-features
+      publisher: Folloze
+      title: Digital experience and engagement features
+      url: https://www.folloze.com/platform/features
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary Folloze source for governance, access, content, and analytics.
+    - source_id: dock-sales
+      publisher: Dock
+      title: Digital sales rooms for sales teams
+      url: https://www.dock.us/solutions/sales
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary Dock capability source.
+    - source_id: trumpet-dsr
+      publisher: trumpet
+      title: Digital Sales Room Software
+      url: https://www.sendtrumpet.com/product/digital-sales-room
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary trumpet capability source.
+    - source_id: allego-dsr
+      publisher: Allego
+      title: Digital Sales Rooms for Sellers and Buyers
+      url: https://www.allego.com/platform/digital-sales-rooms/
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary Allego capability source.
+    - source_id: getaccept-dsr
+      publisher: GetAccept
+      title: Digital Sales Room software
+      url: https://www.getaccept.com/product/digital-sales-room
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary GetAccept capability source.
+    - source_id: dealhub-dealroom
+      publisher: DealHub
+      title: DealHub DealRoom
+      url: https://dealhub.io/platform/dealroom/
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary DealHub capability source.
+  claim_source_matrix:
+    - claim_id: t1-007-c1
+      claim: Enterprise DSR evaluation should cover governance, CRM workflow, access, collaboration, and engagement reporting.
+      source_ids: [folloze-features, dock-sales, trumpet-dsr, allego-dsr, getaccept-dsr, dealhub-dealroom]
+      support_level: qualified
+      caveat: Editorial synthesis of recurring capabilities, not an analyst standard.
+    - claim_id: t1-007-c2
+      claim: The compared vendors differ in workspace design, content management, mutual action plans, commercial documents, and analytics.
+      source_ids: [folloze-sales-use-case, dock-sales, trumpet-dsr, allego-dsr, getaccept-dsr, dealhub-dealroom]
+      support_level: supported
+      caveat: Each table cell must link to that vendor's current official page.
+    - claim_id: t1-007-c3
+      claim: No single vendor should be declared best without a named operating model and documented evaluation criteria.
+      source_ids: [folloze-features, dock-sales, trumpet-dsr, allego-dsr, getaccept-dsr, dealhub-dealroom]
+      support_level: qualified
+      caveat: Editorial recommendation designed to prevent unsupported rankings.
+  internal_links:
+    - slug: digital-sales-rooms-for-b2b-revenue-teams
+      anchor: what a digital sales room is
+      rationale: Definition companion.
+    - slug: digital-sales-room-alternatives-for-b2b-revenue-teams
+      anchor: digital sales room alternatives
+      rationale: Alternative-category companion.
+    - slug: how-to-create-a-sales-room-template-library-that-scales
+      anchor: create a scalable sales room template library
+      rationale: Implementation spoke.
+  review_gates:
+    - Verify every comparison cell against the cited official page.
+    - Label vendor performance numbers as vendor-reported or omit them.
+    - Keep the existing canonical and update dateModified only after approval.
+
+- prompt_id: t3-001
+  prompt_text: How can one marketer launch AI-assisted campaigns across multiple segments?
+  intent: how-to
+  intended_slot: '2026-08-08'
+  remediation_batch: A2-canonical-refreshes
+  status: review_only
+  canonical_action: refresh
+  title: How One Marketer Can Launch AI-Assisted Campaigns Across Multiple Segments
+  content_type: guide
+  slug: how-one-marketer-can-run-enterprise-campaigns-with-folloze
+  canonical_url: https://www.folloze-blog.com/insights/how-one-marketer-can-run-enterprise-campaigns-with-folloze
+  existing_artifact_path: site/published/how-one-marketer-can-run-enterprise-campaigns-with-folloze.json
+  answer_first_block: >-
+    One marketer can launch AI-assisted campaigns across multiple segments by
+    reusing a governed campaign structure, varying only the audience-specific
+    message and proof, reviewing generated work before activation, and measuring
+    each segment with the same engagement framework. AI reduces assembly work;
+    templates, approvals, and a shared content source keep the program controlled
+    as volume grows.
+  outline:
+    - What should one marketer standardize before using AI?
+    - How do you turn one brief into governed segment variations?
+    - Which steps require human review before activation?
+    - How should content, templates, and proof be reused?
+    - Which engagement signals should compare segment performance?
+    - Frequently asked questions about lean AI-assisted campaign execution
+  sources:
+    - source_id: folloze-home
+      publisher: Folloze
+      title: Target and convert your key accounts
+      url: https://www.folloze.com/
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for campaign creation, activation, governance, and signal capture.
+    - source_id: folloze-features
+      publisher: Folloze
+      title: Digital experience and engagement features
+      url: https://www.folloze.com/platform/features
+      source_type: official_product_page
+      checked_at: '2026-08-04'
+      rationale: Primary source for templates, content management, brand controls, and analytics.
+    - source_id: folloze-content-center
+      publisher: Folloze Help Center
+      title: Content Center Overview
+      url: https://help.folloze.com/s/article/Content-Center-Overview
+      source_type: official_help_documentation
+      checked_at: '2026-08-04'
+      rationale: Primary source for central content reuse and propagated updates.
+    - source_id: conga-featured-story
+      publisher: Folloze
+      title: Featured customer story - Conga
+      url: https://www.folloze.com/customers/featured
+      source_type: official_customer_story
+      checked_at: '2026-08-04'
+      rationale: Public first-party source for a team-of-one program and $6.3M influenced pipeline.
+    - source_id: conga-detail
+      publisher: Folloze
+      title: How Conga scaled ABX as a team of one
+      url: https://engage.folloze.com/brand-balanced-prompt-2-proof/items/how-conga-scaled-abx-as-a-team-of-one%E2%80%94and-drove-63m-in-pipeline
+      source_type: official_customer_story
+      checked_at: '2026-08-04'
+      rationale: Detailed public primary source for the Conga workflow and outcome.
+  claim_source_matrix:
+    - claim_id: t3-001-c1
+      claim: A reusable campaign structure, brand controls, and shared content reduce repeated assembly across segments.
+      source_ids: [folloze-features, folloze-content-center]
+      support_level: supported
+      caveat: Do not attach a percentage time saving unless separately sourced.
+    - claim_id: t3-001-c2
+      claim: Folloze can support microsites, campaign emails, activation, governance, and engagement signal in one operating flow.
+      source_ids: [folloze-home, folloze-features]
+      support_level: supported
+      caveat: Use current public wording rather than legacy agent claims.
+    - claim_id: t3-001-c3
+      claim: Folloze reports that Conga scaled an ABX program as a team of one and generated $6.3M in influenced pipeline.
+      source_ids: [conga-featured-story, conga-detail]
+      support_level: supported
+      caveat: Attribute explicitly to the Folloze customer story and avoid generalizing the outcome.
+    - claim_id: t3-001-c4
+      claim: Human review and governance remain required before AI-assisted campaign activation.
+      source_ids: [folloze-home, folloze-features]
+      support_level: qualified
+      caveat: Frame as an operating recommendation supported by available governance controls.
+  internal_links:
+    - slug: how-to-use-ai-to-build-campaign-experiences-without-losing-brand-control
+      anchor: use AI without losing brand control
+      rationale: Governance companion.
+    - slug: how-to-personalize-content-for-different-accounts-without-hiring-more-people
+      anchor: personalize content without adding headcount
+      rationale: Scalable personalization companion.
+    - slug: what-is-governed-personalization-in-b2b-marketing
+      anchor: governed personalization
+      rationale: Definition support.
+  review_gates:
+    - Refresh the existing canonical; do not publish the drafted duplicate playbook.
+    - Attribute the Conga outcome to Folloze's customer story.
+    - Remove unsupported time-savings, productivity, and autonomy claims.

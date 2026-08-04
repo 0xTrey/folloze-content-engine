@@ -3,14 +3,16 @@ from __future__ import annotations
 import json
 import logging
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
+from citation_monitor.contracts import LEGACY_SEMANTICS_VERSION, NATIVE_SEMANTICS_VERSION
+
 LOGGER = logging.getLogger("content_engine.citation_monitor")
 
-SCHEMA_VERSION = 2
-PARSER_VERSION = "regex-v1"
+SCHEMA_VERSION = 3
+PARSER_VERSION = "provider-native-v2"
 
 DB_PATH = Path("data/citation_monitor.db")
 
@@ -58,7 +60,12 @@ CREATE TABLE IF NOT EXISTS citation_results (
     citation_probability REAL DEFAULT 0.0,
     parser_version TEXT NOT NULL DEFAULT 'regex-v1',
     detection_method TEXT NOT NULL DEFAULT 'regex',
-    checked_at TEXT NOT NULL
+    checked_at TEXT NOT NULL,
+    native_citations TEXT NOT NULL DEFAULT '[]',
+    raw_evidence TEXT NOT NULL DEFAULT '{}',
+    evidence_checksum TEXT,
+    grounded_response INTEGER NOT NULL DEFAULT 0,
+    metric_semantics_version TEXT NOT NULL DEFAULT 'legacy-mention-proxy-v1'
 );
 
 CREATE TABLE IF NOT EXISTS competitor_sightings (
@@ -99,6 +106,11 @@ class CitationRow:
     parser_version: str
     detection_method: str
     checked_at: str
+    native_citations: list[dict] = field(default_factory=list)
+    raw_evidence: dict = field(default_factory=dict)
+    evidence_checksum: str | None = None
+    grounded_response: bool = False
+    metric_semantics_version: str = NATIVE_SEMANTICS_VERSION
 
 
 def init_db(db_path: Path = DB_PATH) -> sqlite3.Connection:
@@ -130,6 +142,20 @@ def _migrate_schema(conn: sqlite3.Connection) -> None:
         conn.execute(
             "ALTER TABLE citation_results ADD COLUMN source_urls TEXT NOT NULL DEFAULT '[]'"
         )
+    migrations = {
+        "native_citations": "TEXT NOT NULL DEFAULT '[]'",
+        "raw_evidence": "TEXT NOT NULL DEFAULT '{}'",
+        "evidence_checksum": "TEXT",
+        "grounded_response": "INTEGER NOT NULL DEFAULT 0",
+        "metric_semantics_version": (
+            f"TEXT NOT NULL DEFAULT '{LEGACY_SEMANTICS_VERSION}'"
+        ),
+    }
+    for column_name, definition in migrations.items():
+        if column_name not in columns:
+            conn.execute(
+                f"ALTER TABLE citation_results ADD COLUMN {column_name} {definition}"
+            )
 
 
 def create_run(
@@ -167,8 +193,10 @@ def insert_citation(conn: sqlite3.Connection, row: CitationRow) -> None:
         "(run_id, prompt_id, variant_text, provider, response_text, "
         "folloze_mentioned, folloze_cited, folloze_citation_position, "
         "branded, competitors_mentioned, confidence_flag, sentiment_label, source_urls, "
-        "citation_probability, parser_version, detection_method, checked_at) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "citation_probability, parser_version, detection_method, checked_at, "
+        "native_citations, raw_evidence, evidence_checksum, grounded_response, "
+        "metric_semantics_version) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             row.run_id,
             row.prompt_id,
@@ -187,6 +215,11 @@ def insert_citation(conn: sqlite3.Connection, row: CitationRow) -> None:
             row.parser_version,
             row.detection_method,
             row.checked_at,
+            json.dumps(row.native_citations, sort_keys=True),
+            json.dumps(row.raw_evidence, sort_keys=True),
+            row.evidence_checksum,
+            int(row.grounded_response),
+            row.metric_semantics_version,
         ),
     )
     conn.commit()
@@ -267,11 +300,12 @@ def get_citation_rates(
 ) -> dict[str, float]:
     rows = conn.execute(
         "SELECT prompt_id, "
-        "AVG(folloze_mentioned) as citation_rate "
+        "AVG(folloze_cited) as citation_rate "
         "FROM citation_results "
         "WHERE julianday('now') - julianday(checked_at) <= ? "
+        "AND metric_semantics_version = ? AND grounded_response = 1 "
         "GROUP BY prompt_id",
-        (days,),
+        (days, NATIVE_SEMANTICS_VERSION),
     ).fetchall()
     return {row[0]: row[1] for row in rows}
 
@@ -298,14 +332,33 @@ def get_run_citation_stats(
         "SELECT "
         "COUNT(*) as total, "
         "SUM(folloze_mentioned) as mentioned, "
-        "SUM(folloze_cited) as cited, "
+        "SUM(CASE WHEN metric_semantics_version = ? AND grounded_response = 1 "
+        "THEN folloze_cited ELSE 0 END) as cited, "
         "SUM(CASE WHEN branded = 1 THEN folloze_mentioned ELSE 0 END) as branded_mentions, "
         "SUM(CASE WHEN branded = 1 THEN 1 ELSE 0 END) as branded_checks, "
         "SUM(CASE WHEN branded = 0 THEN folloze_mentioned ELSE 0 END) as non_branded_mentions, "
         "SUM(CASE WHEN branded = 0 THEN 1 ELSE 0 END) as non_branded_checks, "
-        "SUM(CASE WHEN folloze_mentioned = 1 AND sentiment_label = 'positive' THEN 1 ELSE 0 END) as positive_mentions "
+        "SUM(CASE WHEN folloze_mentioned = 1 AND sentiment_label = 'positive' THEN 1 ELSE 0 END) as positive_mentions, "
+        "SUM(CASE WHEN metric_semantics_version = ? THEN 1 ELSE 0 END) as native_checks, "
+        "SUM(CASE WHEN metric_semantics_version = ? AND grounded_response = 1 THEN 1 ELSE 0 END) as grounded_checks, "
+        "SUM(CASE WHEN metric_semantics_version != ? THEN 1 ELSE 0 END) as legacy_checks, "
+        "SUM(CASE WHEN metric_semantics_version = ? AND branded = 0 AND grounded_response = 1 THEN 1 ELSE 0 END) as non_branded_grounded_checks, "
+        "SUM(CASE WHEN metric_semantics_version = ? AND branded = 0 "
+        "AND folloze_cited = 1 THEN 1 ELSE 0 END) as non_branded_citations, "
+        "SUM(CASE WHEN metric_semantics_version = ? AND grounded_response = 1 "
+        "AND folloze_cited = 1 AND source_urls != '[]' THEN 1 ELSE 0 END) "
+        "as source_attributed_citations "
         "FROM citation_results WHERE run_id = ?",
-        (run_id,),
+        (
+            NATIVE_SEMANTICS_VERSION,
+            NATIVE_SEMANTICS_VERSION,
+            NATIVE_SEMANTICS_VERSION,
+            NATIVE_SEMANTICS_VERSION,
+            NATIVE_SEMANTICS_VERSION,
+            NATIVE_SEMANTICS_VERSION,
+            NATIVE_SEMANTICS_VERSION,
+            run_id,
+        ),
     ).fetchone()
 
     total = row[0] or 0
@@ -316,6 +369,12 @@ def get_run_citation_stats(
     non_branded_mentions = row[5] or 0
     non_branded_checks = row[6] or 0
     positive_mentions = row[7] or 0
+    native_checks = row[8] or 0
+    grounded_checks = row[9] or 0
+    legacy_checks = row[10] or 0
+    non_branded_grounded_checks = row[11] or 0
+    non_branded_citations = row[12] or 0
+    source_attributed_citations = row[13] or 0
 
     competitor_total = conn.execute(
         "SELECT COALESCE(SUM(sighting_count), 0) FROM competitor_sightings WHERE run_id = ?",
@@ -333,13 +392,25 @@ def get_run_citation_stats(
         "brand_citations": brand_citations,
         "competitor_mentions": competitor_total,
         "brand_visibility_score": brand_mentions / total_for_rate,
-        "citation_rate": brand_citations / total_for_rate,
+        "citation_rate": brand_citations / max(grounded_checks, 1),
+        "citation_numerator": brand_citations,
+        "citation_denominator": grounded_checks,
+        "grounded_checks": grounded_checks,
+        "native_checks": native_checks,
+        "legacy_checks": legacy_checks,
+        "citation_semantics": NATIVE_SEMANTICS_VERSION,
+        "source_attribution_rate": (
+            source_attributed_citations / max(brand_citations, 1)
+        ),
+        "non_branded_citation_rate": (
+            non_branded_citations / max(non_branded_grounded_checks, 1)
+        ),
         "share_of_voice": brand_mentions / share_denominator if share_denominator else 0.0,
         "sentiment_score": positive_mentions / max(brand_mentions, 1),
         "branded_prompt_visibility_score": branded_mentions / max(branded_checks, 1),
         "non_branded_prompt_visibility_score": non_branded_mentions / max(non_branded_checks, 1),
         # Backward-compatible aliases.
-        "overall_citation_rate": brand_mentions / total_for_rate,
+        "overall_citation_rate": brand_citations / max(grounded_checks, 1),
         "branded_rate": branded_mentions / max(branded_checks, 1),
         "unbranded_rate": non_branded_mentions / max(non_branded_checks, 1),
     }
@@ -351,8 +422,9 @@ def get_run_source_attribution_summary(
     limit: int = 10,
 ) -> list[dict]:
     rows = conn.execute(
-        "SELECT source_urls FROM citation_results WHERE run_id = ? AND source_urls != '[]'",
-        (run_id,),
+        "SELECT source_urls FROM citation_results "
+        "WHERE run_id = ? AND source_urls != '[]' AND metric_semantics_version = ?",
+        (run_id, NATIVE_SEMANTICS_VERSION),
     ).fetchall()
 
     counts: dict[str, int] = {}
@@ -394,5 +466,6 @@ def get_completed_run_summaries(
             continue
         if isinstance(parsed, dict):
             parsed.setdefault("run_date", run_date)
+            parsed.setdefault("citation_semantics", LEGACY_SEMANTICS_VERSION)
             summaries.append(parsed)
     return summaries

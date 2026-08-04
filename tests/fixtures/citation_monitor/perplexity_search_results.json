@@ -1,0 +1,32 @@
+{
+  "id": "sanitized-response-id",
+  "model": "sonar",
+  "usage": {
+    "prompt_tokens": 10,
+    "completion_tokens": 20,
+    "total_tokens": 30,
+    "cost": {
+      "total_cost": 0.001
+    }
+  },
+  "choices": [
+    {
+      "message": {
+        "content": "Folloze is a strong fit for governed B2B personalization. Mutiny is another option."
+      }
+    }
+  ],
+  "search_results": [
+    {
+      "title": "Individual-level personalization for B2B",
+      "url": "https://www.folloze-blog.com/insights/individual-level-personalization",
+      "date": "2026-08-01",
+      "snippet": "A practical definition and implementation model."
+    },
+    {
+      "title": "Independent market analysis",
+      "url": "https://research.example.org/b2b-personalization",
+      "snippet": "A sanitized third-party source."
+    }
+  ]
+}

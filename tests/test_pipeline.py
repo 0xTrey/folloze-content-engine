@@ -469,3 +469,99 @@ def test_stage_for_error_maps_research_provider_failures() -> None:
 def test_stage_for_error_maps_generation_validation_failures() -> None:
     error = pipeline.ValidationError("Gemini payload missing 'sections'")
     assert pipeline._stage_for_error(error) == "generate_content"
+
+
+def _stub_successful_pipeline(monkeypatch) -> None:
+    topic = _topic()
+    research = ResearchContext(topic, [], "summary", "brief", "brand")
+    generated = GeneratedContent(
+        topic,
+        "Title",
+        "Desc",
+        "<p>Folloze is a platform.</p>",
+        [],
+        1000,
+        "comparison",
+        "folloze vs mutiny",
+    )
+    optimized = OptimizedContent(
+        generated,
+        "<p>Folloze is a platform.</p>",
+        '{"@context":"https://schema.org","@type":"Article"}',
+        "Article",
+    )
+    artifact = ReleaseArtifact(
+        title="Title",
+        slug="folloze-vs-mutiny",
+        route="/insights/folloze-vs-mutiny",
+        content_type="comparison",
+        body_html=optimized.body_html,
+        meta_title="Title",
+        meta_description="Desc",
+        json_ld=optimized.json_ld,
+        target_keywords=["folloze vs mutiny"],
+        published_date="2026-03-20",
+        citation_score=82,
+        word_count=1000,
+        canonical_url="https://insights.folloze.com/insights/folloze-vs-mutiny",
+        source_run_id="run-1",
+        status="release_ready",
+        review_notes=[],
+    )
+    monkeypatch.setattr(pipeline, "enrich", lambda *args, **kwargs: research)
+    monkeypatch.setattr(pipeline, "generate", lambda *args, **kwargs: generated)
+    monkeypatch.setattr(pipeline, "optimize", lambda *args, **kwargs: optimized)
+    monkeypatch.setattr(pipeline, "gate", lambda *args, **kwargs: QualityResult(True, 82, [], []))
+    monkeypatch.setattr(pipeline, "write_release_artifact", lambda *args, **kwargs: artifact)
+    monkeypatch.setattr(pipeline, "check_preview_file", lambda *args, **kwargs: None)
+    monkeypatch.setattr(pipeline, "send_release_ready", lambda *args, **kwargs: None)
+
+
+def test_pre_publish_flag_true_calls_and_writes_json(project_root, monkeypatch) -> None:
+    _stub_successful_pipeline(monkeypatch)
+    calls = {"count": 0}
+
+    def fake_pre_publish(topic):
+        calls["count"] += 1
+        return pipeline.PrePublishLLMResult(
+            provider="perplexity",
+            keyword=topic.keywords[0],
+            query="query",
+            response_excerpt="excerpt",
+            folloze_mentioned=False,
+            competitors_mentioned=["mutiny"],
+            source_urls=["https://example.com"],
+            recommendation="gap",
+            checked_at="2026-05-24T00:00:00+00:00",
+        )
+
+    monkeypatch.setattr(pipeline, "run_pre_publish_llm_test", fake_pre_publish)
+    monkeypatch.setattr(sys, "argv", ["pipeline.py"])
+
+    assert pipeline.main() == 0
+    assert calls["count"] == 1
+    run_dir = next((project_root / "logs" / "runs").iterdir())
+    payload = json.loads((run_dir / "pre-publish-llm-test.json").read_text())
+    assert payload["recommendation"] == "gap"
+    manifest = json.loads((run_dir / "run-manifest.json").read_text())
+    assert manifest["pre_publish_llm_test"].endswith("pre-publish-llm-test.json")
+
+
+def test_pre_publish_flag_false_skips_call(project_root, monkeypatch) -> None:
+    config_path = project_root / "config.yaml"
+    raw_config = yaml.safe_load(config_path.read_text())
+    raw_config["pipeline"]["pre_publish_llm_test"] = False
+    config_path.write_text(yaml.safe_dump(raw_config, sort_keys=False))
+    _stub_successful_pipeline(monkeypatch)
+
+    def fail_pre_publish(topic):
+        raise AssertionError("pre-publish should be skipped")
+
+    monkeypatch.setattr(pipeline, "run_pre_publish_llm_test", fail_pre_publish)
+    monkeypatch.setattr(sys, "argv", ["pipeline.py"])
+
+    assert pipeline.main() == 0
+    run_dir = next((project_root / "logs" / "runs").iterdir())
+    assert not (run_dir / "pre-publish-llm-test.json").exists()
+    manifest = json.loads((run_dir / "run-manifest.json").read_text())
+    assert manifest["pre_publish_llm_test"] is None

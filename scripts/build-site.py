@@ -38,6 +38,7 @@ def build_site() -> int:
     index_path = published_dir / "index.json"
     config = Config.load(ROOT / "config.yaml")
     environment = _environment(templates_dir)
+    environment.globals["ga4_measurement_id"] = config.site.ga4_measurement_id
 
     manifest = json.loads(index_path.read_text()) if index_path.exists() else {"artifacts": []}
     entries = _load_entries(manifest.get("artifacts", []), published_dir, config)
@@ -176,13 +177,34 @@ def build_site() -> int:
             ),
         )
 
+    topic_hubs = _topic_hubs(config, entries)
+    for hub in topic_hubs:
+        _write_route(
+            output_dir,
+            hub["route"],
+            _render_template(
+                environment,
+                "hub.html",
+                hub=hub,
+                posts=hub["posts"],
+                page_title=hub["page_title"],
+                meta_description=hub["meta_description"],
+                canonical_url=absolute_url(config.site.origin, hub["route"]),
+                json_ld_blocks=[hub["json_ld"]],
+                body_class="site-page",
+                main_class="shell",
+            ),
+        )
+
+    indexed_pages = static_pages + topic_hubs
+
     (output_dir / "404.html").write_text(_render_not_found())
 
     _copy_assets(assets_dir, output_dir)
     _write_robots_txt(output_dir, config)
-    _write_sitemaps(output_dir, config, entries, static_pages, author["url"])
+    _write_sitemaps(output_dir, config, entries, indexed_pages, author["url"])
     _write_rss(output_dir, config, entries)
-    _write_deployment_manifest(output_dir, config, entries, static_pages)
+    _write_deployment_manifest(output_dir, config, entries, indexed_pages)
     return 0
 
 
@@ -413,7 +435,151 @@ def _static_pages(config: Config) -> list[dict[str, str]]:
                 breadcrumb_pairs=[("Home", "/"), ("Editorial Policy", "/editorial-policy")],
             ),
         },
+        {
+            "route": "/sourcing-methodology",
+            "label": "Methodology",
+            "heading": "Sourcing and evidence methodology",
+            "lede": (
+                "How Folloze Insights decides which claims need evidence, which sources qualify, "
+                "and when a page is blocked from release."
+            ),
+            "page_title": "Sourcing Methodology | Folloze Insights",
+            "meta_description": (
+                "Review the Folloze Insights evidence standards for quantitative claims, "
+                "product comparisons, customer outcomes, and AI-assisted research."
+            ),
+            "body_html": """
+            <h2>Evidence before publication</h2>
+            <p>Numbers, customer outcomes, product capabilities, competitor claims, rankings, quotes, and market-wide conclusions require a traceable source. A page cannot enter the release bundle unless every material claim maps to an approved source from its research pack.</p>
+            <h2>Source hierarchy</h2>
+            <ol>
+              <li>Official product documentation, regulatory records, public customer stories, and original research.</li>
+              <li>Attributable research from established institutions and publishers.</li>
+              <li>Secondary analysis used for discovery and context, not as the sole proof for a material claim.</li>
+            </ol>
+            <p>AI-generated summaries are discovery aids. They are not evidence unless the underlying native source URL is preserved and reviewed.</p>
+            <h2>Evidence statuses</h2>
+            <ul>
+              <li><strong>Ready:</strong> every material claim is traceable to an approved source.</li>
+              <li><strong>Weak support:</strong> a source is linked but is not part of the approved research pack. Release is blocked.</li>
+              <li><strong>Unsupported:</strong> at least one material claim has no qualifying evidence. Release is blocked.</li>
+            </ul>
+            <h2>Measurement disclosure</h2>
+            <p>AI mentions, provider-native linked citations, Google generative-AI impressions, organic search performance, AI referral traffic, and backlinks are reported as separate metrics. API observations are labeled as proxies and are not presented as identical to consumer application results.</p>
+            """,
+            "json_ld": build_generic_page_json_ld(
+                config=config,
+                page_type="WebPage",
+                name="Sourcing and Evidence Methodology",
+                description="How Folloze Insights sources, validates, and blocks unsupported claims.",
+                route="/sourcing-methodology",
+                breadcrumb_pairs=[("Home", "/"), ("Sourcing Methodology", "/sourcing-methodology")],
+            ),
+        },
+        {
+            "route": "/corrections",
+            "label": "Trust",
+            "heading": "Corrections and update policy",
+            "lede": "How readers can flag an issue and how material corrections are handled.",
+            "page_title": "Corrections Policy | Folloze Insights",
+            "meta_description": "Read the Folloze Insights corrections and material update policy.",
+            "body_html": """
+            <h2>Report a factual issue</h2>
+            <p>Readers can contact the named author through the author profile when a claim, link, comparison, or product description appears inaccurate or outdated.</p>
+            <h2>What happens next</h2>
+            <p>Material issues are checked against the original source pack. Confirmed errors are corrected in the existing canonical page so the publication does not create a competing duplicate URL.</p>
+            <h2>Update history</h2>
+            <p>Material changes update the visible modification date and the page's structured data. Cosmetic edits do not receive a new date solely to imply freshness.</p>
+            """,
+            "json_ld": build_generic_page_json_ld(
+                config=config,
+                page_type="WebPage",
+                name="Corrections and Update Policy",
+                description="How Folloze Insights receives, verifies, and publishes corrections.",
+                route="/corrections",
+                breadcrumb_pairs=[("Home", "/"), ("Corrections", "/corrections")],
+            ),
+        },
+        {
+            "route": "/commercial-disclosure",
+            "label": "Disclosure",
+            "heading": "Commercial disclosure",
+            "lede": "The relationship between this publication, its authors, and Folloze.",
+            "page_title": "Commercial Disclosure | Folloze Insights",
+            "meta_description": "Understand the commercial relationship and comparison standards behind Folloze Insights.",
+            "body_html": """
+            <p>Folloze Insights is a Folloze-focused publication operated by contributors who work with or for Folloze. The publication supports education and category understanding around Folloze's market and may link to Folloze product or demo pages.</p>
+            <p>That relationship is material context for readers. Comparative pages must distinguish documented facts from editorial interpretation, cite current official sources for named vendors, and avoid unsupported pricing, capability, or superiority claims.</p>
+            <p>No placement in an editorial comparison is sold. Backlinks are not purchased, exchanged at scale, or acquired through link farms.</p>
+            """,
+            "json_ld": build_generic_page_json_ld(
+                config=config,
+                page_type="WebPage",
+                name="Commercial Disclosure",
+                description="Commercial relationship and comparison disclosure for Folloze Insights.",
+                route="/commercial-disclosure",
+                breadcrumb_pairs=[("Home", "/"), ("Commercial Disclosure", "/commercial-disclosure")],
+            ),
+        },
     ]
+
+
+def _topic_hubs(config: Config, entries: list[dict[str, object]]) -> list[dict[str, object]]:
+    definitions = [
+        (
+            "personalization",
+            "B2B personalization",
+            "Definitions, governance frameworks, and practical workflows for personalizing account and buying-group experiences.",
+            ("personalization", "personalized", "stakeholder", "buying committee"),
+        ),
+        (
+            "digital-sales-rooms",
+            "Digital sales rooms",
+            "Buyer-facing deal collaboration, content governance, stakeholder proof, and engagement measurement.",
+            ("digital sales room", "sales room", "deal room", "deal enablement"),
+        ),
+        (
+            "ai-campaign-execution",
+            "AI-assisted campaign execution",
+            "Governed workflows for turning AI-created content into measurable B2B campaign experiences.",
+            ("ai", "campaign", "governed activation", "marketing workflow"),
+        ),
+        (
+            "abm-abx",
+            "ABM and ABX",
+            "Account-based strategy, buying-group engagement, content activation, and revenue-team alignment.",
+            ("abm", "abx", "account based", "account journey", "buying group"),
+        ),
+    ]
+    hubs: list[dict[str, object]] = []
+    for slug, name, description, phrases in definitions:
+        matching = []
+        for entry in entries:
+            haystack = " ".join(
+                [str(entry["title"]), str(entry["primary_keyword"]), *entry["target_keywords"]]
+            ).lower()
+            if any(phrase in haystack for phrase in phrases):
+                matching.append(entry)
+        route = f"/topics/{slug}"
+        hubs.append(
+            {
+                "route": route,
+                "name": name,
+                "description": description,
+                "posts": matching[:24],
+                "page_title": f"{name} Resources | Folloze Insights",
+                "meta_description": description,
+                "json_ld": build_generic_page_json_ld(
+                    config=config,
+                    page_type="CollectionPage",
+                    name=f"{name} Resources",
+                    description=description,
+                    route=route,
+                    breadcrumb_pairs=[("Home", "/"), ("Topics", "/blog"), (name, route)],
+                ),
+            }
+        )
+    return hubs
 
 
 def _copy_assets(assets_dir: Path, output_dir: Path) -> None:

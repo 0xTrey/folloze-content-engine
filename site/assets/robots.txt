@@ -10,5 +10,5 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-Sitemap: https://insights.folloze.com/insights-sitemap.xml
-
+Sitemap: https://www.folloze-blog.com/sitemap.xml
+Sitemap: https://www.folloze-blog.com/insights-sitemap.xml

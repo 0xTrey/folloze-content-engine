@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import sqlite3
 from collections import Counter
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
 from html import escape
 
+from citation_monitor.contracts import NATIVE_SEMANTICS_VERSION
 from citation_monitor.storage import (
-    get_completed_run_summaries,
     get_competitor_sightings_summary,
+    get_completed_run_summaries,
     get_run_citation_stats,
     get_run_source_attribution_summary,
 )
@@ -33,6 +34,14 @@ class MonitorRunSummary:
     alerts: list[str]
     incomplete: bool = False
     failure_count: int = 0
+    citation_semantics: str = NATIVE_SEMANTICS_VERSION
+    citation_numerator: int = 0
+    citation_denominator: int = 0
+    grounded_checks: int = 0
+    legacy_check_count: int = 0
+    source_attribution_rate: float = 0.0
+    non_branded_citation_rate: float = 0.0
+    coverage_gaps: list[str] = field(default_factory=list)
 
 
 def build_summary(
@@ -43,12 +52,14 @@ def build_summary(
     failure_count: int,
 ) -> MonitorRunSummary:
     stats = get_run_citation_stats(conn, run_id)
-    prompt_rates = {prompt["prompt_id"]: 0.0 for prompt in prompts}
+    prompt_rates: dict[str, float] = {}
 
     rows = conn.execute(
         "SELECT prompt_id, AVG(citation_probability) "
-        "FROM citation_results WHERE run_id = ? GROUP BY prompt_id",
-        (run_id,),
+        "FROM citation_results WHERE run_id = ? AND metric_semantics_version = ? "
+        "AND grounded_response = 1 "
+        "GROUP BY prompt_id",
+        (run_id, NATIVE_SEMANTICS_VERSION),
     ).fetchall()
     for prompt_id, rate in rows:
         prompt_rates[prompt_id] = float(rate or 0.0)
@@ -56,9 +67,12 @@ def build_summary(
     tier_breakdown = _group_rates(prompts, prompt_rates, "tier")
     cluster_breakdown = _group_rates(prompts, prompt_rates, "cluster")
     gaps = sorted(prompt_id for prompt_id, rate in prompt_rates.items() if rate == 0.0)
+    coverage_gaps = sorted(
+        prompt["prompt_id"] for prompt in prompts if prompt["prompt_id"] not in prompt_rates
+    )
     competitor_leading = get_competitor_sightings_summary(conn, run_id)
     source_attribution = get_run_source_attribution_summary(conn, run_id)
-    alerts = _build_alerts(prompt_rates, competitor_leading, stats)
+    alerts = _build_alerts(prompt_rates, competitor_leading, stats, coverage_gaps)
 
     return MonitorRunSummary(
         run_date=run_date,
@@ -77,6 +91,14 @@ def build_summary(
         alerts=alerts,
         incomplete=failure_count > 0,
         failure_count=failure_count,
+        citation_semantics=stats["citation_semantics"],
+        citation_numerator=stats["citation_numerator"],
+        citation_denominator=stats["citation_denominator"],
+        grounded_checks=stats["grounded_checks"],
+        legacy_check_count=stats["legacy_checks"],
+        source_attribution_rate=stats["source_attribution_rate"],
+        non_branded_citation_rate=stats["non_branded_citation_rate"],
+        coverage_gaps=coverage_gaps,
     )
 
 
@@ -91,8 +113,10 @@ def fire_alerts(
     weekly_summaries = (
         get_completed_run_summaries(conn, summary.run_date, days=7) if conn is not None else []
     )
-    if not weekly_summaries:
-        weekly_summaries = [asdict(summary)]
+    weekly_summaries = [
+        run for run in weekly_summaries if run.get("run_date") != summary.run_date
+    ]
+    weekly_summaries.append(asdict(summary))
 
     from notify import send_canary_report
 
@@ -108,8 +132,12 @@ def _group_rates(
 ) -> dict[str, float]:
     grouped: dict[str, list[float]] = {}
     for prompt in prompts:
+        prompt_id = prompt["prompt_id"]
         key = str(prompt.get(field, "unknown"))
-        grouped.setdefault(key, []).append(prompt_rates.get(prompt["prompt_id"], 0.0))
+        grouped.setdefault(key, [])
+        if prompt_id not in prompt_rates:
+            continue
+        grouped[key].append(prompt_rates[prompt_id])
     return {key: (sum(values) / len(values) if values else 0.0) for key, values in grouped.items()}
 
 
@@ -126,7 +154,12 @@ def _build_weekly_report(
     subject = f"[Folloze GEO] Weekly Visibility Monitor — {start.isoformat()} to {end.isoformat()}"
 
     avg_brand_visibility = _average_metric(weekly_summaries, "brand_visibility_score")
-    avg_citation_rate = _average_metric(weekly_summaries, "citation_rate")
+    native_weekly_summaries = [
+        summary
+        for summary in weekly_summaries
+        if summary.get("citation_semantics") == NATIVE_SEMANTICS_VERSION
+    ]
+    avg_citation_rate = _average_metric(native_weekly_summaries, "citation_rate")
     avg_share_of_voice = _average_metric(weekly_summaries, "share_of_voice")
     avg_non_branded_visibility = _average_metric(
         weekly_summaries,
@@ -142,8 +175,13 @@ def _build_weekly_report(
         ("Coverage window", f"{start.isoformat()} to {end.isoformat()}"),
         ("Latest run date", latest_summary.run_date),
         ("Runs captured", str(len(weekly_summaries))),
-        ("Average Brand Visibility Score", f"{avg_brand_visibility:.0%}"),
-        ("Average Citation Rate", f"{avg_citation_rate:.0%}"),
+        ("Native-semantics runs", str(len(native_weekly_summaries))),
+        (
+            "Legacy runs excluded from linked-citation trend",
+            str(len(weekly_summaries) - len(native_weekly_summaries)),
+        ),
+        ("Average Brand Mention Rate", f"{avg_brand_visibility:.0%}"),
+        ("Average Linked Citation Rate (native)", f"{avg_citation_rate:.0%}"),
         ("Average Share of Voice", f"{avg_share_of_voice:.0%}"),
         (
             "Average Non-branded Prompt Visibility",
@@ -152,8 +190,19 @@ def _build_weekly_report(
     ]
     latest_rows = [
         ("Prompts checked", str(latest_summary.prompts_checked)),
-        ("Brand Visibility Score", f"{latest_summary.brand_visibility_score:.0%}"),
-        ("Citation Rate", f"{latest_summary.citation_rate:.0%}"),
+        ("Brand Mention Rate", f"{latest_summary.brand_visibility_score:.0%}"),
+        ("Linked Citation Rate", f"{latest_summary.citation_rate:.0%}"),
+        (
+            "Linked Citation Evidence",
+            f"{latest_summary.citation_numerator}/{latest_summary.citation_denominator} grounded responses",
+        ),
+        ("Source Attribution Rate", f"{latest_summary.source_attribution_rate:.0%}"),
+        (
+            "Non-branded Linked Citation Rate",
+            f"{latest_summary.non_branded_citation_rate:.0%}",
+        ),
+        ("Metric semantics", latest_summary.citation_semantics),
+        ("Legacy checks retained (excluded)", str(latest_summary.legacy_check_count)),
         ("Share of Voice", f"{latest_summary.share_of_voice:.0%}"),
         ("Sentiment Score", f"{latest_summary.sentiment_score:.0%}"),
         (
@@ -170,12 +219,12 @@ def _build_weekly_report(
         (
             str(summary.get("run_date", "")),
             _render_metric_cell(
-                "Brand Visibility Score",
+                "Brand Mention Rate",
                 float(summary.get("brand_visibility_score", 0.0) or 0.0),
                 _metric_tone(float(summary.get("brand_visibility_score", 0.0) or 0.0)),
             ),
             _render_metric_cell(
-                "Citation Rate",
+                "Linked Citation Rate",
                 float(summary.get("citation_rate", 0.0) or 0.0),
                 _metric_tone(float(summary.get("citation_rate", 0.0) or 0.0)),
             ),
@@ -197,7 +246,13 @@ def _build_weekly_report(
         (alert, f"{count} run{'s' if count != 1 else ''}")
         for alert, count in sorted(alert_counts.items())
     ] or [("None", "0 runs")]
-    gap_rows = [(prompt_id, "Open gap") for prompt_id in latest_summary.gaps] or [("None", "-")]
+    gap_rows = [(prompt_id, "No linked citation") for prompt_id in latest_summary.gaps] or [
+        ("None", "-")
+    ]
+    coverage_gap_rows = [
+        (prompt_id, "No provider-native source metadata")
+        for prompt_id in latest_summary.coverage_gaps
+    ] or [("None", "-")]
     competitor_rows = [
         (f"{entry['competitor']} on {entry['prompt_id']}", str(entry['count']))
         for entry in latest_summary.competitor_leading[:10]
@@ -226,8 +281,8 @@ def _build_weekly_report(
                   <div style="font-size:18px; font-weight:700; line-height:26px; margin-bottom:16px;">Summary Metrics</div>
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; border-collapse:separate; border-spacing:12px;">
                     <tr>
-                      <td width="50%" valign="top">{_render_metric_card('Average Brand Visibility Score', avg_brand_visibility, 'brand')}</td>
-                      <td width="50%" valign="top">{_render_metric_card('Average Citation Rate', avg_citation_rate, 'citation')}</td>
+                      <td width="50%" valign="top">{_render_metric_card('Average Brand Mention Rate', avg_brand_visibility, 'brand')}</td>
+                      <td width="50%" valign="top">{_render_metric_card('Average Linked Citation Rate', avg_citation_rate, 'citation')}</td>
                     </tr>
                     <tr>
                       <td width="50%" valign="top">{_render_metric_card('Average Share of Voice', avg_share_of_voice, 'sov')}</td>
@@ -245,8 +300,8 @@ def _build_weekly_report(
                       _render_data_table(
                           headers=(
                               'Run date',
-                              'Brand Visibility Score',
-                              'Citation Rate',
+                              'Brand Mention Rate',
+                              'Linked Citation Rate',
                               'Share of Voice',
                               'Non-branded Prompt Visibility',
                               'Top alerts',
@@ -256,7 +311,8 @@ def _build_weekly_report(
                       ),
                   )}
                   {_render_section_card('Weekly Alert Frequency', _render_kv_table(alert_rows, headers=('Alert', 'Frequency'), compact=True))}
-                  {_render_section_card('Latest Gap Prompts', _render_kv_table(gap_rows, headers=('Prompt', 'Status'), compact=True))}
+                  {_render_section_card('Latest Linked-Citation Gaps', _render_kv_table(gap_rows, headers=('Prompt', 'Status'), compact=True))}
+                  {_render_section_card('Native Evidence Coverage Gaps', _render_kv_table(coverage_gap_rows, headers=('Prompt', 'Status'), compact=True))}
                   {_render_section_card('Latest Competitor Sightings', _render_kv_table(competitor_rows, headers=('Competitor / Prompt', 'Count'), compact=True))}
                   {_render_section_card('Latest Source Attribution', _render_kv_table(source_rows, headers=('Source URL', 'Count'), compact=True))}
                 </td>
@@ -441,11 +497,14 @@ def _build_alerts(
     prompt_rates: dict[str, float],
     competitor_leading: list[dict],
     stats: dict,
+    coverage_gaps: list[str] | None = None,
 ) -> list[str]:
     alerts: list[str] = []
     for prompt_id, rate in sorted(prompt_rates.items()):
         if rate < 0.1:
-            alerts.append(f"LOW VISIBILITY: {prompt_id}")
+            alerts.append(f"LOW LINKED CITATION: {prompt_id}")
+    for prompt_id in coverage_gaps or []:
+        alerts.append(f"MISSING NATIVE EVIDENCE: {prompt_id}")
 
     seen_competitors: set[str] = set()
     for entry in competitor_leading:

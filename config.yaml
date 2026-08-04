@@ -2,6 +2,7 @@
 site:
   origin: "https://www.folloze-blog.com"
   insights_path: "/insights"
+  ga4_measurement_id: "G-JDDWKS0VX6"
 
 delivery:
   target: "vercel_static"
@@ -19,6 +20,7 @@ pipeline:
   log_level: "INFO"
   max_log_age_days: 30
   geo_quality_threshold: 0
+  pre_publish_llm_test: true
 
 notifications:
   email:
@@ -37,7 +39,7 @@ notifications:
       - "kristi.tutt@folloze.com"
   discord:
     enabled: true
-    channel_target: "channel:1480677039169081434"
+    channel_target: "channel:example"
 
 content:
   default_audience: "B2B revenue teams"

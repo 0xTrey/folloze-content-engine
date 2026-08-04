@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-hero">
+  <p class="section-label">Topic hub</p>
+  <h1>{{ hub.name }}</h1>
+  <p class="page-hero__lede">{{ hub.description }}</p>
+</section>
+
+<section class="section archive-section">
+  <div class="section-head">
+    <div>
+      <p class="section-label">Source-backed resources</p>
+      <h2>Explore the topic</h2>
+    </div>
+    <a class="post-card__cta" href="/sourcing-methodology">Review our sourcing methodology &rarr;</a>
+  </div>
+  <div class="post-grid">
+    {% for post in posts %}
+    <article class="post-card">
+      <p class="post-card__meta">{{ post.content_type }} &middot; {{ post.published_date }}</p>
+      <h2><a href="{{ post.route }}">{{ post.title }}</a></h2>
+      <p>{{ post.excerpt }}</p>
+      <a class="post-card__cta" href="{{ post.route }}">Read &rarr;</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

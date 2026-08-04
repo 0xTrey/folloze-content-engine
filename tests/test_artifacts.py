@@ -15,6 +15,7 @@ from artifacts import (
 )
 from config import Config
 from content_calendar import Topic
+from evidence import SourceCandidate, build_evidence_report
 from generator import GeneratedContent
 from optimizer import OptimizedContent
 from quality import QualityResult
@@ -45,6 +46,58 @@ def test_write_release_artifact_outputs_expected_shape(project_root: Path) -> No
     assert (run_dir / "social-brief.json").exists()
     loaded = load_release_artifact(run_dir / "release-artifact.json")
     assert loaded.slug == artifact.slug
+
+
+def test_write_release_artifact_includes_backward_compatible_evidence_fields(
+    project_root: Path,
+) -> None:
+    run_dir = project_root / "logs" / "runs" / "2026-03-21"
+    topic = Topic("Evidence", "guide", "evidence", ["evidence"], 5, "pending")
+    body_html = (
+        '<p>Teams improved conversion by 25% in the '
+        '<a href="https://research.example/report">benchmark report</a>.</p>'
+    )
+    generated = GeneratedContent(
+        topic,
+        "Evidence",
+        "Evidence description",
+        body_html,
+        [],
+        1000,
+        "guide",
+        "evidence",
+    )
+    optimized = OptimizedContent(
+        generated,
+        body_html,
+        '{"@context":"https://schema.org","@type":"Article"}',
+        "Article",
+    )
+    report = build_evidence_report(
+        body_html,
+        [
+            SourceCandidate(
+                title="Benchmark report",
+                url="https://research.example/report",
+                publisher="Research Example",
+                origin="brave",
+            )
+        ],
+    )
+    artifact = write_release_artifact(
+        topic,
+        optimized,
+        QualityResult(True, 80, ["ok"], []),
+        Config.load(),
+        run_dir,
+        "run-evidence",
+        evidence_report=report,
+    )
+
+    assert artifact.evidence_status == "ready"
+    assert artifact.evidence_score == 100
+    assert artifact.source_candidates is not None
+    assert artifact.evidence_plan is not None
 
 
 def test_render_preview_html_contains_metadata(project_root: Path) -> None:
@@ -157,6 +210,11 @@ def test_build_site_generates_output(repo_copy: Path) -> None:
         check=True,
     )
     assert (repo_copy / "site" / "dist" / "insights" / "title" / "index.html").exists()
+    rendered_article = (
+        repo_copy / "site" / "dist" / "insights" / "title" / "index.html"
+    ).read_text(encoding="utf-8")
+    assert "googletagmanager.com/gtag/js?id=G-JDDWKS0VX6" in rendered_article
+    assert "gtag('config', 'G-JDDWKS0VX6'" in rendered_article
     assert (repo_copy / "site" / "dist" / "social-briefs" / "title.json").exists()
     assert (repo_copy / "site" / "dist" / "social-briefs" / "latest.json").exists()
     deployment_manifest = json.loads(

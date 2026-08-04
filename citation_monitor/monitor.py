@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -26,6 +27,7 @@ from citation_monitor.variants import get_variants_for_prompt, load_prompt_libra
 from config import Config
 
 LOGGER = logging.getLogger("content_engine.citation_monitor")
+DEFAULT_PROVIDERS = ["perplexity", "openai", "claude", "gemini"]
 
 
 class CitationMonitor:
@@ -80,7 +82,7 @@ class CitationMonitor:
                 conn=conn,
                 run_id=run_id,
                 prompt_count=summary.prompts_checked,
-                citation_count=stats["mentioned"],
+                citation_count=stats["brand_citations"],
                 alert_fired=alert_fired,
                 summary_json=json.dumps(asdict(summary), sort_keys=True),
             )
@@ -108,6 +110,11 @@ class CitationMonitor:
         }
 
         for variant_text in variants:
+            pending_providers = [
+                provider
+                for provider in providers
+                if variant_text not in checked_by_provider[provider]
+            ]
             for provider in providers:
                 if variant_text in checked_by_provider[provider]:
                     LOGGER.info(
@@ -115,50 +122,88 @@ class CitationMonitor:
                         prompt_id,
                         provider,
                     )
-                    continue
 
-                try:
-                    if self.dry_run:
-                        row = self._build_dry_run_row(run_id, prompt_id, variant_text, provider)
-                    else:
-                        result = PROVIDERS[provider](variant_text)
-                        row = CitationRow(
-                            run_id=run_id,
-                            prompt_id=prompt_id,
-                            variant_text=variant_text,
-                            provider=provider,
-                            response_text=result.response_text,
-                            folloze_mentioned=result.folloze_mentioned,
-                            folloze_cited=result.folloze_cited,
-                            folloze_citation_position=result.folloze_citation_position,
-                            branded="folloze" in variant_text.lower(),
-                            competitors_mentioned=result.competitors_mentioned,
-                            confidence_flag=result.confidence_flag,
-                            sentiment_label=result.sentiment_label,
-                            source_urls=result.source_urls,
-                            citation_probability=1.0 if result.folloze_mentioned else 0.0,
-                            parser_version=PARSER_VERSION,
-                            detection_method="regex",
-                            checked_at=datetime.now(UTC).isoformat(),
-                        )
-                except AuthError:
-                    LOGGER.exception(
+            if not pending_providers:
+                continue
+
+            if self.dry_run:
+                provider_results = {
+                    provider: self._build_dry_run_row(
+                        run_id,
+                        prompt_id,
+                        variant_text,
+                        provider,
+                    )
+                    for provider in pending_providers
+                }
+                provider_errors: dict[str, Exception] = {}
+            else:
+                provider_results = {}
+                provider_errors = {}
+                with ThreadPoolExecutor(
+                    max_workers=len(pending_providers),
+                    thread_name_prefix="citation-provider",
+                ) as executor:
+                    future_to_provider = {
+                        executor.submit(PROVIDERS[provider], variant_text): provider
+                        for provider in pending_providers
+                    }
+                    for future in as_completed(future_to_provider):
+                        provider = future_to_provider[future]
+                        try:
+                            result = future.result()
+                            provider_results[provider] = CitationRow(
+                                run_id=run_id,
+                                prompt_id=prompt_id,
+                                variant_text=variant_text,
+                                provider=provider,
+                                response_text=result.response_text,
+                                folloze_mentioned=result.folloze_mentioned,
+                                folloze_cited=result.folloze_cited,
+                                folloze_citation_position=result.folloze_citation_position,
+                                branded="folloze" in variant_text.lower(),
+                                competitors_mentioned=result.competitors_mentioned,
+                                confidence_flag=result.confidence_flag,
+                                sentiment_label=result.sentiment_label,
+                                source_urls=result.source_urls,
+                                citation_probability=1.0 if result.folloze_cited else 0.0,
+                                parser_version=PARSER_VERSION,
+                                detection_method=(
+                                    "provider-native-metadata"
+                                    if getattr(result, "grounded_response", False)
+                                    else "no-native-citation-metadata"
+                                ),
+                                checked_at=datetime.now(UTC).isoformat(),
+                                native_citations=getattr(result, "native_citations", []),
+                                raw_evidence=getattr(result, "raw_evidence", {}),
+                                evidence_checksum=getattr(result, "evidence_checksum", None),
+                                grounded_response=getattr(result, "grounded_response", False),
+                            )
+                        except (AuthError, ProviderError) as exc:
+                            provider_errors[provider] = exc
+
+            for provider in pending_providers:
+                error = provider_errors.get(provider)
+                if isinstance(error, AuthError):
+                    LOGGER.error(
                         "Auth error querying provider=%s prompt_id=%s; aborting run",
                         provider,
                         prompt_id,
+                        exc_info=(type(error), error, error.__traceback__),
                     )
-                    raise
-                except ProviderError as exc:
+                    raise error
+                if isinstance(error, ProviderError):
                     self._failure_count += 1
                     LOGGER.warning(
                         "Provider failure provider=%s prompt_id=%s variant=%r: %s",
                         provider,
                         prompt_id,
                         variant_text,
-                        exc,
+                        error,
                     )
                     continue
 
+                row = provider_results[provider]
                 insert_citation(conn, row)
                 checked_by_provider[provider].add(variant_text)
                 for competitor in row.competitors_mentioned:
@@ -170,8 +215,8 @@ class CitationMonitor:
                         sighting_count=1,
                         checked_at=row.checked_at,
                     )
-                if not self.dry_run:
-                    time.sleep(1.0)
+            if not self.dry_run:
+                time.sleep(1.0)
 
     def _build_dry_run_row(
         self,
@@ -190,14 +235,14 @@ class CitationMonitor:
             provider=provider,
             response_text=f"[dry-run] {provider} :: {variant_text}",
             folloze_mentioned=mentioned,
-            folloze_cited=mentioned,
-            folloze_citation_position=1 if mentioned else None,
+            folloze_cited=False,
+            folloze_citation_position=None,
             branded=branded,
             competitors_mentioned=[],
             confidence_flag="normal",
             sentiment_label="positive" if mentioned else "neutral",
             source_urls=[],
-            citation_probability=1.0 if mentioned else 0.0,
+            citation_probability=0.0,
             parser_version=PARSER_VERSION,
             detection_method="dry-run",
             checked_at=checked_at,
@@ -206,9 +251,11 @@ class CitationMonitor:
     @staticmethod
     def _normalize_providers(providers) -> list[str]:
         if providers is None:
-            return ["perplexity", "openai"]
+            providers = DEFAULT_PROVIDERS
 
-        normalized = [str(provider).strip() for provider in providers if str(provider).strip()]
+        normalized = list(
+            dict.fromkeys(str(provider).strip() for provider in providers if str(provider).strip())
+        )
         unknown = [provider for provider in normalized if provider not in PROVIDERS]
         if unknown:
             raise ValueError(f"Unknown providers: {', '.join(unknown)}")

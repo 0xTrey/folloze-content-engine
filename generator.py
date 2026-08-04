@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import re
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from html import escape
 from typing import Any
 
@@ -22,7 +22,11 @@ from runtime_secrets import get_secret, hydrate_provider_env
 LOGGER = logging.getLogger("content_engine")
 
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
-REFUSAL_RE = re.compile(r"\b(i can(?:not|'t)|i am unable|i won't|cannot assist)\b", re.IGNORECASE)
+REFUSAL_RE = re.compile(
+    r"^\s*(?:(?:i(?:'m| am) sorry)[,.:]?\s*)?"
+    r"(?:i can(?:not|'t)|i am unable|i won't|cannot assist)\b",
+    re.IGNORECASE,
+)
 GATEWAY_PROFILES = ("workhorse", "openai", "strategic", "kimi", "minimax", "local")
 GATEWAY_TIMEOUT_SECONDS = 120
 
@@ -70,10 +74,7 @@ def _generate_from_prompt(topic: Topic, prompt: str, config: Config) -> Generate
                 config.llm.generation_model,
                 config.pipeline.max_retries_llm,
             )
-            if REFUSAL_RE.search(text):
-                raise RefusalError("Gemini refused the content request")
-
-            payload = _extract_json_payload(text)
+            payload = _extract_content_payload(text, "Gemini")
             content = _build_content(topic, payload)
             if content.word_count < minimum_words:
                 raise ValidationError(
@@ -83,7 +84,8 @@ def _generate_from_prompt(topic: Topic, prompt: str, config: Config) -> Generate
         except (EmptyResponseError, ValidationError, ProviderUnavailableError, RefusalError) as exc:
             last_error = exc
             if isinstance(exc, RefusalError):
-                raise
+                LOGGER.warning("Gemini refused the request; trying gateway fallback")
+                break
 
     # Gemini exhausted — fall back to LLMGateway using the best available writing profiles.
     LOGGER.warning("Gemini failed after all retries (%s); falling back to LLMGateway", last_error)
@@ -91,9 +93,7 @@ def _generate_from_prompt(topic: Topic, prompt: str, config: Config) -> Generate
         for attempt_prompt in prompt_attempts:
             try:
                 text = _call_gateway(attempt_prompt, gw_profile)
-                if REFUSAL_RE.search(text):
-                    raise RefusalError("Gateway refused the content request")
-                payload = _extract_json_payload(text)
+                payload = _extract_content_payload(text, f"Gateway profile={gw_profile}")
                 content = _build_content(topic, payload)
                 if content.word_count < minimum_words:
                     raise ValidationError(
@@ -101,8 +101,10 @@ def _generate_from_prompt(topic: Topic, prompt: str, config: Config) -> Generate
                     )
                 LOGGER.info("Gateway fallback succeeded via profile=%s", gw_profile)
                 return content
-            except RefusalError:
-                raise
+            except RefusalError as exc:
+                LOGGER.warning("Gateway profile=%s refused the request", gw_profile)
+                last_error = exc
+                break
             except ValidationError as exc:
                 LOGGER.warning(
                     "Gateway profile=%s content too short, retrying with expansion prompt", gw_profile
@@ -113,6 +115,8 @@ def _generate_from_prompt(topic: Topic, prompt: str, config: Config) -> Generate
                 last_error = exc
                 break  # provider unavailable — skip to next profile
 
+    if isinstance(last_error, RefusalError):
+        raise last_error
     raise ProviderUnavailableError(f"All providers failed: {last_error}")
 
 
@@ -125,8 +129,20 @@ def _render_prompt(topic: Topic, research: ResearchContext) -> str:
     )
     template = environment.get_template(f"{topic.content_type}.md")
     rendered = template.render(topic=topic, research=research)
+    source_packet = json.dumps(
+        [asdict(source) for source in research.source_candidates], indent=2
+    )
     return (
         f"{rendered}\n\n"
+        "EVIDENCE CONTRACT:\n"
+        "- The source candidates below are provenance captured by the research stage.\n"
+        "- Every statistic, attributed finding, comparative performance claim, and vendor "
+        "capability claim must include a directly supporting inline <a href=\"...\"> citation "
+        "in the same paragraph.\n"
+        "- Use only source URLs that actually support the adjacent claim. If no candidate supports "
+        "a material claim, remove or qualify the claim instead of inventing a citation.\n"
+        "- Prefer primary research, official documentation, and named first-party product pages.\n"
+        f"SOURCE CANDIDATES:\n{source_packet}\n\n"
         "STRICT JSON RULES:\n"
         "- Return exactly one valid JSON object.\n"
         "- Do not wrap the response in markdown fences.\n"
@@ -253,6 +269,26 @@ def _extract_json_payload(text: str) -> dict[str, Any]:
     return payload
 
 
+def _extract_content_payload(text: str, provider: str) -> dict[str, Any]:
+    """Parse structured content before considering refusal language.
+
+    Generated articles can legitimately contain sentences such as "I can't measure
+    stakeholder coverage without role data." Refusal detection must therefore apply
+    only when the provider did not return the requested JSON object.
+    """
+    try:
+        return _extract_json_payload(text)
+    except (EmptyResponseError, ValidationError) as exc:
+        if _looks_like_refusal(text):
+            raise RefusalError(f"{provider} refused the content request") from exc
+        raise
+
+
+def _looks_like_refusal(text: str) -> bool:
+    normalized = text.strip()
+    return "{" not in normalized and len(normalized) <= 1000 and bool(REFUSAL_RE.search(normalized))
+
+
 def _count_words(html: str) -> int:
     text = BeautifulSoup(html, "html.parser").get_text(" ")
     return len([word for word in text.split() if word.strip()])
@@ -290,26 +326,31 @@ def _self_heal_common_quality_blockers(topic: Topic, body_html: str) -> str:
         "next-generation": "new",
         "future-proof": "prepare",
         # Forbidden positioning language
-        "buyer experience platform": "AI orchestration platform",
-        "microsite builder": "ABM content hub",
+        "buyer experience platform": "personalized account experience",
+        "microsite builder": "microsite",
+        "landing page builder": "personalized campaign destination",
         "page builder": "personalized campaign destination",
-        "agentic": "AI-assisted",
+        "abx platform": "personalized account experience",
+        "bxp": "personalized account experience",
+        "activation layer": "governed activation path",
+        "ai orchestration platform": "open execution platform",
         # General brand-banned wording
         "revolutionary": "new",
         "set it and forget it": "configure it with clear governance",
         "generator ai": "generative AI",
-        "abm platform": "ABX platform",
+        "abm platform": "account-based campaign motion",
     }
     for source, target in replacements.items():
         healed = re.sub(rf"\b{re.escape(source)}s?\b", target, healed, flags=re.IGNORECASE)
+    for kill_word in GEO_KILL_LIST:
+        healed = re.sub(rf"\b{re.escape(kill_word.lower())}\b", "", healed, flags=re.IGNORECASE)
 
     if not _opening_sentence_has_definition(healed):
         keyword = escape(topic.keywords[0])
         lead = (
-            f"<p>{keyword} refers to personalized, campaign-specific web destinations "
-            "that give each buyer a clear next step after a meeting, event, or outreach "
-            "sequence. Pipeline anxiety is a warning sign that sales follow-up is too slow, "
-            "too generic, or too hard to trust.</p>"
+            "<p>Pipeline anxiety rises when sales follow-up is slow, generic, or hard to trust, "
+            f"and {keyword} refers to personalized, campaign-specific web destinations "
+            "that give each buyer a clear next step after a meeting, event, or outreach sequence.</p>"
         )
         healed = f"{lead}\n{healed}"
     return healed
@@ -407,8 +448,8 @@ def _quality_repair_instructions(topic: Topic, failures: list[str], minimum_word
             f'- The very first sentence of body_html MUST match one of these exact patterns: '
             f'"{topic.keywords[0]} is a ..." or "{topic.keywords[0]} refers to ..." unless '
             f'the keyword itself contains forbidden entity language. If it does, write the first '
-            f'definitional sentence with an approved substitute such as "ABX platform" or '
-            f'"AI orchestration platform" instead, and do not repeat the forbidden phrase in body_html. '
+            f'definitional sentence with an approved substitute such as "personalized account experience" '
+            f'or "first-party engagement signal" instead, and do not repeat the forbidden phrase in body_html. '
             f'This sentence must appear before any other content. '
             f'Example: "{topic.keywords[0]} is a personalized, campaign-specific web destination '
             f'designed for account-based marketing and sales outreach."'
@@ -417,7 +458,14 @@ def _quality_repair_instructions(topic: Topic, failures: list[str], minimum_word
         instructions.append(
             "- Add at least two attribution sentences inside body_html that "
             'begin with "According to", "Per", "Reported by", or '
-            '"Found that", and name the source organization.'
+            '"Found that", name the source organization, and link the directly '
+            "supporting source URL in the same paragraph."
+        )
+    if any("Unsupported material claim" in failure for failure in failures):
+        instructions.append(
+            "- For every unsupported material claim, either add a directly supporting inline "
+            "source URL from SOURCE CANDIDATES in the same paragraph or remove/qualify the claim. "
+            "Never invent a URL or use a source that does not support the exact claim."
         )
     if any("Missing FAQ section" in failure for failure in failures):
         instructions.append(
@@ -509,10 +557,13 @@ def _geo_repair_instructions(failures: list[str]) -> list[str]:
         instructions.append(
             "- Remove ALL forbidden entity terms including plural and variant forms. "
             "Search for and delete every instance of: 'page builder', 'page builders', "
-            "'microsite builder', 'microsite builders', 'buyer experience platform', 'agentic'. "
-            "Replace with: 'personalized campaign destination', 'ABM content hub', or 'Folloze'. "
+            "'landing page builder', 'landing page builders', 'microsite builder', "
+            "'microsite builders', 'buyer experience platform', "
+            "'ABX platform', 'BXP', 'activation layer', and 'AI orchestration platform'. "
+            "Replace with: 'personalized account experience', 'microsite', "
+            "'first-party engagement signal', or 'Folloze'. "
             "Do not use forbidden terms even in negations, comparisons, rebuttals, or FAQ questions "
-            "such as 'not just a page builder'. Do a thorough check — even one occurrence fails the gate."
+            "such as 'not just a page builder'. Do a thorough check; even one occurrence fails the gate."
         )
     if any("emotion" in f.lower() or "pain" in f.lower() for f in failures):
         instructions.append(

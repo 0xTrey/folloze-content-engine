@@ -31,9 +31,9 @@ def publisher_profile(config: Config) -> PublisherProfile:
     return PublisherProfile(
         name="Folloze",
         description=(
-            "Folloze is an AI orchestration platform for B2B go-to-market teams, "
-            "built to help marketers scale campaigns, activate buyer signals, and "
-            "connect engagement to pipeline."
+            "Folloze helps B2B marketing teams target and convert key accounts "
+            "with personalized experiences, first-party engagement signal, and "
+            "AI-speed execution."
         ),
         site_url="https://www.folloze.com",
         logo_path="/folloze-logo.png",
@@ -153,6 +153,7 @@ def build_article_json_ld(artifact: "ReleaseArtifact", config: Config) -> str:
             current["url"] = artifact.canonical_url
             current["datePublished"] = artifact.published_date
             current["dateModified"] = artifact.published_date
+            current["isPartOf"] = {"@id": _website_id(config)}
         if any(value == "FAQPage" for value in node_types):
             current["mainEntityOfPage"] = {"@type": "WebPage", "@id": artifact.canonical_url}
         normalized_graph.append(current)
@@ -176,12 +177,14 @@ def build_article_json_ld(artifact: "ReleaseArtifact", config: Config) -> str:
 
     normalized_graph.extend(
         [
+            _website_node(config, publisher),
             _organization_node(publisher),
             _person_node(author),
             _web_page_node(
                 name=artifact.title,
                 description=artifact.meta_description,
                 url=artifact.canonical_url,
+                config=config,
             ),
             _breadcrumb_node(
                 [
@@ -208,6 +211,7 @@ def build_generic_page_json_ld(
     publisher = publisher_profile_dict(config)
     page_url = absolute_url(config.site.origin, route)
     graph: list[dict[str, Any]] = [
+        _website_node(config, publisher),
         _organization_node(publisher),
         {
             "@type": page_type,
@@ -217,8 +221,9 @@ def build_generic_page_json_ld(
             "url": page_url,
             "mainEntityOfPage": page_url,
             "publisher": _organization_ref(publisher),
+            "isPartOf": {"@id": _website_id(config)},
         },
-        _web_page_node(name=name, description=description, url=page_url),
+        _web_page_node(name=name, description=description, url=page_url, config=config),
         _breadcrumb_node(breadcrumb_pairs, config),
     ]
     return json.dumps({"@context": "https://schema.org", "@graph": graph}, indent=2)
@@ -230,6 +235,7 @@ def build_author_page_json_ld(config: Config, posts: list[dict[str, Any]]) -> st
     page_url = author["url"]
     author_route = f"/authors/{author['slug']}"
     graph: list[dict[str, Any]] = [
+        _website_node(config, publisher),
         _organization_node(publisher),
         _person_node(author),
         {
@@ -240,6 +246,7 @@ def build_author_page_json_ld(config: Config, posts: list[dict[str, Any]]) -> st
             "url": page_url,
             "mainEntity": _person_ref(author),
             "publisher": _organization_ref(publisher),
+            "isPartOf": {"@id": _website_id(config)},
             "hasPart": [
                 {
                     "@type": "Article",
@@ -315,13 +322,35 @@ def _person_node(author: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _web_page_node(*, name: str, description: str, url: str) -> dict[str, Any]:
+def _website_id(config: Config) -> str:
+    return f"{config.site.origin.rstrip('/')}/#website"
+
+
+def _website_node(config: Config, publisher: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "@type": ["WebSite", "Blog"],
+        "@id": _website_id(config),
+        "name": "Folloze Insights",
+        "url": config.site.origin.rstrip("/") + "/",
+        "description": (
+            "Source-backed research, comparisons, definitions, and practical guides "
+            "for B2B account-based marketing and revenue teams."
+        ),
+        "publisher": _organization_ref(publisher),
+        "inLanguage": "en-US",
+    }
+
+
+def _web_page_node(
+    *, name: str, description: str, url: str, config: Config
+) -> dict[str, Any]:
     return {
         "@type": "WebPage",
         "@id": url,
         "name": name,
         "description": description,
         "url": url,
+        "isPartOf": {"@id": _website_id(config)},
     }
 
 

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import sys
+import threading
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -9,6 +11,8 @@ import pytest
 
 from citation_monitor import monitor as monitor_mod
 from citation_monitor import providers, report, variants
+from citation_monitor.contracts import LEGACY_SEMANTICS_VERSION, NATIVE_SEMANTICS_VERSION
+from citation_monitor.report import MonitorRunSummary
 from citation_monitor.storage import (
     PARSER_VERSION,
     CitationRow,
@@ -64,24 +68,33 @@ def _citation_row(
     source_urls: list[str] | None = None,
 ) -> CitationRow:
     mentioned = folloze_mentioned
+    cited = mentioned if folloze_cited is None else folloze_cited
+    urls = source_urls if source_urls is not None else (
+        ["https://www.folloze-blog.com/insights/example"] if cited else []
+    )
     return CitationRow(
         run_id=run_id,
         prompt_id=prompt_id,
         variant_text=variant_text,
         provider=provider,
-        response_text="Folloze is a strong fit. Source: https://www.folloze.com/insights/example",
+        response_text="Folloze is a strong fit.",
         folloze_mentioned=mentioned,
-        folloze_cited=mentioned if folloze_cited is None else folloze_cited,
-        folloze_citation_position=1 if mentioned else None,
+        folloze_cited=cited,
+        folloze_citation_position=1 if cited else None,
         branded=branded,
         competitors_mentioned=competitors_mentioned or [],
         confidence_flag="normal",
         sentiment_label=sentiment_label or ("positive" if mentioned else "neutral"),
-        source_urls=source_urls if source_urls is not None else (["https://www.folloze.com/insights/example"] if mentioned else []),
-        citation_probability=1.0 if mentioned else 0.0,
+        source_urls=urls,
+        citation_probability=1.0 if cited else 0.0,
         parser_version=PARSER_VERSION,
-        detection_method="regex",
+        detection_method="provider-native-metadata" if urls else "no-native-citation-metadata",
         checked_at="2026-04-01T10:00:00",
+        native_citations=[{"url": url, "owned": True} for url in urls],
+        raw_evidence={"native_citations": [{"url": url} for url in urls]},
+        evidence_checksum="sanitized-checksum" if urls else None,
+        grounded_response=bool(urls),
+        metric_semantics_version=NATIVE_SEMANTICS_VERSION,
     )
 
 
@@ -111,6 +124,58 @@ def test_init_db_creates_tables(tmp_path: Path) -> None:
         "citation_results",
         "competitor_sightings",
     } <= tables
+
+
+def test_schema_migration_preserves_historical_rows_as_legacy(tmp_path: Path) -> None:
+    db_path = tmp_path / "legacy.db"
+    legacy = sqlite3.connect(db_path)
+    legacy.execute(
+        """
+        CREATE TABLE citation_results (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_id INTEGER NOT NULL,
+            prompt_id TEXT NOT NULL,
+            variant_text TEXT NOT NULL,
+            provider TEXT NOT NULL,
+            response_text TEXT,
+            folloze_mentioned INTEGER NOT NULL DEFAULT 0,
+            folloze_cited INTEGER NOT NULL DEFAULT 0,
+            folloze_citation_position INTEGER,
+            branded INTEGER NOT NULL DEFAULT 0,
+            competitors_mentioned TEXT DEFAULT '[]',
+            confidence_flag TEXT DEFAULT 'normal',
+            sentiment_label TEXT NOT NULL DEFAULT 'neutral',
+            source_urls TEXT NOT NULL DEFAULT '[]',
+            citation_probability REAL DEFAULT 0.0,
+            parser_version TEXT NOT NULL DEFAULT 'regex-v1',
+            detection_method TEXT NOT NULL DEFAULT 'regex',
+            checked_at TEXT NOT NULL
+        )
+        """
+    )
+    legacy.execute(
+        """
+        INSERT INTO citation_results (
+            run_id, prompt_id, variant_text, provider, response_text,
+            folloze_mentioned, folloze_cited, checked_at
+        ) VALUES (1, 'legacy-prompt', 'legacy variant', 'perplexity',
+                  'Folloze was mentioned', 1, 1, '2026-07-01T00:00:00')
+        """
+    )
+    legacy.commit()
+    legacy.close()
+
+    conn = init_db(db_path)
+    row = conn.execute(
+        "SELECT folloze_cited, grounded_response, metric_semantics_version "
+        "FROM citation_results WHERE prompt_id = 'legacy-prompt'"
+    ).fetchone()
+    stats = get_run_citation_stats(conn, 1)
+
+    assert row == (1, 0, LEGACY_SEMANTICS_VERSION)
+    assert stats["brand_mentions"] == 1
+    assert stats["brand_citations"] == 0
+    assert stats["legacy_checks"] == 1
 
 
 def test_create_and_complete_run(tmp_path: Path) -> None:
@@ -147,7 +212,7 @@ def test_insert_citation_and_query(tmp_path: Path) -> None:
     assert row[2] == 1
     assert json.loads(row[3]) == ["mutiny"]
     assert row[4] == "positive"
-    assert json.loads(row[5]) == ["https://www.folloze.com/insights/example"]
+    assert json.loads(row[5]) == ["https://www.folloze-blog.com/insights/example"]
     assert stats["mentioned"] == 1
     assert stats["brand_visibility_score"] == pytest.approx(1.0)
     assert stats["citation_rate"] == pytest.approx(1.0)
@@ -213,6 +278,50 @@ def test_get_latest_incomplete_run(tmp_path: Path) -> None:
 
 def test_query_perplexity_folloze_mentioned(monkeypatch) -> None:
     monkeypatch.setattr(providers, "get_secret", lambda env_name: "token")
+    posted_payloads: list[dict] = []
+    tracked_events: list[dict | None] = []
+    fixture = json.loads(
+        (
+            Path(__file__).parent
+            / "fixtures"
+            / "citation_monitor"
+            / "perplexity_search_results.json"
+        ).read_text(encoding="utf-8")
+    )
+
+    def fake_post(*args, **kwargs) -> DummyResponse:
+        posted_payloads.append(kwargs["json"])
+        return DummyResponse(200, fixture)
+
+    monkeypatch.setattr(
+        providers.requests,
+        "post",
+        fake_post,
+    )
+    monkeypatch.setattr(providers, "append_event", lambda event: tracked_events.append(event))
+    result = providers.query_perplexity("best ai marketing platform")
+    assert result.folloze_mentioned is True
+    assert result.folloze_cited is True
+    assert result.folloze_citation_position == 1
+    assert "mutiny" in result.competitors_mentioned
+    assert result.sentiment_label == "positive"
+    assert result.source_urls == [
+        "https://www.folloze-blog.com/insights/individual-level-personalization",
+        "https://research.example.org/b2b-personalization",
+    ]
+    assert result.grounded_response is True
+    assert result.native_citations[0]["owned"] is True
+    assert result.raw_evidence["provider"] == "perplexity"
+    assert len(result.evidence_checksum or "") == 64
+    assert posted_payloads[0]["model"] == "sonar"
+    assert tracked_events[0]["source"] == "content_engine_citation_monitor"
+    assert tracked_events[0]["model"] == "sonar"
+    assert tracked_events[0]["unit"] == "usd"
+    assert tracked_events[0]["used_increment"] == 0.001
+
+
+def test_plain_text_mention_and_url_are_not_a_native_citation(monkeypatch) -> None:
+    monkeypatch.setattr(providers, "get_secret", lambda env_name: "token")
     monkeypatch.setattr(
         providers.requests,
         "post",
@@ -222,20 +331,21 @@ def test_query_perplexity_folloze_mentioned(monkeypatch) -> None:
                 "choices": [
                     {
                         "message": {
-                            "content": "Folloze is the strongest fit.\nSource: https://www.folloze.com/insights/example\nMutiny is also an option."
+                            "content": "Folloze: https://www.folloze-blog.com/insights/example"
                         }
                     }
                 ]
             },
         ),
     )
-    result = providers.query_perplexity("best ai marketing platform")
+
+    result = providers.query_perplexity("prompt")
+
     assert result.folloze_mentioned is True
-    assert result.folloze_cited is True
-    assert result.folloze_citation_position == 1
-    assert "mutiny" in result.competitors_mentioned
-    assert result.sentiment_label == "positive"
-    assert result.source_urls == ["https://www.folloze.com/insights/example"]
+    assert result.folloze_cited is False
+    assert result.folloze_citation_position is None
+    assert result.source_urls == []
+    assert result.grounded_response is False
 
 
 def test_query_perplexity_no_mention(monkeypatch) -> None:
@@ -256,6 +366,7 @@ def test_query_perplexity_no_mention(monkeypatch) -> None:
 
 def test_query_perplexity_rate_limit_retry(monkeypatch) -> None:
     monkeypatch.setattr(providers, "get_secret", lambda env_name: "token")
+    monkeypatch.setattr(providers, "append_error_event", lambda **kwargs: None)
     sleeps: list[float] = []
     responses = iter(
         [
@@ -275,6 +386,7 @@ def test_query_perplexity_rate_limit_retry(monkeypatch) -> None:
 
 def test_query_perplexity_auth_error(monkeypatch) -> None:
     monkeypatch.setattr(providers, "get_secret", lambda env_name: "token")
+    monkeypatch.setattr(providers, "append_error_event", lambda **kwargs: None)
     monkeypatch.setattr(providers.requests, "post", lambda *args, **kwargs: DummyResponse(401))
     with pytest.raises(providers.AuthError):
         providers.query_perplexity("best ai marketing platform")
@@ -301,6 +413,144 @@ def test_openai_gateway_fallback(monkeypatch) -> None:
     assert result.provider == "openai"
     assert result.folloze_mentioned is True
     assert result.sentiment_label == "positive"
+
+
+def test_gateway_profile_uses_profile_provider_and_analysis(monkeypatch) -> None:
+    calls: list[tuple[str, list[dict], int, float, int]] = []
+
+    class FakeGateway:
+        def __init__(self, profile: str):
+            self.profile = profile
+
+        def chat(self, messages, max_tokens: int, temperature: float, timeout: int) -> str:
+            calls.append((self.profile, messages, max_tokens, temperature, timeout))
+            return "Folloze is a strong choice. Mutiny is also mentioned. https://www.folloze.com/"
+
+    monkeypatch.setattr(providers, "hydrate_provider_env", lambda: None)
+    monkeypatch.setattr(providers, "LLMGateway", FakeGateway)
+
+    result = providers.query_gateway_profile(
+        "best ai marketing platform",
+        profile="anthropic",
+        provider_name="claude",
+    )
+
+    assert result.provider == "claude"
+    assert result.folloze_mentioned is True
+    assert result.folloze_cited is False
+    assert result.grounded_response is False
+    assert result.sentiment_label == "positive"
+    assert "mutiny" in result.competitors_mentioned
+    assert calls == [
+        (
+            "anthropic",
+            [{"role": "user", "content": "best ai marketing platform"}],
+            4096,
+            0.3,
+            providers.REQUEST_TIMEOUT,
+        )
+    ]
+
+
+def test_gateway_profile_exceptions_become_provider_error(monkeypatch) -> None:
+    class FakeGateway:
+        def __init__(self, profile: str):
+            self.profile = profile
+
+        def chat(self, messages, max_tokens: int, temperature: float, timeout: int) -> str:
+            raise RuntimeError("boom")
+
+    monkeypatch.setattr(providers, "hydrate_provider_env", lambda: None)
+    monkeypatch.setattr(providers, "LLMGateway", FakeGateway)
+
+    with pytest.raises(providers.ProviderError, match="gemini gateway failed: boom"):
+        providers.query_gateway_profile("prompt", profile="gemini", provider_name="gemini")
+
+
+def test_gateway_profile_auth_exceptions_become_auth_error(monkeypatch) -> None:
+    class FakeGateway:
+        def __init__(self, profile: str):
+            raise KeyError("AI_GEMINI_KEY")
+
+    monkeypatch.setattr(providers, "hydrate_provider_env", lambda: None)
+    monkeypatch.setattr(providers, "LLMGateway", FakeGateway)
+
+    with pytest.raises(providers.AuthError, match="gemini gateway auth failed"):
+        providers.query_gateway_profile("prompt", profile="gemini", provider_name="gemini")
+
+
+def test_gemini_gateway_wrapper(monkeypatch) -> None:
+    calls: list[tuple[str, str]] = []
+
+    def fake_gateway(prompt_text: str, *, profile: str, provider_name: str):
+        calls.append((profile, provider_name))
+        return providers.ProviderResult(
+            provider=provider_name,
+            response_text=prompt_text,
+            folloze_mentioned=False,
+            folloze_cited=False,
+            folloze_citation_position=None,
+            competitors_mentioned=[],
+            confidence_flag="normal",
+            sentiment_label="neutral",
+            source_urls=[],
+        )
+
+    monkeypatch.setattr(providers, "query_gateway_profile", fake_gateway)
+
+    assert providers.query_gemini_gateway("prompt").provider == "gemini"
+    assert calls == [("gemini", "gemini")]
+
+
+def test_query_claude_success(monkeypatch) -> None:
+    monkeypatch.setattr(providers, "get_secret", lambda env_name: "anthropic-token")
+    monkeypatch.setattr(
+        providers.requests,
+        "post",
+        lambda *args, **kwargs: DummyResponse(
+            200,
+            {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Folloze is a strong fit. Source: https://www.folloze.com/insights/example. Mutiny is another option.",
+                    }
+                ]
+            },
+        ),
+    )
+
+    result = providers.query_claude("best ai marketing platform")
+
+    assert result.provider == "claude"
+    assert result.folloze_mentioned is True
+    assert result.folloze_cited is False
+    assert "mutiny" in result.competitors_mentioned
+    assert result.source_urls == []
+
+
+def test_query_claude_missing_key_is_auth_error(monkeypatch) -> None:
+    monkeypatch.setattr(providers, "get_secret", lambda env_name: None)
+
+    with pytest.raises(providers.AuthError, match="ANTHROPIC_API_KEY not available"):
+        providers.query_claude("prompt")
+
+
+def test_provider_defaults_include_all_four() -> None:
+    monitor = monitor_mod.CitationMonitor(providers=None)
+
+    assert monitor.providers == ["perplexity", "openai", "claude", "gemini"]
+
+
+def test_provider_normalization_trims_and_dedupes() -> None:
+    monitor = monitor_mod.CitationMonitor(providers=["perplexity", "perplexity", " claude "])
+
+    assert monitor.providers == ["perplexity", "claude"]
+
+
+def test_provider_normalization_rejects_unknown() -> None:
+    with pytest.raises(ValueError, match="Unknown providers: nope"):
+        monitor_mod.CitationMonitor(providers=["perplexity", "nope"])
 
 
 def test_get_variants_uses_cache(tmp_path: Path, monkeypatch) -> None:
@@ -369,15 +619,24 @@ def test_monitor_run_stores_results(project_root: Path, monkeypatch) -> None:
 
     def fake_provider(variant_text: str):
         mentioned = "folloze" in variant_text.lower() or "alt" in variant_text
+        cited = "alt" in variant_text
         return SimpleNamespace(
             response_text=f"response for {variant_text}",
             folloze_mentioned=mentioned,
-            folloze_cited=mentioned,
-            folloze_citation_position=1 if mentioned else None,
+            folloze_cited=cited,
+            folloze_citation_position=1 if cited else None,
             competitors_mentioned=["mutiny"] if "alt" in variant_text else [],
             confidence_flag="normal",
             sentiment_label="positive" if mentioned else "neutral",
-            source_urls=["https://www.folloze.com/insights/example"] if "alt" in variant_text else [],
+            source_urls=["https://www.folloze-blog.com/insights/example"] if cited else [],
+            native_citations=(
+                [{"url": "https://www.folloze-blog.com/insights/example", "owned": True}]
+                if cited
+                else []
+            ),
+            raw_evidence={"fixture": True},
+            evidence_checksum="sanitized-checksum",
+            grounded_response=cited,
         )
 
     monkeypatch.setattr(monitor_mod, "PROVIDERS", {"perplexity": fake_provider})
@@ -392,8 +651,67 @@ def test_monitor_run_stores_results(project_root: Path, monkeypatch) -> None:
     assert competitor_count == 2
     assert summary.prompts_checked == 2
     assert summary.brand_visibility_score == pytest.approx(0.75)
-    assert summary.citation_rate == pytest.approx(0.75)
+    assert summary.citation_rate == pytest.approx(1.0)
+    assert summary.citation_numerator == 2
+    assert summary.citation_denominator == 2
     assert summary.failure_count == 0
+
+
+def test_monitor_queries_providers_concurrently_but_writes_in_parent(
+    project_root: Path,
+    monkeypatch,
+) -> None:
+    prompts_dir = project_root / "prompts"
+    prompts_dir.mkdir(exist_ok=True)
+    prompt = _prompt("t1-001")
+    (prompts_dir / "prompt_library.json").write_text(
+        json.dumps({"version": "1.0", "updated": "2026-04-01", "prompts": [prompt]}),
+        encoding="utf-8",
+    )
+
+    db_path = project_root / "data" / "citation_monitor.db"
+    barrier = threading.Barrier(2)
+    provider_threads: list[str] = []
+
+    monkeypatch.setattr(
+        monitor_mod,
+        "get_variants_for_prompt",
+        lambda conn, prompt, max_variants=5: [prompt["canonical_text"]],
+    )
+    monkeypatch.setattr(monitor_mod, "fire_alerts", lambda summary, config, conn=None: False)
+    monkeypatch.setattr(monitor_mod.time, "sleep", lambda value: None)
+
+    def fake_provider(variant_text: str):
+        provider_threads.append(threading.current_thread().name)
+        barrier.wait(timeout=2)
+        return SimpleNamespace(
+            response_text=f"response for {variant_text}",
+            folloze_mentioned=True,
+            folloze_cited=True,
+            folloze_citation_position=1,
+            competitors_mentioned=[],
+            confidence_flag="normal",
+            sentiment_label="positive",
+            source_urls=[],
+        )
+
+    monkeypatch.setattr(
+        monitor_mod,
+        "PROVIDERS",
+        {"perplexity": fake_provider, "gemini": fake_provider},
+    )
+    summary = monitor_mod.CitationMonitor(
+        db_path=db_path,
+        providers=["perplexity", "gemini"],
+    ).run()
+
+    conn = init_db(db_path)
+    rows = conn.execute(
+        "SELECT provider, COUNT(*) FROM citation_results GROUP BY provider ORDER BY provider"
+    ).fetchall()
+    assert rows == [("gemini", 1), ("perplexity", 1)]
+    assert len(set(provider_threads)) == 2
+    assert summary.prompts_checked == 1
 
 
 def test_monitor_resume_skips_checked(project_root: Path, monkeypatch) -> None:
@@ -481,6 +799,117 @@ def test_monitor_dry_run_skips_variant_generation(project_root: Path, monkeypatc
     assert summary.prompts_checked == 1
 
 
+def test_run_citation_monitor_writes_summary_json(tmp_path: Path, monkeypatch) -> None:
+    import scripts.run_citation_monitor as runner
+
+    summary = MonitorRunSummary(
+        run_date="2026-04-01",
+        prompts_checked=1,
+        brand_visibility_score=0.5,
+        citation_rate=0.5,
+        share_of_voice=0.5,
+        sentiment_score=1.0,
+        branded_prompt_visibility_score=0.5,
+        non_branded_prompt_visibility_score=0.0,
+        tier_breakdown={"tier1": 0.5},
+        cluster_breakdown={"ai-campaigns": 0.5},
+        gaps=[],
+        competitor_leading=[],
+        source_attribution=[{"url": "https://www.folloze.com/", "count": 1}],
+        alerts=[],
+        incomplete=False,
+        failure_count=0,
+    )
+    captured: dict[str, object] = {}
+
+    class FakeMonitor:
+        def __init__(self, db_path: Path, providers: list[str], dry_run: bool):
+            captured["db_path"] = db_path
+            captured["providers"] = providers
+            captured["dry_run"] = dry_run
+
+        def run(self, resume: bool = False) -> MonitorRunSummary:
+            captured["resume"] = resume
+            return summary
+
+    summary_out = tmp_path / "nested" / "summary.json"
+    monkeypatch.setattr(runner, "CitationMonitor", FakeMonitor)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_citation_monitor.py",
+            "--dry-run",
+            "--providers",
+            " perplexity,openai,openai, claude ",
+            "--db-path",
+            str(tmp_path / "citation.db"),
+            "--summary-out",
+            str(summary_out),
+        ],
+    )
+
+    assert runner.main() == 0
+    assert captured["providers"] == ["perplexity", "openai", "claude"]
+    assert captured["dry_run"] is True
+    assert captured["resume"] is False
+    assert json.loads(summary_out.read_text(encoding="utf-8")) == {
+        "alerts": [],
+        "brand_visibility_score": 0.5,
+        "branded_prompt_visibility_score": 0.5,
+        "citation_denominator": 0,
+        "citation_numerator": 0,
+        "citation_rate": 0.5,
+        "citation_semantics": "provider-native-v2",
+        "cluster_breakdown": {"ai-campaigns": 0.5},
+        "competitor_leading": [],
+        "coverage_gaps": [],
+        "failure_count": 0,
+        "gaps": [],
+        "grounded_checks": 0,
+        "incomplete": False,
+        "legacy_check_count": 0,
+        "non_branded_citation_rate": 0.0,
+        "non_branded_prompt_visibility_score": 0.0,
+        "prompts_checked": 1,
+        "run_date": "2026-04-01",
+        "sentiment_score": 1.0,
+        "share_of_voice": 0.5,
+        "source_attribution": [{"count": 1, "url": "https://www.folloze.com/"}],
+        "source_attribution_rate": 0.0,
+        "tier_breakdown": {"tier1": 0.5},
+    }
+
+
+def test_run_citation_monitor_does_not_write_summary_on_failure(tmp_path: Path, monkeypatch) -> None:
+    import scripts.run_citation_monitor as runner
+
+    class FakeMonitor:
+        def __init__(self, db_path: Path, providers: list[str], dry_run: bool):
+            pass
+
+        def run(self, resume: bool = False) -> MonitorRunSummary:
+            raise RuntimeError("failed")
+
+    summary_out = tmp_path / "summary.json"
+    monkeypatch.setattr(runner, "CitationMonitor", FakeMonitor)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "run_citation_monitor.py",
+            "--dry-run",
+            "--db-path",
+            str(tmp_path / "citation.db"),
+            "--summary-out",
+            str(summary_out),
+        ],
+    )
+
+    assert runner.main() == 1
+    assert not summary_out.exists()
+
+
 def test_build_summary_from_real_db(tmp_path: Path) -> None:
     conn = init_db(tmp_path / "citation.db")
     run_id = create_run(conn, "2026-04-01")
@@ -513,18 +942,22 @@ def test_build_summary_from_real_db(tmp_path: Path) -> None:
     summary = report.build_summary(conn, run_id, "2026-04-01", prompts, failure_count=2)
     assert summary.prompts_checked == 3
     assert summary.brand_visibility_score == pytest.approx(2 / 3)
-    assert summary.citation_rate == pytest.approx(2 / 3)
+    assert summary.citation_rate == pytest.approx(1.0)
+    assert summary.citation_numerator == 2
+    assert summary.citation_denominator == 2
     assert summary.branded_prompt_visibility_score == pytest.approx(1.0)
     assert summary.non_branded_prompt_visibility_score == pytest.approx(0.0)
     assert summary.tier_breakdown["tier1"] == pytest.approx(1.0)
     assert summary.cluster_breakdown["competitive"] == pytest.approx(0.0)
-    assert "t3-001" in summary.gaps
+    assert summary.gaps == []
+    assert summary.coverage_gaps == ["t2-001", "t3-001"]
+    assert "MISSING NATIVE EVIDENCE: t3-001" in summary.alerts
     assert summary.competitor_leading[0] == {
         "prompt_id": "t2-001",
         "competitor": "mutiny",
         "count": 6,
     }
-    assert summary.source_attribution[0]["url"] == "https://www.folloze.com/insights/example"
+    assert summary.source_attribution[0]["url"] == "https://www.folloze-blog.com/insights/example"
     assert "COMPETITOR LEADING: mutiny" in summary.alerts
     assert "NON-BRANDED VISIBILITY GAP" in summary.alerts
     assert summary.incomplete is True
@@ -593,6 +1026,7 @@ def test_fire_alerts_sends_weekly_rollup_on_monday(monkeypatch, tmp_path: Path) 
                 "gaps": ["t1-001"],
                 "competitor_leading": [{"prompt_id": "t1-001", "competitor": "mutiny", "count": 6}],
                 "source_attribution": [{"url": "https://www.folloze.com/insights/example", "count": 2}],
+                "citation_semantics": NATIVE_SEMANTICS_VERSION,
                 "alerts": ["LOW SHARE OF VOICE"],
                 "incomplete": False,
                 "failure_count": 0,
@@ -622,6 +1056,7 @@ def test_fire_alerts_sends_weekly_rollup_on_monday(monkeypatch, tmp_path: Path) 
                 "gaps": ["t1-001"],
                 "competitor_leading": [{"prompt_id": "t1-001", "competitor": "mutiny", "count": 7}],
                 "source_attribution": [{"url": "https://www.folloze.com/insights/example", "count": 3}],
+                "citation_semantics": NATIVE_SEMANTICS_VERSION,
                 "alerts": ["LOW SHARE OF VOICE", "NON-BRANDED VISIBILITY GAP"],
                 "incomplete": False,
                 "failure_count": 0,
@@ -661,9 +1096,9 @@ def test_fire_alerts_sends_weekly_rollup_on_monday(monkeypatch, tmp_path: Path) 
     assert "Daily Snapshots" in body
     assert "linear-gradient" in body
     assert "Generated for email-safe rendering" in body
-    assert "Average Brand Visibility Score" in body
+    assert "Average Brand Mention Rate" in body
     assert "26%" in body
-    assert "Average Citation Rate" in body
+    assert "Average Linked Citation Rate" in body
     assert "11%" in body
     assert "Average Share of Voice" in body
     assert "16%" in body

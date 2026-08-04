@@ -4,7 +4,7 @@ import json
 import logging
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -14,6 +14,7 @@ from llm_gateway import LLMGateway
 
 from config import Config
 from content_calendar import Topic
+from evidence import SourceCandidate, deduplicate_sources, source_candidate_from_result
 from exceptions import ProviderUnavailableError, RateLimitError
 from runtime_secrets import get_secret, hydrate_provider_env
 
@@ -54,6 +55,7 @@ class ResearchContext:
     brand_context: str
     degraded: bool = False
     degradation_reason: str = ""
+    source_candidates: list[SourceCandidate] = field(default_factory=list)
 
 
 def enrich(topic: Topic, config: Config) -> ResearchContext:
@@ -67,12 +69,26 @@ def enrich(topic: Topic, config: Config) -> ResearchContext:
         degraded_reasons.append(f"Brave degraded: {exc}")
 
     perplexity_summary = ""
+    perplexity_sources: list[SourceCandidate] = []
     try:
-        perplexity_summary = _perplexity_summary(topic.title)
+        perplexity_summary, perplexity_sources = _perplexity_research(topic.title)
     except (requests.RequestException, RateLimitError) as exc:
         degraded_reasons.append(f"Perplexity degraded: {exc}")
 
     gemini_brief = _gemini_brief(topic, brand_context, brave_results, perplexity_summary, config)
+
+    brave_sources = [
+        candidate
+        for result in brave_results
+        if (
+            candidate := source_candidate_from_result(
+                title=result.get("title", ""),
+                url=result.get("url", ""),
+                description=result.get("description", ""),
+                origin="brave",
+            )
+        )
+    ]
 
     return ResearchContext(
         topic=topic,
@@ -82,6 +98,7 @@ def enrich(topic: Topic, config: Config) -> ResearchContext:
         brand_context=brand_context,
         degraded=bool(degraded_reasons),
         degradation_reason="; ".join(degraded_reasons),
+        source_candidates=deduplicate_sources([*brave_sources, *perplexity_sources]),
     )
 
 
@@ -114,6 +131,11 @@ def _brave_search(keyword: str) -> list[dict[str, str]]:
 
 
 def _perplexity_summary(topic_title: str) -> str:
+    summary, _ = _perplexity_research(topic_title)
+    return summary
+
+
+def _perplexity_research(topic_title: str) -> tuple[str, list[SourceCandidate]]:
     api_key = get_secret("PERPLEXITY_API_KEY")
     if not api_key:
         raise requests.RequestException("PERPLEXITY_API_KEY not set")
@@ -136,9 +158,30 @@ def _perplexity_summary(topic_title: str) -> str:
         raise RateLimitError("Perplexity rate limit")
     response.raise_for_status()
     payload = response.json()
-    append_event(build_perplexity_usage(payload))
+    append_event(build_perplexity_usage(payload, source="content_engine_research"))
     content = payload["choices"][0]["message"]["content"]
-    return _sanitize_text(content)
+    sources: list[SourceCandidate] = []
+    for index, raw_url in enumerate(payload.get("citations", []), start=1):
+        candidate = source_candidate_from_result(
+            title=f"Perplexity citation {index}",
+            url=str(raw_url),
+            origin="perplexity_citation",
+        )
+        if candidate:
+            sources.append(candidate)
+    for item in payload.get("search_results", []):
+        if not isinstance(item, dict):
+            continue
+        candidate = source_candidate_from_result(
+            title=str(item.get("title", "")),
+            url=str(item.get("url", "")),
+            origin="perplexity_search_result",
+            description=str(item.get("snippet", item.get("description", ""))),
+            published_at=str(item.get("date", item.get("published_at", ""))),
+        )
+        if candidate:
+            sources.append(candidate)
+    return _sanitize_text(content), deduplicate_sources(sources)
 
 
 def _gemini_brief(

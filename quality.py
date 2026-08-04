@@ -16,6 +16,7 @@ from brand_rules import (
     PROOF_POINTS,
 )
 from config import Config
+from evidence import EvidenceReport
 from generator import GeneratedContent
 from optimizer import OptimizedContent
 
@@ -52,9 +53,17 @@ class QualityResult:
     geo_score: int = 0
     geo_failures: list[str] | None = None
     seo_warnings: list[str] | None = None
+    evidence_status: str | None = None
+    evidence_score: int | None = None
+    claim_source_matrix: list[dict[str, object]] | None = None
 
 
-def gate(content: OptimizedContent, config: Config, brand_context: str) -> QualityResult:
+def gate(
+    content: OptimizedContent,
+    config: Config,
+    brand_context: str,
+    evidence_report: EvidenceReport | None = None,
+) -> QualityResult:
     min_words = config.content.min_words_by_type[content.generated.content_type]
 
     # AEO checks (existing 10, max 100)
@@ -79,6 +88,7 @@ def gate(content: OptimizedContent, config: Config, brand_context: str) -> Quali
         reasons.append(f"{label}: {'pass' if failure is None else 'fail'}")
         if failure:
             failures.append(failure)
+    aeo_score = max(0, min(100, aeo_score))
 
     # GEO checks (new 10, max 100)
     geo_checks = [
@@ -101,6 +111,7 @@ def gate(content: OptimizedContent, config: Config, brand_context: str) -> Quali
         reasons.append(f"geo_{label}: {'pass' if failure is None else 'fail'}")
         if failure:
             geo_failures.append(failure)
+    geo_score = max(0, min(100, geo_score))
 
     # Hard GEO failures block regardless of score
     hard_geo_failures = [f for f in geo_failures if any(tag in f for tag in ("[HARD]",))]
@@ -120,12 +131,44 @@ def gate(content: OptimizedContent, config: Config, brand_context: str) -> Quali
     brand_fails = _brand_failures(content.generated, content.body_html)
     all_failures.extend(brand_fails)
 
-    composite = (aeo_score + geo_score) // 2
+    evidence_blocked = False
+    claim_source_matrix: list[dict[str, object]] | None = None
+    if evidence_report is not None:
+        reasons.append(f"evidence: {evidence_report.status}")
+        # Release requires a fully traceable evidence pack. A material claim
+        # linked to an unknown or unapproved source is still not release-ready.
+        evidence_blocked = evidence_report.status != "ready"
+        if evidence_blocked:
+            if evidence_report.unsupported_material_claims:
+                all_failures.extend(
+                    f"[HARD] Unsupported material claim: {claim}"
+                    for claim in evidence_report.unsupported_material_claims
+                )
+            else:
+                all_failures.append(
+                    "[HARD] Evidence sources are not in the approved research pack"
+                )
+        claim_source_matrix = [
+            {
+                "claim_id": item.claim_id,
+                "claim": item.claim,
+                "material": item.material,
+                "source_urls": list(item.source_urls),
+                "status": item.status,
+                "rationale": item.rationale,
+            }
+            for item in evidence_report.claim_source_matrix
+        ]
+
+    composite = max(0, min(100, (aeo_score + geo_score) // 2))
+    if evidence_report is not None:
+        composite = min(composite, max(0, min(100, evidence_report.score)))
     passed = (
         aeo_score >= config.pipeline.quality_threshold
         and geo_score >= config.pipeline.geo_quality_threshold
         and not brand_fails
         and not hard_geo_failures
+        and not evidence_blocked
     )
     return QualityResult(
         passed=passed,
@@ -136,6 +179,9 @@ def gate(content: OptimizedContent, config: Config, brand_context: str) -> Quali
         geo_score=geo_score,
         geo_failures=geo_failures,
         seo_warnings=seo_warnings,
+        evidence_status=evidence_report.status if evidence_report else None,
+        evidence_score=evidence_report.score if evidence_report else None,
+        claim_source_matrix=claim_source_matrix,
     )
 
 

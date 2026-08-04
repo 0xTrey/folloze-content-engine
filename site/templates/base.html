@@ -8,6 +8,18 @@
     <link rel="canonical" href="{{ canonical_url }}">
     <link rel="alternate" type="application/rss+xml" title="Folloze Insights RSS" href="/rss.xml">
     <link rel="stylesheet" href="/styles.css">
+    {% if ga4_measurement_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga4_measurement_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ ga4_measurement_id }}', {
+        'page_location': window.location.href,
+        'page_title': document.title
+      });
+    </script>
+    {% endif %}
     {% for block in json_ld_blocks %}
     <script type="application/ld+json">{{ block | safe }}</script>
     {% endfor %}
@@ -22,6 +34,7 @@
         <nav class="site-nav">
           <a href="/">Home</a>
           <a href="/blog">Blog</a>
+          <a href="/topics/personalization">Topics</a>
           <a href="/about">About</a>
           <a href="/editorial-policy">Editorial Policy</a>
           <a href="https://www.folloze.com" rel="noreferrer">Folloze.com</a>
@@ -34,12 +47,15 @@
     </main>
     <footer class="site-footer">
       <div class="shell site-footer__inner">
-        <p>&copy; 2026 <a href="https://www.folloze.com" rel="noreferrer">Folloze</a> &mdash; AI Orchestration Platform for B2B Teams</p>
+        <p>&copy; 2026 <a href="https://www.folloze.com" rel="noreferrer">Folloze</a> &mdash; Helping B2B teams target and convert key accounts</p>
         <nav class="footer-nav">
           <a href="/blog">Blog</a>
           <a href="/authors/trey-harnden">Author</a>
           <a href="/about">About</a>
           <a href="/editorial-policy">Editorial Policy</a>
+          <a href="/sourcing-methodology">Sourcing</a>
+          <a href="/corrections">Corrections</a>
+          <a href="/commercial-disclosure">Disclosure</a>
           <a href="https://www.folloze.com/platform/overview" rel="noreferrer">Platform</a>
           <a href="https://www.folloze.com/request-demo" rel="noreferrer">Book a demo</a>
         </nav>

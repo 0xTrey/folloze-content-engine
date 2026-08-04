@@ -27,6 +27,7 @@ from content_calendar import (
     mark_skipped,
     slugify,
 )
+from evidence import build_evidence_report
 from exceptions import (
     CalendarExhaustedError,
     ContentEngineError,
@@ -37,6 +38,7 @@ from exceptions import (
 from generator import generate, regenerate_for_quality
 from notify import send_error, send_release_ready
 from optimizer import optimize
+from pre_publish_llm import PrePublishLLMResult, run_pre_publish_llm_test
 from quality import gate
 from research import enrich
 from verify import check_preview_file
@@ -60,6 +62,8 @@ def main() -> int:
     research_context = None
     quality_result = None
     artifact = None
+    pre_publish_result = None
+    evidence_report = None
     published_url = ""
     status = "started"
     lock_acquired = False
@@ -128,10 +132,21 @@ def main() -> int:
             )
             (run_dir / "optimized-content.html").write_text(optimized_content.body_html)
 
+            evidence_report = build_evidence_report(
+                optimized_content.body_html,
+                research_context.source_candidates,
+            )
+            _write_json(run_dir / "evidence-report.json", evidence_report.to_dict())
+
             quality_result = _time_stage(
                 stage_timings,
                 quality_stage,
-                lambda: gate(optimized_content, config, research_context.brand_context),
+                lambda: gate(
+                    optimized_content,
+                    config,
+                    research_context.brand_context,
+                    evidence_report=evidence_report,
+                ),
                 run_dir,
                 run_id,
             )
@@ -154,6 +169,14 @@ def main() -> int:
                 continue
             raise ValidationError("; ".join(quality_result.failures) or "Quality gate failed")
 
+        if config.pipeline.pre_publish_llm_test:
+            pre_publish_result = _run_pre_publish_llm_test_nonfatal(
+                topic,
+                stage_timings,
+                run_dir,
+                run_id,
+            )
+
         artifact = _time_stage(
             stage_timings,
             "write_release_artifact",
@@ -164,6 +187,7 @@ def main() -> int:
                 config,
                 run_dir,
                 run_id,
+                evidence_report=evidence_report,
             ),
             run_dir,
             run_id,
@@ -178,7 +202,14 @@ def main() -> int:
 
         if not args.dry_run:
             if config.delivery.release_mode == "manual":
-                send_release_ready(topic, artifact, quality_result, run_dir, config)
+                send_release_ready(
+                    topic,
+                    artifact,
+                    quality_result,
+                    run_dir,
+                    config,
+                    pre_publish_result=pre_publish_result,
+                )
             if args.topic is None:
                 mark_release_ready(
                     Path("content/calendar.yaml"),
@@ -242,6 +273,12 @@ def main() -> int:
                     research_context.degradation_reason if research_context else ""
                 ),
                 "release_artifact": str(run_dir / "release-artifact.json") if artifact else None,
+                "evidence_report": (
+                    str(run_dir / "evidence-report.json") if evidence_report else None
+                ),
+                "pre_publish_llm_test": (
+                    str(run_dir / "pre-publish-llm-test.json") if pre_publish_result else None
+                ),
                 "preview_file": str(run_dir / "rendered-preview.html") if artifact else None,
                 "events_file": str(run_dir / "run-events.jsonl"),
             },
@@ -469,6 +506,44 @@ def _stage_name(initial_stage: str, repair_stage: str, quality_attempt: int) -> 
     if quality_attempt == 1:
         return repair_stage
     return f"{repair_stage}_{quality_attempt}"
+
+
+def _run_pre_publish_llm_test_nonfatal(
+    topic: Topic,
+    stage_timings: dict[str, float],
+    run_dir: Path,
+    run_id: str,
+) -> PrePublishLLMResult:
+    try:
+        result = _time_stage(
+            stage_timings,
+            "pre_publish_llm_test",
+            lambda: run_pre_publish_llm_test(topic),
+            run_dir,
+            run_id,
+        )
+    except Exception as exc:
+        LOGGER.exception("Unexpected pre-publish LLM test failure; continuing degraded")
+        keyword = topic.keywords[0].strip() if topic.keywords and topic.keywords[0].strip() else topic.title
+        query = (
+            f"For the query '{keyword}', what would a B2B marketing leader currently learn? "
+            "Name relevant vendors if appropriate, cite sources when possible, and be concise."
+        )
+        result = PrePublishLLMResult(
+            provider="perplexity",
+            keyword=keyword,
+            query=query,
+            response_excerpt="",
+            folloze_mentioned=False,
+            competitors_mentioned=[],
+            source_urls=[],
+            recommendation="unknown",
+            checked_at=datetime.now().astimezone().isoformat(),
+            degraded=True,
+            error=f"{type(exc).__name__}: {exc}",
+        )
+    _write_json(run_dir / "pre-publish-llm-test.json", result.to_dict())
+    return result
 
 
 def _write_json(path: Path, payload: dict) -> None:
