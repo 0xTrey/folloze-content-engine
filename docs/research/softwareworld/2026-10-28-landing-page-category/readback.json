@@ -1,0 +1,213 @@
+{
+  "verifiedAt": "2026-10-28T16:32:50.969Z",
+  "listingId": 1280,
+  "categoryId": 83,
+  "publicProfile": "https://www.softwareworld.co/software/folloze-reviews/#features",
+  "directory": "https://www.softwareworld.co/top-landing-page-software/",
+  "landingDescription": "Folloze helps B2B marketers build and host personalized landing pages for account-based campaigns. Create branded pages and microsites without coding, reuse approved templates and content, and tailor messaging and calls to action to available account, persona, and behavioral context. AI-assisted writing helps teams refine page content. First-party account, contact, and content engagement insights, connected through configured CRM, marketing automation, and ABM integrations, help teams assess buyer interest and plan relevant follow-up.",
+  "landingFeatures": [
+    {
+      "checked": true,
+      "id": "feature_83_2990",
+      "label": "Customer Segmentation"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2991",
+      "label": "Alerts/Notifications"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2992",
+      "label": "Engagement Tracking"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2993",
+      "label": "Publishing Options"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2994",
+      "label": "Template Management"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2995",
+      "label": "Web Forms"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2996",
+      "label": "Widgets"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2997",
+      "label": "SEO Management"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2998",
+      "label": "Drag & Drop"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_2999",
+      "label": "Content Management"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3000",
+      "label": "Email Marketing"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3001",
+      "label": "Campaign Segmentation"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3002",
+      "label": "Multi-Channel Marketing"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3003",
+      "label": "Auto-Responders"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3004",
+      "label": "Responsive Web Design"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3005",
+      "label": "Social Media Integration"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3006",
+      "label": "Lead Management"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3007",
+      "label": "Design Management"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3008",
+      "label": "AB Testing"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3009",
+      "label": "CRM"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3010",
+      "label": "WYSIWYG Editor"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3011",
+      "label": "Campaign Management"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3012",
+      "label": "Lead Capture"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3013",
+      "label": "Forms Management"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3014",
+      "label": "Contact Management"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3015",
+      "label": "Lead Generation"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3016",
+      "label": "Website Management"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3017",
+      "label": "Event Triggered Actions"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3018",
+      "label": "Form Builder"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3019",
+      "label": "Conversion Tracking"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_3020",
+      "label": "Media Library"
+    },
+    {
+      "checked": true,
+      "id": "feature_83_16400",
+      "label": "Artificial Intelligence"
+    }
+  ],
+  "descriptionExact": true,
+  "otherDescriptionsUnchanged": true,
+  "changedFeatures": [
+    {
+      "checked": false,
+      "id": "selectAll_83",
+      "name": ""
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3003",
+      "name": "features[83][3003]"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3006",
+      "name": "features[83][3006]"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3008",
+      "name": "features[83][3008]"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3009",
+      "name": "features[83][3009]"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3014",
+      "name": "features[83][3014]"
+    },
+    {
+      "checked": false,
+      "id": "feature_83_3017",
+      "name": "features[83][3017]"
+    }
+  ],
+  "selectedFeatureCount": 26,
+  "directorySearch": "Folloze",
+  "directoryMatchingProducts": 1,
+  "proof": "Live public profile expanded category and live directory search showed saved description and 26 selected features."
+}

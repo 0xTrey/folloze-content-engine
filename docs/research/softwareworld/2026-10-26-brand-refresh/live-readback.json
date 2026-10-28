@@ -1,0 +1,33 @@
+{
+  "verified_at": "2026-10-26T22:11:21.898Z",
+  "listing_url": "https://www.softwareworld.co/software/folloze-reviews/",
+  "title": "Folloze Reviews Oct 2026: Pricing & Features | SoftwareWorld",
+  "logo": {
+    "complete": true,
+    "height": 800,
+    "url": "https://www.softwareworld.co/assets/software/logo/folloze1.png",
+    "width": 800
+  },
+  "gallery": [
+    {
+      "complete": true,
+      "height": 1002,
+      "url": "https://www.softwareworld.co/assets/software/media/folloze-4.jpg",
+      "width": 2000
+    },
+    {
+      "complete": true,
+      "height": 1002,
+      "url": "https://www.softwareworld.co/assets/software/media/folloze-5.jpg",
+      "width": 2000
+    },
+    {
+      "complete": true,
+      "height": 1002,
+      "url": "https://www.softwareworld.co/assets/software/media/folloze-6.jpg",
+      "width": 2000
+    }
+  ],
+  "media_kind": "Official current Folloze product illustrations, not literal UI screenshots",
+  "logo_upload_method": "Chrome native file picker, followed by Save & Next; hosted logo path changed from folloze.png to folloze1.png."
+}

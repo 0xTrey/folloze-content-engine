@@ -1,0 +1,49 @@
+{
+  "observed_at": "2026-10-26T22:03:16.502Z",
+  "source_page": "https://www.folloze.com/",
+  "listing": "https://www.softwareworld.co/software/folloze-reviews/",
+  "conversion": "Format conversion only; logo rasterized on a white square canvas with proportional scaling and clear space; visual content unchanged.",
+  "media_note": "These are official current website product illustrations, not literal UI screenshots. Captions disclose illustrative status and example data.",
+  "assets": [
+    {
+      "source": "1f968a16f8490998.svg",
+      "file": "folloze-current-logo.png",
+      "role": "logo",
+      "source_url": "https://cdn.prod.website-files.com/6464087fdf877a12a8bd4cd6/6464087fdf877a12a8bd4d26_folloze-logo.svg",
+      "bytes": 17811,
+      "width": 800,
+      "height": 800,
+      "sha256": "2bf9bf0ece8250dd891014696611e6fa56a3e3173aec2cf2d4fd0aeced9644f3"
+    },
+    {
+      "source": "3cbc39b9bacb6b86.webp",
+      "file": "folloze-build.jpg",
+      "role": "Build product illustration",
+      "source_url": "https://cdn.prod.website-files.com/6464087fdf877a12a8bd4cd6/6a29ee9e50e43d6ae5db6abb_Campaigns%20That%20Practically%20Build%20Themselves-p-2000.webp",
+      "bytes": 111635,
+      "width": 2000,
+      "height": 1002,
+      "sha256": "fd31d2cc55017e7195275fb202101eb0b32ebf64a1096d5408a26dff136db26b"
+    },
+    {
+      "source": "b496427d09ffc28d.webp",
+      "file": "folloze-activate.jpg",
+      "role": "Activate product illustration",
+      "source_url": "https://cdn.prod.website-files.com/6464087fdf877a12a8bd4cd6/6a29ee9e3160485c36340d68_Personalizes%20Content%20to%20Buyer%20Behavior-p-2000.webp",
+      "bytes": 74090,
+      "width": 2000,
+      "height": 1002,
+      "sha256": "a05be2c33ef7a2eb76f105a209d22afb33a77b1abce90642d77b2abd6d8d1d53"
+    },
+    {
+      "source": "d3c49d6cdbe6b9f8.webp",
+      "file": "folloze-signal.jpg",
+      "role": "Signal product illustration",
+      "source_url": "https://cdn.prod.website-files.com/6464087fdf877a12a8bd4cd6/6a29ee9eeeb44c54734b535a_Clarity%20for%20Marketing.%20Speed%20for%20Sales.-p-2000.webp",
+      "bytes": 63763,
+      "width": 2000,
+      "height": 1002,
+      "sha256": "7dd4b82dc23d29c75d6f5a5a2f254dff545333e958b29719aa4055f3f571be2d"
+    }
+  ]
+}
